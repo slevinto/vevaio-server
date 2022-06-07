@@ -2,7 +2,7 @@ import express from 'express';
 import {router} from './route.js';
 
 const app = express();
-const port = 3000;
+const port = 9000;
 
 app.set('view engine', 'pug');
 app.set('views', './src/views');
