@@ -6,7 +6,7 @@ const port = process.env.PORT;
 
 app.set('view engine', 'pug');
 app.set('views', './src/views');
-
+console.log( 'wait for event...');
 app.use('/', router);
 
 app.post( '/', ( req, res ) => {
