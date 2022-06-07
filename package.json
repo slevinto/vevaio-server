@@ -1,0 +1,31 @@
+{
+  "name": "covid19-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.4",
+    "esm": "^3.2.25",
+    "express": "^4.17.1",
+    "pug": "^3.0.2"
+  },
+  "plugins": [
+    "import"
+  ],
+  "rules": {
+    "import/no-unresolved": 2,
+    "import/no-commonjs": 2,
+    "import/extensions": [
+      2,
+      "ignorePackages"
+    ]
+  }
+}
