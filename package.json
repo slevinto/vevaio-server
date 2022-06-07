@@ -1,5 +1,5 @@
 {
-  "name": "covid19-tracker",
+  "name": "vevaio-server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -27,5 +27,8 @@
       2,
       "ignorePackages"
     ]
+  },
+  "engines": {
+    "node": "16.x"
   }
 }
