@@ -9,7 +9,7 @@ app.set('views', './src/views');
 console.log( 'wait for event...');
 app.use('/', router);
 app.use(express.json());
-
+app.use(express.urlencoded());
 app.post( '/', ( req, res ) => {
     console.log( 'received webhook', req.body );
     res.sendStatus( 200 );
