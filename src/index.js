@@ -8,6 +8,7 @@ app.set('view engine', 'pug');
 app.set('views', './src/views');
 console.log( 'wait for event...');
 app.use('/', router);
+app.use(express.json());
 
 app.post( '/', ( req, res ) => {
     console.log( 'received webhook', req.body );
