@@ -12,6 +12,11 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.post( '/', ( req, res ) => {
     console.log( 'received webhook', req.body );
+    console.log(req.body)
+    console.log('type of req.body: %s', typeof req.body)
+    console.log('type of req.body.dailyDynamicValueTypes: %s', typeof req.body.dailyDynamicValueTypes)
+    console.log('is req.body.dailyDynamicValueTypes an array?: %s', Array.isArray(req.body.dailyDynamicValueTypes))
+    console.log('type of first array element: %s', typeof req.body.dailyDynamicValueTypes[0])
     res.sendStatus( 200 );
 })
 
