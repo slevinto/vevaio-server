@@ -19,22 +19,19 @@ app.post( '/', ( req, res ) => {
         url: 'https://api.und-gesund.de/v5/dynamicEpochValues',
         data: {
             authenticationToken: 'ae664cd0264a712251117d5d12bd8281',
-            startTimestamp: '2022-06-09T00:00:00+01:00',
-            endTimestamp: '2022-06-09T19:00:00+01:00',
             startTimestampUnix: '1654732800000',
             endTimestampUnix: '1654801200000',
             dataSources: '3',
             valueTypes: '1000,1200',
+            detailed: 'true',
+            displayTypeName:'true',
+            displayPartnerUserID='true'
         },
-        /*auth:
-        {
-            username: 'vevaio-api',
-            password: 'TNx8c9w5sZvwXqJh'
-        },*/
         headers: {
             'Authorization': 'Basic dmV2YWlvLWFwaTpUTng4Yzl3NXNadndYcUpo',
             'Content-Type': 'application/x-www-form-urlencoded',
-            'AppAuthorization': 'Basic eEhiRFQyN1hmc3duNlk0SjpqdGdGd2FjQzlERlhKd0dhQlpuWDNLTmdiWWc1SlNZZlo1dmY3Wnd4RGpER2tnRUdwN1JaN1c0SFgzMlJwNGFm'
+            'AppAuthorization': 'Basic eEhiRFQyN1hmc3duNlk0SjpqdGdGd2FjQzlERlhKd0dhQlpuWDNLTmdiWWc1SlNZZlo1dmY3Wnd4RGpER2tnRUdwN1JaN1c0SFgzMlJwNGFm',
+            'appID': 'xHbDT27Xfswn6Y4J'
         }
 
       }).then((res) => {
