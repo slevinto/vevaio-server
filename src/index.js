@@ -28,7 +28,7 @@ app.post( '/', ( req, res ) => {
         {
             headers: {
                 'Authorization': 'Basic dmV2YWlvLWFwaTpUTng4Yzl3NXNadndYcUpo',
-                'Content-Type': 'application/x-www-form-urlencoded, application/json',
+                'Content-Type': 'application/x-www-form-urlencoded',
                 'AppAuthorization': 'Basic eEhiRFQyN1hmc3duNlk0SjpqdGdGd2FjQzlERlhKd0dhQlpuWDNLTmdiWWc1SlNZZlo1dmY3Wnd4RGpER2tnRUdwN1JaN1c0SFgzMlJwNGFm'
             }
         }).then((res) => {
