@@ -13,11 +13,11 @@ app.use('/', router);
 app.use(express.json());
 app.use(express.urlencoded());
 const data = {
-            authenticationToken: 'ae664cd0264a712251117d5d12bd8281',
+            authenticationToken: '2a94895e176b0116926cc95d011f1085',
             startTimestampUnix: '1654732800000',
             endTimestampUnix: '1654801200000',
             dataSources: '3',
-            valueTypes: '1000,1200',
+            valueTypes: '1000,1200,3000',
             detailed: 'true',
             displayTypeName: 'true'
         };
@@ -26,7 +26,7 @@ const data = {
             headers: {
                 'Authorization': 'Basic dmV2YWlvLWFwaTpUTng4Yzl3NXNadndYcUpo',
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'AppAuthorization': 'Basic eEhiRFQyN1hmc3duNlk0SjpqdGdGd2FjQzlERlhKd0dhQlpuWDNLTmdiWWc1SlNZZlo1dmY3Wnd4RGpER2tnRUdwN1JaN1c0SFgzMlJwNGFm'
+                'AppAuthorization': 'Basic Z0g4eTlaS1VFMmZrdGtaVzo5ekxZaFAyN3FrZVZSYkY3azk1VHpEQ1pMQXpLTGpSWFQ1TmZnQTlNdUtjUjJ1RllxTnIyRHNBbmY5eGJIVmY5'
             }
         };    
     
