@@ -1,5 +1,6 @@
 import express from 'express';
 import {router} from './route.js';
+import axios from 'axios';
 
 const app = express();
 const port = process.env.PORT;
@@ -11,12 +12,7 @@ app.use('/', router);
 app.use(express.json());
 app.use(express.urlencoded());
 app.post( '/', ( req, res ) => {
-    console.log( 'received webhook', req.body );
-    console.log(req.body)
-    console.log('type of req.body: %s', typeof req.body)
-    console.log('type of req.body.dailyDynamicValueTypes: %s', typeof req.body.dailyDynamicValueTypes)
-    console.log('is req.body.dailyDynamicValueTypes an array?: %s', Array.isArray(req.body.dailyDynamicValueTypes))
-    console.log('type of first array element: %s', typeof req.body.dailyDynamicValueTypes[0])
+    console.log( 'received webhook\n', req.body );
     res.sendStatus( 200 );
 })
 
