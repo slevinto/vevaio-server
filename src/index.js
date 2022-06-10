@@ -45,6 +45,7 @@ const data = {
             config,
         ).then((res) => {
             console.log("RESPONSE RECEIVED: ", res.data);
+            console.log("RESPONSE RECEIVED first: ", res.data[0]);
         }).catch(function (error) {
             console.log("ERROR RECEIVED: ", error);
         });
