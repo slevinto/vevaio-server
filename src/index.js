@@ -1,6 +1,7 @@
 import express from 'express';
 import {router} from './route.js';
 import axios from 'axios';
+import qs from 'qs';
 
 const app = express();
 const port = process.env.PORT;
@@ -33,7 +34,7 @@ const data = {
          console.log( 'received webhook\n', req.body );
          axios.post(
         'https://api.und-gesund.de/v5/dynamicEpochValues',
-        data,
+        qs.stringify(data),
         config,
         ).then((res) => {
             console.log("RESPONSE RECEIVED: ", res);
