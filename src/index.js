@@ -33,8 +33,11 @@ const data = {
     app.post( '/', ( req, res ) => {
         console.log( 'received webhook\n', qs.stringify(req.body) );
         
-        const startTimestampUnix = req.body.sourceUpdate.startTimestampUnix
-        console.log( 'received startTimestampUnix\n', startTimestampUnix); 
+        try {
+            const startTimestampUnix = req.body.sourceUpdate.startTimestampUnix
+            console.log( 'received startTimestampUnix\n', startTimestampUnix); 
+        }
+        catch {}
 
         axios.post(
             'https://api.und-gesund.de/v5/dynamicEpochValues',
