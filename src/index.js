@@ -24,8 +24,8 @@ app.post( '/', ( req, res ) => {
             dataSources: '3',
             valueTypes: '1000,1200',
             detailed: 'true',
-            displayTypeName:'true',
-            displayPartnerUserID='true'
+            displayTypeName: 'true',
+            displayPartnerUserID: 'true'
         },
         headers: {
             'Authorization': 'Basic dmV2YWlvLWFwaTpUTng4Yzl3NXNadndYcUpo',
