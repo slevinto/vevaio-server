@@ -51,9 +51,7 @@ const data = {
             console.log("RESPONSE RECEIVED: ", res.data);
             res.data.forEach(dataSource => {
                 console.log("received dataSource: ", dataSource);
-                dataSource.data.forEach(element => {
-                    console.log("received dynamicValueType: ", element);
-                });
+                console.log("received dataSource data: ", dataSource.data);                
             });
         }).catch(function (error) {
             console.log("ERROR RECEIVED: ", error);
