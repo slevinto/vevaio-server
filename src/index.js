@@ -45,7 +45,12 @@ const data = {
             config,
         ).then((res) => {
             console.log("RESPONSE RECEIVED: ", res.data);
-            console.log("RESPONSE RECEIVED first: ", res.data[0]);
+            res.data.forEach(dataSource => {
+                console.log("received dataSource: ", dataSource);
+                dataSource.forEach(element => {
+                    console.log("received dynamicValueType: ", element.dynamicValueType);
+                });
+            });
         }).catch(function (error) {
             console.log("ERROR RECEIVED: ", error);
         });
