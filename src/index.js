@@ -47,7 +47,7 @@ const data = {
             console.log("RESPONSE RECEIVED: ", res.data);
             res.data.forEach(dataSource => {
                 console.log("received dataSource: ", dataSource);
-                dataSource.dataSources.forEach(element => {
+                dataSource.data.forEach(element => {
                     console.log("received dynamicValueType: ", element.dynamicValueType);
                 });
             });
