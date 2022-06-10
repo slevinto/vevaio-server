@@ -14,10 +14,9 @@ app.use(express.urlencoded());
 app.post( '/', ( req, res ) => {
     console.log( 'received webhook\n', req.body );
 
-    axios({
-        method: 'post',
-        url: 'https://api.und-gesund.de/v5/dynamicEpochValues',
-        data: {
+    axios.post(
+        'https://api.und-gesund.de/v5/dynamicEpochValues',
+        {
             authenticationToken: 'ae664cd0264a712251117d5d12bd8281',
             startTimestampUnix: '1654732800000',
             endTimestampUnix: '1654801200000',
@@ -26,18 +25,17 @@ app.post( '/', ( req, res ) => {
             detailed: 'true',
             displayTypeName: 'true'
         },
-        headers: {
-            'Authorization': 'Basic dmV2YWlvLWFwaTpUTng4Yzl3NXNadndYcUpo',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'AppAuthorization': 'Basic eEhiRFQyN1hmc3duNlk0SjpqdGdGd2FjQzlERlhKd0dhQlpuWDNLTmdiWWc1SlNZZlo1dmY3Wnd4RGpER2tnRUdwN1JaN1c0SFgzMlJwNGFm',
-            'appID': 'xHbDT27Xfswn6Y4J'
-        }
-
-      }).then((res) => {
-        console.log("RESPONSE RECEIVED: ", res);
-      }).catch(function (error) {
-        console.log("ERROR RECEIVED: ", error);
-      });
+        {
+            headers: {
+                'Authorization': 'Basic dmV2YWlvLWFwaTpUTng4Yzl3NXNadndYcUpo',
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'AppAuthorization': 'Basic eEhiRFQyN1hmc3duNlk0SjpqdGdGd2FjQzlERlhKd0dhQlpuWDNLTmdiWWc1SlNZZlo1dmY3Wnd4RGpER2tnRUdwN1JaN1c0SFgzMlJwNGFm'
+            }
+        }).then((res) => {
+            console.log("RESPONSE RECEIVED: ", res);
+        }).catch(function (error) {
+            console.log("ERROR RECEIVED: ", error);
+        });
 
     res.sendStatus( 200 );
 })
