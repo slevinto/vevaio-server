@@ -11,12 +11,7 @@ console.log( 'wait for event...');
 app.use('/', router);
 app.use(express.json());
 app.use(express.urlencoded());
-app.post( '/', ( req, res ) => {
-    console.log( 'received webhook\n', req.body );
-
-    axios.post(
-        'https://api.und-gesund.de/v5/dynamicEpochValues',
-        {
+const data = {
             authenticationToken: 'ae664cd0264a712251117d5d12bd8281',
             startTimestampUnix: '1654732800000',
             endTimestampUnix: '1654801200000',
@@ -24,14 +19,23 @@ app.post( '/', ( req, res ) => {
             valueTypes: '1000,1200',
             detailed: 'true',
             displayTypeName: 'true'
-        },
-        {
+        };
+
+    const config = {
             headers: {
                 'Authorization': 'Basic dmV2YWlvLWFwaTpUTng4Yzl3NXNadndYcUpo',
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'AppAuthorization': 'Basic eEhiRFQyN1hmc3duNlk0SjpqdGdGd2FjQzlERlhKd0dhQlpuWDNLTmdiWWc1SlNZZlo1dmY3Wnd4RGpER2tnRUdwN1JaN1c0SFgzMlJwNGFm'
             }
-        }).then((res) => {
+        };    
+    
+    app.post( '/', ( req, res ) => {
+         console.log( 'received webhook\n', req.body );
+         axios.post(
+        'https://api.und-gesund.de/v5/dynamicEpochValues',
+        data,
+        config,
+        ).then((res) => {
             console.log("RESPONSE RECEIVED: ", res);
         }).catch(function (error) {
             console.log("ERROR RECEIVED: ", error);
