@@ -24,8 +24,7 @@ app.post( '/', ( req, res ) => {
             dataSources: '3',
             valueTypes: '1000,1200',
             detailed: 'true',
-            displayTypeName: 'true',
-            displayPartnerUserID: 'true'
+            displayTypeName: 'true'
         },
         headers: {
             'Authorization': 'Basic dmV2YWlvLWFwaTpUTng4Yzl3NXNadndYcUpo',
@@ -36,6 +35,8 @@ app.post( '/', ( req, res ) => {
 
       }).then((res) => {
         console.log("RESPONSE RECEIVED: ", res);
+      }).catch(function (error) {
+        console.log("ERROR RECEIVED: ", error);
       });
 
     res.sendStatus( 200 );
