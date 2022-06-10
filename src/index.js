@@ -35,7 +35,11 @@ const data = {
         
         try {
             const startTimestampUnix = req.body.sourceUpdate.startTimestampUnix
-            console.log( 'received startTimestampUnix\n', startTimestampUnix); 
+            console.log( 'received startTimestampUnix\n', startTimestampUnix);
+            const endTimestampUnix = req.body.sourceUpdate.endTimestampUnix
+            console.log( 'received endTimestampUnix\n', endTimestampUnix); 
+            const authenticationToken = req.body.sourceUpdate.authenticationToken
+            console.log( 'received authenticationToken\n', authenticationToken); 
         }
         catch {}
 
@@ -45,10 +49,10 @@ const data = {
             config,
         ).then((res) => {
             console.log("RESPONSE RECEIVED: ", res.data);
-            res.data.dataSources.forEach(dataSource => {
+            res.data.forEach(dataSource => {
                 console.log("received dataSource: ", dataSource);
                 dataSource.data.forEach(element => {
-                    console.log("received dynamicValueType: ", element.dynamicValueType);
+                    console.log("received dynamicValueType: ", element);
                 });
             });
         }).catch(function (error) {
