@@ -31,13 +31,17 @@ const data = {
         };    
     
     app.post( '/', ( req, res ) => {
-         console.log( 'received webhook\n', req.body );
-         axios.post(
-        'https://api.und-gesund.de/v5/dynamicEpochValues',
-        qs.stringify(data),
-        config,
+        console.log( 'received webhook\n', qs.stringify(req.body) );
+        
+        const startTimestampUnix = req.body.sourceUpdate.startTimestampUnix
+        console.log( 'received startTimestampUnix\n', startTimestampUnix); 
+
+        axios.post(
+            'https://api.und-gesund.de/v5/dynamicEpochValues',
+            qs.stringify(data),
+            config,
         ).then((res) => {
-            console.log("RESPONSE RECEIVED: ", res);
+            console.log("RESPONSE RECEIVED: ", res.data);
         }).catch(function (error) {
             console.log("ERROR RECEIVED: ", error);
         });
