@@ -31,7 +31,7 @@ const data = {
         };    
     
     app.post( '/', ( req, res ) => {
-        console.log( 'received webhook\n', qs.stringify(req.body) );
+        console.log( 'received webhook\n', req.body );
         
         try {
             const startTimestampUnix = req.body.sourceUpdate.startTimestampUnix
