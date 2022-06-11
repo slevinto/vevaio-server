@@ -70,20 +70,20 @@ app.post( '/', ( req, res ) => {
         data.authenticationToken = '2a94895e176b0116926cc95d011f1085'
         data.valueTypes = '1000,1200,3000'
         data.dataSources = '3'
-    }      
-    
+    }    
+      
+    const url = ''
     if (dailyDynamicValueTypes)
     {        
         data.valueTypes = qs.stringify(dailyDynamicValueTypes).replace('[', '').replace(']', '').replace('0=', '')
-        const url = 'https://api.und-gesund.de/v5/dynamicEpochValues'
-        GetDynamicValues(url)
+        url = 'https://api.und-gesund.de/v5/dailyDynamicValues'        
     }
     if (dynamicValueTypes)
     {
         data.valueTypes = qs.stringify(dynamicValueTypes).replace('[', '').replace(']', '').replace('0=', '')
-        const url = 'https://api.und-gesund.de/v5/dailyDynamicValues'
-        GetDynamicValues(url)
+        url = 'https://api.und-gesund.de/v5/dynamicEpochValues'        
     }    
+    GetDynamicValues(url)
 
     res.sendStatus( 200 )
 })
