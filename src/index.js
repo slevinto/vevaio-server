@@ -13,7 +13,7 @@ app.use('/', router);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const data = {
-            authenticationToken: '2a94895e176b0116926cc95d011f1085',
+            authenticationToken: '',
             startTimestampUnix: '',
             endTimestampUnix: '',
             dataSources: '3',
@@ -42,6 +42,7 @@ const data = {
             console.log( 'received authenticationToken\n', authenticationToken) 
             data.startTimestampUnix = startTimestampUnix
             data.endTimestampUnix = endTimestampUnix
+            data.authenticationToken = authenticationToken
         }
         catch {}
         
