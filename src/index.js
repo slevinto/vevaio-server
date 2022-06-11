@@ -61,7 +61,8 @@ app.post( '/', ( req, res ) => {
         data.authenticationToken = authenticationToken
         data.valueTypes = types.replace('[', '').replace(']', '')
     }
-    catch {
+    catch (e) {
+        console.log("Error: ", e.message)
         data.startTimestampUnix = '1654902000000'
         data.endTimestampUnix = '1654937489489'
         data.authenticationToken = '2a94895e176b0116926cc95d011f1085'
