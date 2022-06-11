@@ -3,6 +3,7 @@ import {router} from './route.js'
 import axios from 'axios'
 import qs from 'qs'
 import { initializeApp } from 'firebase/app'
+import { getDatabase, ref, set } from 'firebase/database'
 
 const firebaseConfig = {
     apiKey: "AIzaSyC_nEOSyUepPuf8mKNa0oT7CB8Mz6Qi0wM",
@@ -16,7 +17,7 @@ const firebaseConfig = {
 }
 
 const appFirebase = initializeApp(firebaseConfig)
-const database = appFirebase.database()
+const database = getDatabase(appFirebase)
 
 const app = express()
 const port = process.env.PORT
@@ -72,16 +73,7 @@ app.post( '/', ( req, res ) => {
             console.log("received dataSource: ", dataSource)
                 dataSource.dataSources.forEach(dataElem => {
                     console.log("received dataSource data: ", qs.parse(dataElem.data))
-
-                    database.ref(data.authenticationToken).set(qs.parse(dataElem.data), function(error) {
-                        if (error) {
-                            // The write failed...
-                            console.log("Failed with error: " + error)
-                        } else {
-                            // The write was successful...
-                            console.log("success")
-                        }
-                    })
+                    writeUserData(data.authenticationToken)
             })             
             console.log("received token: ", qs.parse(dataSource.authenticationToken))
         });
@@ -93,3 +85,8 @@ app.post( '/', ( req, res ) => {
 })
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
+
+function writeUserData(token, json) {    
+    set(ref(db, token), json);
+}
+  
