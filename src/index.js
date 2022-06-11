@@ -11,7 +11,7 @@ app.set('views', './src/views');
 console.log( 'wait for event...');
 app.use('/', router);
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 const data = {
             authenticationToken: '2a94895e176b0116926cc95d011f1085',
             startTimestampUnix: '',
