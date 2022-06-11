@@ -77,7 +77,7 @@ app.post( '/', ( req, res ) => {
             console.log("received dataSource: ", dataSource)
                 dataSource.dataSources.forEach(dataElem => {
                     console.log("received dataSource data: ", qs.parse(dataElem.data))
-                    writeUserData(data.authenticationToken)
+                    writeUserData(data.authenticationToken, qs.parse(dataElem.data))
             })             
             console.log("received token: ", qs.parse(dataSource.authenticationToken))
         });
