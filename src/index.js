@@ -32,7 +32,7 @@ const data = {
     authenticationToken: '',
     startTimestampUnix: '',
     endTimestampUnix: '',
-    dataSources: '3',
+    dataSources: '',
     valueTypes: '',
     detailed: 'true',
     displayTypeName: 'true'
@@ -49,8 +49,8 @@ const data = {
 app.post( '/', ( req, res ) => {
     const answer = qs.parse(req.body.sourceUpdate)
     const types = qs.parse(answer["/v5/dailyDynamicValues"]).dailyDynamicValueTypes
-    console.log( 'received types\n', types)
-        
+    const dataSources = answer.dataSource
+            
     try {
         const startTimestampUnix = req.body.sourceUpdate.startTimestampUnix
         const endTimestampUnix = req.body.sourceUpdate.endTimestampUnix
@@ -60,6 +60,7 @@ app.post( '/', ( req, res ) => {
         data.endTimestampUnix = endTimestampUnix
         data.authenticationToken = authenticationToken
         data.valueTypes = qs.stringify(types).replace('[', '').replace(']', '').replace('0=', '')
+        data.dataSources = dataSources
     }
     catch (e) {
         console.log("Error: ", e.message)
@@ -67,6 +68,7 @@ app.post( '/', ( req, res ) => {
         data.endTimestampUnix = '1654937489489'
         data.authenticationToken = '2a94895e176b0116926cc95d011f1085'
         data.valueTypes = '1000,1200,3000'
+        data.dataSources = '3'
     }
 
     console.log("send post: ", data)    
