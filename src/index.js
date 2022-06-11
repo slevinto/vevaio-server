@@ -51,7 +51,8 @@ const data = {
             console.log("RESPONSE RECEIVED: ", res.data);
             res.data.forEach(dataSource => {
                 console.log("received dataSource: ", dataSource);
-                console.log("received dataSource data: ", dataSource.data);                
+                console.log("received dataSource data: ", dataSource.dataSources[0].data);  
+                console.log("received response: ", qs.parse(dataSource));                
             });
         }).catch(function (error) {
             console.log("ERROR RECEIVED: ", error);
