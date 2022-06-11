@@ -48,7 +48,7 @@ const data = {
     
 app.post( '/', ( req, res ) => {
     console.log( 'received webhook\n', qs.parse(req.body))
-        
+    console.log( 'received dataTypes\n', qs.parse(req.body.sourceUpdate))
     try {
         const startTimestampUnix = req.body.sourceUpdate.startTimestampUnix
         console.log( 'received startTimestampUnix\n', startTimestampUnix)
