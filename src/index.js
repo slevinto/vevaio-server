@@ -71,8 +71,8 @@ app.post( '/', ( req, res ) => {
         data.valueTypes = '1000,1200,3000'
         data.dataSources = '3'
     }    
-      
-    const url = ''
+
+    var url = ''
     if (dailyDynamicValueTypes)
     {        
         data.valueTypes = qs.stringify(dailyDynamicValueTypes).replace('[', '').replace(']', '').replace('0=', '')
