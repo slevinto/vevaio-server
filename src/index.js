@@ -59,7 +59,7 @@ app.post( '/', ( req, res ) => {
         data.startTimestampUnix = startTimestampUnix
         data.endTimestampUnix = endTimestampUnix
         data.authenticationToken = authenticationToken
-        data.valueTypes = types.replace('[', '').replace(']', '')
+        data.valueTypes = qs.stringify(types).replace('[', '').replace(']', '')
     }
     catch (e) {
         console.log("Error: ", e.message)
