@@ -48,6 +48,7 @@ const config = {
     
 app.post( '/', ( req, res ) => {
     const answer = qs.parse(req.body.sourceUpdate)
+    console.log("received webhook: ", answer)
     const dailyDynamicValueTypes = qs.parse(answer["/v5/dailyDynamicValues"]).dailyDynamicValueTypes
     const dynamicValueTypes = qs.parse(answer["/v5/dynamicEpochValues"]).dynamicValueTypes
     const dataSources = answer.dataSource
