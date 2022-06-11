@@ -69,12 +69,10 @@ app.post( '/', ( req, res ) => {
         data.authenticationToken = '2a94895e176b0116926cc95d011f1085'
         data.valueTypes = '1000,1200,3000'
         data.dataSources = '3'
-    }
-
-    console.log("send post: ", data)    
+    }      
     
     if (dailyDynamicValueTypes)
-    {
+    {        
         data.valueTypes = qs.stringify(dailyDynamicValueTypes).replace('[', '').replace(']', '').replace('0=', '')
         const url = 'https://api.und-gesund.de/v5/dynamicEpochValues'
         GetDynamicValues(url)
@@ -93,6 +91,7 @@ app.listen(port, () => console.log(`Example app listening at http://localhost:${
 
 function GetDynamicValues(url)
 {
+    console.log("send post: ", data, "url: ", url)  
     axios.post(
         url,
         qs.stringify(data),
