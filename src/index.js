@@ -48,14 +48,9 @@ const data = {
     
 app.post( '/', ( req, res ) => {
     const answer = qs.parse(req.body.sourceUpdate)
-    console.log( 'received webHook\n', answer)
-    console.log( 'received types\n', qs.parse(answer["/v5/dailyDynamicValues"]))
-    var types_str = ''
-    answer["/v5/dailyDynamicValues"].dailyDynamicValueTypes.forEach(type => {
-        types_str = types_str + type.value + ","
-    })
-    console.log( 'received dataTypes\n', types_str)
-    
+    const types = qs.parse(answer["/v5/dailyDynamicValues"]).dailyDynamicValueTypes
+    console.log( 'received types\n', types)
+        
     try {
         const startTimestampUnix = req.body.sourceUpdate.startTimestampUnix
         console.log( 'received startTimestampUnix\n', startTimestampUnix)
