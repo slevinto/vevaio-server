@@ -33,7 +33,7 @@ const data = {
     startTimestampUnix: '',
     endTimestampUnix: '',
     dataSources: '3',
-    valueTypes: '1200,1000,3000',
+    valueTypes: '',
     detailed: 'true',
     displayTypeName: 'true'
 }
@@ -62,11 +62,13 @@ app.post( '/', ( req, res ) => {
         data.startTimestampUnix = startTimestampUnix
         data.endTimestampUnix = endTimestampUnix
         data.authenticationToken = authenticationToken
+        data.valueTypes = types.replace('[', '').replace(']', '')
     }
     catch {
         data.startTimestampUnix = '1654902000000'
         data.endTimestampUnix = '1654937489489'
         data.authenticationToken = '2a94895e176b0116926cc95d011f1085'
+        data.valueTypes = '1000,1200,3000'
     }
         
     axios.post(
