@@ -111,6 +111,6 @@ function GetDynamicValues(url)
 }
 
 function writeUserData(token, json) {    
-    push(ref(database, 'users/').child(token), json)
+    push(ref(database, 'users/' + token), json)
 }
   
