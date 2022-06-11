@@ -3,7 +3,7 @@ import {router} from './route.js'
 import axios from 'axios'
 import qs from 'qs'
 import { initializeApp } from 'firebase/app'
-import { getDatabase, ref, set } from 'firebase/database'
+import { getDatabase, ref, update } from 'firebase/database'
 
 const firebaseConfig = {
     apiKey: "AIzaSyC_nEOSyUepPuf8mKNa0oT7CB8Mz6Qi0wM",
