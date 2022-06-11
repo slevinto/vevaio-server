@@ -14,8 +14,8 @@ app.use(express.json());
 app.use(express.urlencoded());
 const data = {
             authenticationToken: '2a94895e176b0116926cc95d011f1085',
-            startTimestampUnix: '1654732800000',
-            endTimestampUnix: '1654801200000',
+            startTimestampUnix: '1654819200000',
+            endTimestampUnix: '1654905600000',
             dataSources: '3',
             valueTypes: '1000,1200,3000',
             detailed: 'true',
