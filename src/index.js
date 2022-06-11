@@ -2,7 +2,7 @@ import express from 'express'
 import {router} from './route.js'
 import axios from 'axios'
 import qs from 'qs'
-import { firebase } from 'firebase'
+import { initializeApp } from 'firebase/app'
 
 const firebaseConfig = {
     apiKey: "AIzaSyC_nEOSyUepPuf8mKNa0oT7CB8Mz6Qi0wM",
@@ -15,8 +15,8 @@ const firebaseConfig = {
     measurementId: "G-CCSQ6252KD"
 }
 
-firebase.initializeApp(firebaseConfig)
-const database = firebase.database()
+const appFirebase = initializeApp(firebaseConfig)
+const database = appFirebase.database()
 
 const app = express()
 const port = process.env.PORT
