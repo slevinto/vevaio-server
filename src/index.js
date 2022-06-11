@@ -33,7 +33,7 @@ const data = {
     startTimestampUnix: '',
     endTimestampUnix: '',
     dataSources: '3',
-    valueTypes: '1000,1200,3000',
+    valueTypes: '1200,1000,3000',
     detailed: 'true',
     displayTypeName: 'true'
 }
@@ -47,8 +47,8 @@ const data = {
 }    
     
 app.post( '/', ( req, res ) => {
-    console.log( 'received webhook\n', qs.parse(req.body))
-    console.log( 'received dataTypes\n', qs.parse(req.body.sourceUpdate))
+    console.log( 'received webHook\n', qs.parse(req.body.sourceUpdate))
+    console.log( 'received dataTypes\n', qs.parse(req.body.sourceUpdate["/v5/dailyDynamicValues"].dailyDynamicValueTypes))
     try {
         const startTimestampUnix = req.body.sourceUpdate.startTimestampUnix
         console.log( 'received startTimestampUnix\n', startTimestampUnix)
