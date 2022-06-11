@@ -91,6 +91,6 @@ app.post( '/', ( req, res ) => {
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
 
 function writeUserData(token, json) {    
-    //database.set(ref(`/users/${token}`), json);
+    set(ref(database, 'users/' + token), json)
 }
   
