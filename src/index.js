@@ -31,7 +31,7 @@ const data = {
         };    
     
     app.post( '/', ( req, res ) => {
-        console.log( 'received webhook\n', req.body );
+        console.log( 'received webhook\n', qs.parse(req.body));
         
         try {
             const startTimestampUnix = req.body.sourceUpdate.startTimestampUnix
@@ -50,9 +50,11 @@ const data = {
         ).then((res) => {
             console.log("RESPONSE RECEIVED: ", res.data);
             res.data.forEach(dataSource => {
-                console.log("received dataSource: ", dataSource);
-                console.log("received dataSource data: ", dataSource.dataSources[0].data);  
-                console.log("received response: ", qs.parse(dataSource));                
+                console.log("received dataSource: ", dataSource); 
+                dataSource.dataSources.forEach(dataElem => {
+                    console.log("received dataSource data: ", qs.parse(dataElem.data)); 
+                });             
+                console.log("received token: ", qs.parse(dataSource.authenticationToken));                
             });
         }).catch(function (error) {
             console.log("ERROR RECEIVED: ", error);
