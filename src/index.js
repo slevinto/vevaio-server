@@ -14,8 +14,8 @@ app.use(express.json());
 app.use(express.urlencoded());
 const data = {
             authenticationToken: '2a94895e176b0116926cc95d011f1085',
-            startTimestampUnix: '1654819200000',
-            endTimestampUnix: '1654905600000',
+            startTimestampUnix: '',
+            endTimestampUnix: '',
             dataSources: '3',
             valueTypes: '1000,1200,3000',
             detailed: 'true',
@@ -35,14 +35,16 @@ const data = {
         
         try {
             const startTimestampUnix = req.body.sourceUpdate.startTimestampUnix
-            console.log( 'received startTimestampUnix\n', startTimestampUnix);
+            console.log( 'received startTimestampUnix\n', startTimestampUnix)
             const endTimestampUnix = req.body.sourceUpdate.endTimestampUnix
-            console.log( 'received endTimestampUnix\n', endTimestampUnix); 
+            console.log( 'received endTimestampUnix\n', endTimestampUnix) 
             const authenticationToken = req.body.sourceUpdate.authenticationToken
-            console.log( 'received authenticationToken\n', authenticationToken); 
+            console.log( 'received authenticationToken\n', authenticationToken) 
+            data.startTimestampUnix = startTimestampUnix
+            data.endTimestampUnix = endTimestampUnix
         }
         catch {}
-
+        
         axios.post(
             'https://api.und-gesund.de/v5/dynamicEpochValues',
             qs.stringify(data),
