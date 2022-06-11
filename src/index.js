@@ -38,7 +38,7 @@ const data = {
     displayTypeName: 'true'
 }
 
- const config = {
+const config = {
     headers: {
         'Authorization': 'Basic dmV2YWlvLWFwaTpUTng4Yzl3NXNadndYcUpo',
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -48,7 +48,8 @@ const data = {
     
 app.post( '/', ( req, res ) => {
     const answer = qs.parse(req.body.sourceUpdate)
-    const types = qs.parse(answer["/v5/dailyDynamicValues"]).dailyDynamicValueTypes
+    const dailyDynamicValueTypes = qs.parse(answer["/v5/dailyDynamicValues"]).dailyDynamicValueTypes
+    const dynamicValueTypes = qs.parse(answer["/v5/dynamicEpochValues"]).dynamicValueTypes
     const dataSources = answer.dataSource
             
     try {
@@ -58,8 +59,7 @@ app.post( '/', ( req, res ) => {
                 
         data.startTimestampUnix = startTimestampUnix
         data.endTimestampUnix = endTimestampUnix
-        data.authenticationToken = authenticationToken
-        data.valueTypes = qs.stringify(types).replace('[', '').replace(']', '').replace('0=', '')
+        data.authenticationToken = authenticationToken        
         data.dataSources = dataSources
     }
     catch (e) {
@@ -72,8 +72,29 @@ app.post( '/', ( req, res ) => {
     }
 
     console.log("send post: ", data)    
+    
+    if (dailyDynamicValueTypes)
+    {
+        data.valueTypes = qs.stringify(dailyDynamicValueTypes).replace('[', '').replace(']', '').replace('0=', '')
+        const url = 'https://api.und-gesund.de/v5/dynamicEpochValues'
+        GetDynamicValues(url)
+    }
+    if (dynamicValueTypes)
+    {
+        data.valueTypes = qs.stringify(dynamicValueTypes).replace('[', '').replace(']', '').replace('0=', '')
+        const url = 'https://api.und-gesund.de/v5/dailyDynamicValues'
+        GetDynamicValues(url)
+    }    
+
+    res.sendStatus( 200 )
+})
+
+app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
+
+function GetDynamicValues(url)
+{
     axios.post(
-        'https://api.und-gesund.de/v5/dynamicEpochValues',
+        url,
         qs.stringify(data),
         config,
     ).then((res) => {
@@ -87,11 +108,7 @@ app.post( '/', ( req, res ) => {
     }).catch(function (error) {
         console.log("ERROR RECEIVED: ", error)
     })
-
-    res.sendStatus( 200 )
-})
-
-app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
+}
 
 function writeUserData(token, json) {    
     set(ref(database, 'users/' + token), json)
