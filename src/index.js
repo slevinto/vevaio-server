@@ -3,7 +3,7 @@ import {router} from './route.js'
 import axios from 'axios'
 import qs from 'qs'
 import { initializeApp } from 'firebase/app'
-import { getDatabase, ref, update } from 'firebase/database'
+import { getDatabase, ref, push } from 'firebase/database'
 
 const firebaseConfig = {
     apiKey: "AIzaSyC_nEOSyUepPuf8mKNa0oT7CB8Mz6Qi0wM",
@@ -111,6 +111,6 @@ function GetDynamicValues(url)
 }
 
 function writeUserData(token, json) {    
-    update(ref(database, 'users/' + token), json)
+    push(ref(database, 'users/').child(token), json)
 }
   
