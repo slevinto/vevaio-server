@@ -61,7 +61,11 @@ app.post( '/', ( req, res ) => {
         data.endTimestampUnix = endTimestampUnix
         data.authenticationToken = authenticationToken
     }
-    catch {}
+    catch {
+        data.startTimestampUnix = '1654902000000'
+        data.endTimestampUnix = '1654937489489'
+        data.authenticationToken = '2a94895e176b0116926cc95d011f1085'
+    }
         
     axios.post(
         'https://api.und-gesund.de/v5/dynamicEpochValues',
