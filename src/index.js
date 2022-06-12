@@ -57,7 +57,7 @@ app.post( '/', ( req, res ) => {
     const authenticationToken = answer.authenticationToken  
 
     var url = ''
-    if (dailyDynamicValues)
+    if (dailyDynamicValues.startTimestampUnix)
     {        
         data.startTimestampUnix = dailyDynamicValues.startTimestampUnix
         data.endTimestampUnix = dailyDynamicValues.endTimestampUnix
@@ -67,7 +67,7 @@ app.post( '/', ( req, res ) => {
         url = 'https://api.und-gesund.de/v5/dailyDynamicValues' 
         GetDynamicValues(url)       
     }
-    if (dynamicEpochValues)
+    if (dynamicEpochValues.startTimestampUnix)
     {
         data.startTimestampUnix = dynamicEpochValues.startTimestampUnix
         data.endTimestampUnix = dynamicEpochValues.endTimestampUnix
