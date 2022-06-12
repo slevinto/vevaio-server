@@ -76,15 +76,16 @@ app.post( '/', ( req, res ) => {
     if (dailyDynamicValueTypes)
     {        
         data.valueTypes = qs.stringify(dailyDynamicValueTypes).replace('[', '').replace(']', '').replace('0=', '')
-        url = 'https://api.und-gesund.de/v5/dailyDynamicValues'        
+        url = 'https://api.und-gesund.de/v5/dailyDynamicValues' 
+        GetDynamicValues(url)       
     }
     if (dynamicValueTypes)
     {
         data.valueTypes = qs.stringify(dynamicValueTypes).replace('[', '').replace(']', '').replace('0=', '')
-        url = 'https://api.und-gesund.de/v5/dynamicEpochValues'        
+        url = 'https://api.und-gesund.de/v5/dynamicEpochValues'  
+        GetDynamicValues(url)      
     }    
-    GetDynamicValues(url)
-
+   
     res.sendStatus( 200 )
 })
 
@@ -103,8 +104,8 @@ function GetDynamicValues(url)
                     console.log("received dataSource data: ", qs.parse(dataElem.data))
                     writeUserData(data.authenticationToken, qs.parse(dataElem.data))
             })             
-            console.log("received token: ", qs.parse(dataSource.authenticationToken))
-        });
+        console.log("received token: ", qs.parse(dataSource.authenticationToken))
+    })
     }).catch(function (error) {
         console.log("ERROR RECEIVED: ", error)
     })
