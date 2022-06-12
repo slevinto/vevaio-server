@@ -47,41 +47,33 @@ const config = {
 }    
     
 app.post( '/', ( req, res ) => {
+
     const answer = qs.parse(req.body.sourceUpdate)
     console.log("received webhook: ", answer)
-    const dailyDynamicValueTypes = qs.parse(answer["/v5/dailyDynamicValues"]).dailyDynamicValueTypes
-    const dynamicValueTypes = qs.parse(answer["/v5/dynamicEpochValues"]).dynamicValueTypes
+    
+    const dailyDynamicValues = qs.parse(answer["/v5/dailyDynamicValues"])
+    const dynamicEpochValues = qs.parse(answer["/v5/dynamicEpochValues"])
     const dataSources = answer.dataSource
-            
-    try {
-        const startTimestampUnix = req.body.sourceUpdate.startTimestampUnix
-        const endTimestampUnix = req.body.sourceUpdate.endTimestampUnix
-        const authenticationToken = req.body.sourceUpdate.authenticationToken
-                
-        data.startTimestampUnix = startTimestampUnix
-        data.endTimestampUnix = endTimestampUnix
-        data.authenticationToken = authenticationToken        
-        data.dataSources = dataSources
-    }
-    catch (e) {
-        console.log("Error: ", e.message)
-        data.startTimestampUnix = '1654902000000'
-        data.endTimestampUnix = '1654937489489'
-        data.authenticationToken = '2a94895e176b0116926cc95d011f1085'
-        data.valueTypes = '1000,1200,3000'
-        data.dataSources = '3'
-    }    
+    const authenticationToken = answer.authenticationToken  
 
     var url = ''
-    if (dailyDynamicValueTypes)
+    if (dailyDynamicValues)
     {        
-        data.valueTypes = qs.stringify(dailyDynamicValueTypes).replace('[', '').replace(']', '').replace('0=', '')
+        data.startTimestampUnix = dailyDynamicValues.startTimestampUnix
+        data.endTimestampUnix = dailyDynamicValues.endTimestampUnix
+        data.valueTypes = qs.stringify(dailyDynamicValues.dailyDynamicValueTypes).replace('[', '').replace(']', '').replace('0=', '')
+        data.authenticationToken = authenticationToken        
+        data.dataSources = dataSources
         url = 'https://api.und-gesund.de/v5/dailyDynamicValues' 
         GetDynamicValues(url)       
     }
-    if (dynamicValueTypes)
+    if (dynamicEpochValues)
     {
-        data.valueTypes = qs.stringify(dynamicValueTypes).replace('[', '').replace(']', '').replace('0=', '')
+        data.startTimestampUnix = dynamicEpochValues.startTimestampUnix
+        data.endTimestampUnix = dynamicEpochValues.endTimestampUnix
+        data.valueTypes = qs.stringify(dynamicEpochValues.dynamicValueTypes).replace('[', '').replace(']', '').replace('0=', '')
+        data.authenticationToken = authenticationToken        
+        data.dataSources = dataSources
         url = 'https://api.und-gesund.de/v5/dynamicEpochValues'  
         GetDynamicValues(url)      
     }    
