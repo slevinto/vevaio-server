@@ -61,7 +61,7 @@ app.post( '/', ( req, res ) => {
     {        
         data.startTimestampUnix = dailyDynamicValues.startTimestampUnix
         data.endTimestampUnix = dailyDynamicValues.endTimestampUnix
-        data.valueTypes = qs.stringify(dailyDynamicValues.dailyDynamicValueTypes).replace('[', '').replace(']', '').replace(/=/g,'').replace(/[0-9]/g, '').replace(/&/g,',')
+        data.valueTypes = qs.stringify(dailyDynamicValues.dailyDynamicValueTypes).replace('[', '').replace(']', '').replace(/[^0-9\.]=/g,'').replace(/&/g,',')
         data.authenticationToken = authenticationToken        
         data.dataSources = dataSources
         url = 'https://api.und-gesund.de/v5/dailyDynamicValues' 
@@ -71,7 +71,7 @@ app.post( '/', ( req, res ) => {
     {
         data.startTimestampUnix = dynamicEpochValues.startTimestampUnix
         data.endTimestampUnix = dynamicEpochValues.endTimestampUnix
-        data.valueTypes = qs.stringify(dynamicEpochValues.dynamicValueTypes).replace('[', '').replace(']', '').replace(/=/g,'').replace(/[0-9]/g, '').replace(/&/g,',')
+        data.valueTypes = qs.stringify(dynamicEpochValues.dynamicValueTypes).replace('[', '').replace(']', '').replace(/[^0-9\.]=/g,'').replace(/&/g,',')
         data.authenticationToken = authenticationToken        
         data.dataSources = dataSources
         url = 'https://api.und-gesund.de/v5/dynamicEpochValues'  
