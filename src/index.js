@@ -94,7 +94,8 @@ function GetDynamicValues(url)
         res.data.forEach(dataSource => {
                 dataSource.dataSources.forEach(dataElem => {
                     console.log("received dataSource data: ", qs.parse(dataElem.data))
-                    writeUserData(data.authenticationToken, qs.parse(dataElem.data))
+
+                    writeUserData(data.partnerUserID, qs.parse(dataElem.data))
             })             
         console.log("received token: ", qs.parse(dataSource.authenticationToken))
     })
