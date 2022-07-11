@@ -108,10 +108,13 @@ function GetDynamicValues(url, partnerUserID)
         config,
     ).then((res) => {
         res.data.forEach(dataSource => {
-                dataSource.dataSources.forEach(dataElem => {
-                    console.log("received dataSource data: ", qs.parse(dataElem.data))
-                    data_time_value.createdAtUnix = dataElem.createdAtUnix
-                    data_time_value.value = dataElem.value
+            dataSource.dataSources.forEach(dataElem => {
+                var data_list = qs.parse(dataElem.data)
+                console.log("received dataSource data: ", data_list)
+                data_list.forEach(data_piece => {
+                    data_time_value.createdAtUnix = data_piece.createdAtUnix
+                    data_time_value.value = data_piece.value
+                   
                     var name = ''
                     if (dataElem.dailyDynamicValueTypeName)
                         name = dataElem.dailyDynamicValueTypeName
@@ -119,23 +122,23 @@ function GetDynamicValues(url, partnerUserID)
                         name = dataElem.dynamicValueTypeName    
                     switch (name) {                        
                         case 'Steps':
-                          folder_path = '/Activity/Steps'                          
-                          break
+                            folder_path = '/Activity/Steps'                          
+                            break
                         case 'CoveredDistance':
-                          folder_path = '/Activity/Distance'                          
-                          break
+                            folder_path = '/Activity/Distance'                          
+                            break
                         case 'FloorsClimbed':
-                          folder_path = '/Activity/Floors Climbed'                          
-                          break
+                            folder_path = '/Activity/Floors Climbed'                          
+                            break
                         case 'ElevationGain':
-                          folder_path = '/Activity/Elevation Gain'                          
-                          break
+                            folder_path = '/Activity/Elevation Gain'                          
+                            break
                         case 'BurnedCalories':
-                          folder_path = '/Activity/Burned Calories'                          
-                          break
+                            folder_path = '/Activity/Burned Calories'                          
+                            break
                         case 'ActiveBurnedCalories':
-                          folder_path = '/Activity/Active Burned Calories'                          
-                          break
+                            folder_path = '/Activity/Active Burned Calories'                          
+                            break
                         case 'ActivityDuration':
                             folder_path = '/Activity/Activity Duration'                          
                             break;  
@@ -143,8 +146,9 @@ function GetDynamicValues(url, partnerUserID)
                             folder_path = '/' + name    
                     }
                     writeUserData(partnerUserID, folder_path, data_time_value)
-                })             
-                console.log("received token: ", qs.parse(dataSource.authenticationToken))
+                })      
+            })       
+            console.log("received token: ", qs.parse(dataSource.authenticationToken))
         })
     }).catch(function (error) {
         console.log("ERROR RECEIVED: ", error)
