@@ -111,15 +111,15 @@ function GetDynamicValues(url, partnerUserID)
             dataSource.dataSources.forEach(dataElem => {
                 var data_list = qs.parse(dataElem.data)
                 console.log("received dataSource data: ", data_list)
-                data_list.forEach(data_piece => {
+                dataElem.data.forEach(data_piece => {
                     data_time_value.createdAtUnix = data_piece.createdAtUnix
                     data_time_value.value = data_piece.value
                    
                     var name = ''
-                    if (dataElem.dailyDynamicValueTypeName)
-                        name = dataElem.dailyDynamicValueTypeName
+                    if (data_piece.dailyDynamicValueTypeName)
+                        name = data_piece.dailyDynamicValueTypeName
                     else 
-                        name = dataElem.dynamicValueTypeName    
+                        name = data_piece.dynamicValueTypeName    
                     switch (name) {                        
                         case 'Steps':
                             folder_path = '/Activity/Steps'                          
