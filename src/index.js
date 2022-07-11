@@ -28,6 +28,7 @@ app.use('/', router)
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+// build from webhook response to send to thryve for receiving new data
 const data = {
     authenticationToken: '',
     startTimestampUnix: '',
@@ -46,13 +47,16 @@ const config = {
     }
 }    
 
+// response from thryve with time and value to write in firebase
 const data_time_value = {
     createdAtUnix: '',
     value: ''
 }
- 
+
+// path to write in firebase
 const folder_path = ''
 
+// received webhook from thryve that exists new data
 app.post( '/', ( req, res ) => {
 
     const answer = qs.parse(req.body.sourceUpdate)
@@ -103,8 +107,12 @@ function GetDynamicValues(url)
                     console.log("received dataSource data: ", qs.parse(dataElem.data))
                     data_time_value.createdAtUnix = dataElem.createdAtUnix
                     data_time_value.value = dataElem.value
-
-                    switch (dataElem.dailyDynamicValueTypeName) {                        
+                    var name = ''
+                    if (dataElem.dailyDynamicValueTypeName)
+                        name = dataElem.dailyDynamicValueTypeName
+                    else 
+                        name = dataElem.dynamicValueTypeName    
+                    switch (name) {                        
                         case 'Steps':
                           folder_path = '/Activity/Steps'                          
                           break
@@ -127,7 +135,7 @@ function GetDynamicValues(url)
                             folder_path = '/Activity/Activity Duration'                          
                             break;  
                         default:
-                          console.log(`Sorry, we are out of ${dataElem.dailyDynamicValueTypeName}.`)
+                            folder_path = '/Unknown'    
                     }
                     writeUserData(dataElem.partnerUserID, folder_path, data_time_value)
                 })             
