@@ -45,7 +45,14 @@ const config = {
         'AppAuthorization': 'Basic Z0g4eTlaS1VFMmZrdGtaVzo5ekxZaFAyN3FrZVZSYkY3azk1VHpEQ1pMQXpLTGpSWFQ1TmZnQTlNdUtjUjJ1RllxTnIyRHNBbmY5eGJIVmY5'
     }
 }    
-    
+
+const data_time_value = {
+    createdAtUnix: '',
+    value: ''
+}
+ 
+const folder_path = ''
+
 app.post( '/', ( req, res ) => {
 
     const answer = qs.parse(req.body.sourceUpdate)
@@ -94,17 +101,44 @@ function GetDynamicValues(url)
         res.data.forEach(dataSource => {
                 dataSource.dataSources.forEach(dataElem => {
                     console.log("received dataSource data: ", qs.parse(dataElem.data))
+                    data_time_value.createdAtUnix = dataElem.createdAtUnix
+                    data_time_value.value = dataElem.value
 
-                    writeUserData(dataElem.partnerUserID, qs.parse(dataElem.data))
-            })             
-        console.log("received token: ", qs.parse(dataSource.authenticationToken))
-    })
+                    switch (dataElem.dailyDynamicValueTypeName) {                        
+                        case 'Steps':
+                          folder_path = '/Activity/Steps'                          
+                          break
+                        case 'CoveredDistance':
+                          folder_path = '/Activity/Distance'                          
+                          break
+                        case 'FloorsClimbed':
+                          folder_path = '/Activity/Floors Climbed'                          
+                          break
+                        case 'ElevationGain':
+                          folder_path = '/Activity/Elevation Gain'                          
+                          break
+                        case 'BurnedCalories':
+                          folder_path = '/Activity/Burned Calories'                          
+                          break
+                        case 'ActiveBurnedCalories':
+                          folder_path = '/Activity/Active Burned Calories'                          
+                          break
+                        case 'ActivityDuration':
+                            folder_path = '/Activity/Activity Duration'                          
+                            break;  
+                        default:
+                          console.log(`Sorry, we are out of ${dataElem.dailyDynamicValueTypeName}.`)
+                    }
+                    writeUserData(dataElem.partnerUserID, folder_path, data_time_value)
+                })             
+                console.log("received token: ", qs.parse(dataSource.authenticationToken))
+        })
     }).catch(function (error) {
         console.log("ERROR RECEIVED: ", error)
     })
 }
 
-function writeUserData(token, json) {    
-    push(ref(database, 'users/' + token), json)
+function writeUserData(token, folder_path, json) {    
+    push(ref(database, 'users/' + token + folder_path), json)
 }
   
