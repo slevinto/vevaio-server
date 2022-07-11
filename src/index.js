@@ -29,7 +29,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 // build from webhook response to send to thryve for receiving new data
-const data = {
+var data = {
     authenticationToken: '',
     startTimestampUnix: '',
     endTimestampUnix: '',
@@ -48,13 +48,13 @@ const config = {
 }    
 
 // response from thryve with time and value to write in firebase
-const data_time_value = {
+var data_time_value = {
     createdAtUnix: '',
     value: ''
 }
 
 // path to write in firebase
-const folder_path = ''
+var folder_path = ''
 
 // received webhook from thryve that exists new data
 app.post( '/', ( req, res ) => {
