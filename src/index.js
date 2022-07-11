@@ -31,6 +31,7 @@ app.use(express.urlencoded({ extended: true }))
 // build from webhook response to send to thryve for receiving new data
 var data = {
     authenticationToken: '',
+    partnerUserID: '',
     startTimestampUnix: '',
     endTimestampUnix: '',
     dataSources: '',
@@ -66,6 +67,8 @@ app.post( '/', ( req, res ) => {
     const dynamicEpochValues = qs.parse(answer["/v5/dynamicEpochValues"])
     const dataSources = answer.dataSource
     const authenticationToken = answer.authenticationToken  
+    const partnerUserID = answer.partnerUserID  
+
 
     var url = ''
     if (dailyDynamicValues.startTimestampUnix)
@@ -73,20 +76,22 @@ app.post( '/', ( req, res ) => {
         data.startTimestampUnix = dailyDynamicValues.startTimestampUnix
         data.endTimestampUnix = dailyDynamicValues.endTimestampUnix
         data.valueTypes = qs.stringify(dailyDynamicValues.dailyDynamicValueTypes).replace('[', '').replace(']', '').replace(/[0-9]+=/g,'').replace(/&/g,',')
-        data.authenticationToken = authenticationToken        
+        data.authenticationToken = authenticationToken       
+        data.partnerUserID = partnerUserID   
         data.dataSources = dataSources
         url = 'https://api.und-gesund.de/v5/dailyDynamicValues' 
-        GetDynamicValues(url)       
+        GetDynamicValues(url, partnerUserID)       
     }
     if (dynamicEpochValues.startTimestampUnix)
     {
         data.startTimestampUnix = dynamicEpochValues.startTimestampUnix
         data.endTimestampUnix = dynamicEpochValues.endTimestampUnix
         data.valueTypes = qs.stringify(dynamicEpochValues.dynamicValueTypes).replace('[', '').replace(']', '').replace(/[0-9]+=/g,'').replace(/&/g,',')
-        data.authenticationToken = authenticationToken        
+        data.authenticationToken = authenticationToken  
+        data.partnerUserID = partnerUserID         
         data.dataSources = dataSources
         url = 'https://api.und-gesund.de/v5/dynamicEpochValues'  
-        GetDynamicValues(url)      
+        GetDynamicValues(url, partnerUserID)      
     }    
    
     res.sendStatus( 200 )
@@ -94,7 +99,7 @@ app.post( '/', ( req, res ) => {
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
 
-function GetDynamicValues(url)
+function GetDynamicValues(url, partnerUserID)
 {
     console.log("send post: ", data, "url: ", url)  
     axios.post(
@@ -135,9 +140,9 @@ function GetDynamicValues(url)
                             folder_path = '/Activity/Activity Duration'                          
                             break;  
                         default:
-                            folder_path = '/Unknown'    
+                            folder_path = '/' + name    
                     }
-                    writeUserData(dataElem.partnerUserID, folder_path, data_time_value)
+                    writeUserData(partnerUserID, folder_path, data_time_value)
                 })             
                 console.log("received token: ", qs.parse(dataSource.authenticationToken))
         })
