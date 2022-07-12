@@ -188,7 +188,56 @@ function GetDynamicValues(url, partnerUserID)
                             break
                         case 'Weight':
                             folder_path = '/Body Measurement/Weight'                          
-                            break;        
+                            break;     
+                        // Cycle tracking
+                        case 'MenstrualBleeding':
+                            folder_path = '/Cycle tracking/Cervical Mucus'                          
+                            break
+                        case 'CycleLength':
+                            folder_path = '/Cycle tracking/Menstruation'                          
+                            break
+                        case 'PredictedFertility':
+                            folder_path = '/Cycle tracking/Ovulation Test'                          
+                            break
+                        case 'SexualEvent':
+                            folder_path = '/Cycle tracking/Sexual Activity'                          
+                            break;  
+                        // Nutrition
+                        case 'Hydration':
+                            folder_path = '/Nutrition/Hydration'                          
+                            break
+                        case 'ConsumedCalories':
+                            folder_path = '/Nutrition/Nutrition'                          
+                            break;   
+                        // Sleep
+                        case 'SleepDuration':
+                            folder_path = '/Sleep/Sleep'                          
+                            break;  
+                        // Vitals
+                        case 'BloodGlucose':
+                            folder_path = '/Vitals/Blood Glucose'                          
+                            break
+                        case 'BloodPressureDiastolic':
+                            folder_path = '/Vitals/Blood Pressure'                          
+                            break
+                        case 'BodyTemperature':
+                            folder_path = '/Vitals/Body Temperature'                          
+                            break
+                        case 'HeartRate':
+                            folder_path = '/Vitals/Heart Rate'                          
+                            break
+                        case 'Rmssd':
+                            folder_path = '/Vitals/Heart Rate Series'                          
+                            break
+                        case 'BreathingDisturbancesIntensity':
+                            folder_path = '/Vitals/Oxygen Saturation'                          
+                            break
+                        case 'RespirationRate':
+                            folder_path = '/Vitals/Respiratory Rate'                          
+                            break
+                        case 'HeartRateResting':
+                            folder_path = '/Vitals/Resting Heart Rate'                          
+                            break                  
                         default:
                             folder_path = '/Other/' + name    
                     }
