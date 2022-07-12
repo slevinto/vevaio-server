@@ -139,11 +139,29 @@ function GetDynamicValues(url, partnerUserID)
                         case 'ActiveBurnedCalories':
                             folder_path = '/Activity/Active Burned Calories'                          
                             break
+                        case 'BurnedCalories':
+                            folder_path = '/Activity/Burned Calories'                          
+                            break
+                        case 'PowerInWatts':
+                            folder_path = '/Activity/Power'                          
+                            break
                         case 'ActivityDuration':
                             folder_path = '/Activity/Activity Duration'                          
                             break;  
+                        case 'Speed':
+                            folder_path = '/Activity/Speed'                          
+                            break;  
+                        case 'VO2max':
+                            folder_path = '/Activity/Vo2 Max'                          
+                            break;  
+                        case 'ActivityTypeDetail2':
+                            if (data_time_value.value == "361")
+                                folder_path = '/Activity/Wheel chair push'    
+                            else
+                                folder_path = '/Other/' + name                         
+                            break;      
                         default:
-                            folder_path = '/' + name    
+                            folder_path = '/Other/' + name    
                     }
                     writeUserData(partnerUserID, folder_path, data_time_value)
                 })      
