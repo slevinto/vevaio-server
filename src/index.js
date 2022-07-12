@@ -120,7 +120,8 @@ function GetDynamicValues(url, partnerUserID)
                         name = data_piece.dailyDynamicValueTypeName
                     else 
                         name = data_piece.dynamicValueTypeName    
-                    switch (name) {                        
+                    switch (name) {  
+                        // Activity                      
                         case 'Steps':
                             folder_path = '/Activity/Steps'                          
                             break
@@ -156,10 +157,38 @@ function GetDynamicValues(url, partnerUserID)
                             break;  
                         case 'ActivityTypeDetail2':
                             if (data_time_value.value == "361")
-                                folder_path = '/Activity/Wheel chair push'    
+                                folder_path = '/Activity/Wheel Chair Push'    
                             else
                                 folder_path = '/Other/' + name                         
-                            break;      
+                            break; 
+                        // Body Measurement   
+                        case 'MetabolicEquivalent':
+                            folder_path = '/Body Measurement/Basal Metabolic Rate'                          
+                            break
+                        case 'FatMass':
+                            folder_path = '/Body Measurement/Body Fat'                          
+                            break
+                        case 'BoneMass':
+                            folder_path = '/Body Measurement/Bone Mass'                          
+                            break
+                        case 'FatFreeMass':
+                            folder_path = '/Body Measurement/Fat Free Mass'                          
+                            break
+                        case 'Height':
+                            folder_path = '/Body Measurement/Height'                          
+                            break
+                        case 'WaistCircumference':
+                            folder_path = '/Body Measurement/Waist Circumference'                          
+                            break
+                        case 'HipCircumference':
+                            folder_path = '/Body Measurement/Hip Circumference'                          
+                            break
+                        case 'MuscleMass':
+                            folder_path = '/Body Measurement/Lean Body Mass'                          
+                            break
+                        case 'Weight':
+                            folder_path = '/Body Measurement/Weight'                          
+                            break;        
                         default:
                             folder_path = '/Other/' + name    
                     }
