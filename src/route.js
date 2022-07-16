@@ -1,6 +1,6 @@
 import express from 'express';
 import { initializeApp } from 'firebase/app'
-import { getDatabase } from 'firebase/database'
+import { getDatabase, ref } from 'firebase/database'
 
 var router = express.Router();
 
@@ -17,15 +17,13 @@ const firebaseConfig = {
 
 const appFirebase = initializeApp(firebaseConfig)
 const database = getDatabase(appFirebase)
-const ref = database.ref('users');
 
 // Home page route.
 router.get('/', (req, res) => {
-  ref.on('value', (snapshot) => {
-    console.log(snapshot.val());
-  }, (errorObject) => {
-    console.log('The read failed: ' + errorObject.name);
-  }); 
+  database.ref('users/').once('value')
+.then(function(snapshot) {
+    console.log( snapshot.val() )
+})
 });
 
 export { router, database };
