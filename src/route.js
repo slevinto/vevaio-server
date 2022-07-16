@@ -4,8 +4,6 @@ import { getDatabase, ref, child, get } from 'firebase/database'
 import { renderFile } from 'pug'
 
 var router = express.Router()
-router.set('view engine', 'pug')
-router.set('views', './src/views')
 
 const firebaseConfig = {
   apiKey: "AIzaSyC_nEOSyUepPuf8mKNa0oT7CB8Mz6Qi0wM",
@@ -32,7 +30,7 @@ router.get('/', (req, res) => {
         allUsers.push(attributename);
       } 
       console.log("users: " + allUsers) 
-      renderFile("index", { 'allUsers': allUsers });
+      renderFile("./src/views/index.pug", { 'allUsers': allUsers });
     } else {
     console.log("No data available")    
     }
