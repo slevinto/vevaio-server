@@ -1,23 +1,8 @@
 import express from 'express'
-import {router} from './route.js'
+import { router, database } from './route.js'
 import axios from 'axios'
 import qs from 'qs'
-import { initializeApp } from 'firebase/app'
-import { getDatabase, ref, push } from 'firebase/database'
-
-const firebaseConfig = {
-    apiKey: "AIzaSyC_nEOSyUepPuf8mKNa0oT7CB8Mz6Qi0wM",
-    authDomain: "vevaio.firebaseapp.com",
-    databaseURL: "https://vevaio-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "vevaio",
-    storageBucket: "vevaio.appspot.com",
-    messagingSenderId: "1053328596166",
-    appId: "1:1053328596166:web:ba066b9f2fa3bc3e49cbc7",
-    measurementId: "G-CCSQ6252KD"
-}
-
-const appFirebase = initializeApp(firebaseConfig)
-const database = getDatabase(appFirebase)
+import { ref, push } from 'firebase/database'
 
 const app = express()
 const port = process.env.PORT

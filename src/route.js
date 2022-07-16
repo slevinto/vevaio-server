@@ -1,27 +1,31 @@
 import express from 'express';
 import axios from 'axios';
+import { initializeApp } from 'firebase/app'
+import { getDatabase, ref, get } from 'firebase/database'
 
 var router = express.Router();
 
+const firebaseConfig = {
+  apiKey: "AIzaSyC_nEOSyUepPuf8mKNa0oT7CB8Mz6Qi0wM",
+  authDomain: "vevaio.firebaseapp.com",
+  databaseURL: "https://vevaio-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "vevaio",
+  storageBucket: "vevaio.appspot.com",
+  messagingSenderId: "1053328596166",
+  appId: "1:1053328596166:web:ba066b9f2fa3bc3e49cbc7",
+  measurementId: "G-CCSQ6252KD"
+}
+
+const appFirebase = initializeApp(firebaseConfig)
+const database = getDatabase(appFirebase)
+
 // Home page route.
-router.get('/', (req, res) => {
-    const apiUrl = "https://api.covid19api.com/summary";
-    const countries = axios.get(apiUrl).then((response) => {
-        res.render("home", {
-          appName: "My COVID-19 Tracker",
-          pageName: "COVID-19 Cases",
-          data: response.data.Countries,
-        });
-      })
-      .catch(function (err) {
-        return console.error(err);
-      });  
+router.get('/', () => {
+    
+    var users = get(ref(database, 'users/'))
+    console.log("USERS RECEIVED: ", users)
+
 })
 
-// About page route.
-router.get('/about', function (req, res) {
-  res.render("about", { title: "About" });
-})
-
-export {router};
+export { router, database };
 
