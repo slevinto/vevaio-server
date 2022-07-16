@@ -1,6 +1,7 @@
 import express from 'express';
 import { initializeApp } from 'firebase/app'
 import { getDatabase, ref, child, get } from 'firebase/database'
+import { renderFile } from 'pug'
 
 var router = express.Router()
 
@@ -29,7 +30,7 @@ router.get('/', (req, res) => {
         allUsers.push(attributename);
       } 
       console.log("users: " + allUsers) 
-      res.sendFile("/src/views/index.html", { root: '.' });
+      renderFile("index", { 'allUsers': allUsers });
     } else {
     console.log("No data available")    
     }
