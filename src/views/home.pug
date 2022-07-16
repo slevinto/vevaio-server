@@ -2,6 +2,7 @@ extends layout
 
 block content
     .centered
+        h1.text-6xl Hello world!
         select(name='key', id='key')
             each val, index in data
                 option(value = index) #{val}
