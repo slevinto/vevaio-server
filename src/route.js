@@ -17,13 +17,14 @@ const firebaseConfig = {
 
 const appFirebase = initializeApp(firebaseConfig)
 const database = getDatabase(appFirebase)
-const allUsers = []
+var allUsers = []
 
 // Home page route.
 router.get('/', (req, res) => {
   const dbRef = ref(database)
   get(child(dbRef, `users/`)).then((snapshot) => {
     if (snapshot.exists()) {
+      allUsers = []
       const allData = snapshot.val()    
       for(var attributename in allData){
         allUsers.push(attributename);
