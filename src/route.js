@@ -21,7 +21,7 @@ const database = getDatabase(appFirebase)
 // Home page route.
 router.get('/', (req, res) => {
       ref(database, 'users/')
-      .once("value")
+      .on("value")
       .then((snapshot) => {
         res.send(snapshot.val())
         console.log("user received: ", snapshot.val())
