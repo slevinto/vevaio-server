@@ -1,5 +1,5 @@
 import express from 'express'
-import { router, database } from './route.js'
+import { router, database, allUsers } from './route.js'
 import axios from 'axios'
 import qs from 'qs'
 import { ref, push } from 'firebase/database'
@@ -7,6 +7,8 @@ import { ref, push } from 'firebase/database'
 const app = express()
 const port = process.env.PORT
 
+app.set("views", "./src/views");
+app.set("view engine", "pug");
 app.use('/', router)
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -237,4 +239,9 @@ function GetDynamicValues(url, partnerUserID)
 function writeUserData(token, folder_path, json) {    
     push(ref(database, 'users/' + token + folder_path), json)
 }
+
+app.get("/", (req, res) => {
+    res.render("index", { allUsersResult: allUsers });
+  });
+
   

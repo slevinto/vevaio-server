@@ -1,7 +1,6 @@
 import express from 'express';
 import { initializeApp } from 'firebase/app'
 import { getDatabase, ref, child, get } from 'firebase/database'
-import { renderFile } from 'pug'
 
 var router = express.Router()
 
@@ -29,8 +28,7 @@ router.get('/', (req, res) => {
       for(var attributename in allData){
         allUsers.push(attributename);
       } 
-      console.log("users: " + allUsers) 
-      renderFile("./src/views/index.pug", { 'allUsers': allUsers });
+      console.log("users: " + allUsers)       
       res.end()
     } else {
     console.log("No data available")    
@@ -41,5 +39,5 @@ router.get('/', (req, res) => {
   })
 })
 
-export { router, database }
+export { router, database, allUsers }
 
