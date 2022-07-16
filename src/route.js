@@ -20,9 +20,7 @@ const database = getDatabase(appFirebase)
 
 // Home page route.
 router.get('/', (req, res) => {
-  firebase
-      .database()
-      .ref("users/")
+      ref(database, 'users/')
       .once("value")
       .then((snapshot) => {
         res.send(snapshot.val())
