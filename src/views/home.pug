@@ -2,9 +2,9 @@ extends layout
 
 block content
     .centered
-        select
-each val, index in data
-option(value=val) #{index}
+        select(name='key', id='key')
+            each val, index in data
+                option(value = val, selected = val === 'tamib') = val
         
         
             
