@@ -4,6 +4,8 @@ import { getDatabase, ref, child, get } from 'firebase/database'
 import { renderFile } from 'pug'
 
 var router = express.Router()
+router.set('view engine', 'pug')
+router.set('views', './src/views')
 
 const firebaseConfig = {
   apiKey: "AIzaSyC_nEOSyUepPuf8mKNa0oT7CB8Mz6Qi0wM",
@@ -19,10 +21,6 @@ const firebaseConfig = {
 const appFirebase = initializeApp(firebaseConfig)
 const database = getDatabase(appFirebase)
 const allUsers = []
-
-const app = express()
-app.set('view engine', 'pug')
-app.set('views', './src/views')
 
 // Home page route.
 router.get('/', (req, res) => {
