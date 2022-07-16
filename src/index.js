@@ -6,10 +6,13 @@ import { ref, push } from 'firebase/database'
 
 const app = express()
 const port = process.env.PORT
+const __dirname = process.env.PWD
 
-app.set("views", "./src/views");
+app.set("views", path.join(__dirname, "/src/views"))
 app.set("view engine", "pug");
 app.use('/', router)
+app.use(express.static(__dirname + '/src/public'))
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
