@@ -240,9 +240,6 @@ function writeUserData(token, folder_path, json) {
     push(ref(database, 'users/' + token + folder_path), json)
 }
 
-app.get("*", (req, res) => {
-    //res.render("index", { allUsersResult: allUsers });
-    console.log("slava: ")
-  });
+
 
   
