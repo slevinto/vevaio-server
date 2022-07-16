@@ -21,8 +21,7 @@
     "postcss": "^8.4.14",
     "postcss-cli": "^10.0.0",
     "pug": "^3.0.2",
-    "qs": "^6.10.5",
-    "tailwindcss": "^3.1.6"
+    "qs": "^6.10.5"
   },
   "plugins": [
     "import"
@@ -37,5 +36,8 @@
   },
   "engines": {
     "node": "16.x"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.1.6"
   }
 }
