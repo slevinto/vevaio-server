@@ -1,6 +1,6 @@
 import express from 'express';
 import { initializeApp } from 'firebase/app'
-import { getDatabase, ref, onValue } from 'firebase/database'
+import { getDatabase, ref, child, get } from 'firebase/database'
 
 var router = express.Router();
 
@@ -20,10 +20,16 @@ const database = getDatabase(appFirebase)
 
 // Home page route.
 router.get('/', (req, res) => {
-  onValue(ref(database, 'users/'), (snapshot) => {
-    const data = snapshot.val();
-    console.log("user: " + data);
-  });
+  const dbRef = ref(database);
+  get(child(dbRef, `users/`)).then((snapshot) => {
+  if (snapshot.exists()) {
+    console.log(snapshot.val());
+  } else {
+    console.log("No data available");
+  }
+}).catch((error) => {
+  console.error(error);
+});
 });
 
 export { router, database };
