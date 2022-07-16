@@ -30,7 +30,7 @@ router.get('/', (req, res) => {
         allUsers.push(attributename);
       } 
       console.log("users: " + allUsers) 
-      renderFile("index", { 'allUsers': allUsers });
+      renderFile("index.pug", { 'allUsers': allUsers });
     } else {
     console.log("No data available")    
     }
