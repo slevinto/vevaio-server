@@ -2,7 +2,7 @@ import express from 'express';
 import { initializeApp } from 'firebase/app'
 import { getDatabase, ref, child, get } from 'firebase/database'
 
-var router = express.Router();
+var router = express.Router()
 
 const firebaseConfig = {
   apiKey: "AIzaSyC_nEOSyUepPuf8mKNa0oT7CB8Mz6Qi0wM",
@@ -17,27 +17,27 @@ const firebaseConfig = {
 
 const appFirebase = initializeApp(firebaseConfig)
 const database = getDatabase(appFirebase)
+const allUsers = []
 
 // Home page route.
 router.get('/', (req, res) => {
-  const dbRef = ref(database);
+  const dbRef = ref(database)
   get(child(dbRef, `users/`)).then((snapshot) => {
-  if (snapshot.exists()) {
-    const allData = snapshot.val()
-    console.log("user is: " + allData);  
-    for(var attributename in allData){
-      console.log(attributename + " : " + allData[attributename]);
-  }  
-    res.json(snapshot);
-  } else {
-    console.log("No data available");
-    
-  }
-}).catch((error) => {
-  console.error(error);
-  res.json(error);
-});
-});
+    if (snapshot.exists()) {
+      const allData = snapshot.val()    
+      for(var attributename in allData){
+        allUsers.push(attributename);
+      } 
+      console.log("users: " + allUsers) 
+      res.end()
+    } else {
+    console.log("No data available")    
+    }
+  }).catch((error) => {
+    console.error(error)
+    res.json(error)
+  })
+})
 
-export { router, database };
+export { router, database }
 
