@@ -2,37 +2,6 @@ extends layout
 
 block content
     .centered
-        .cards
-            each val, index in data
-                .card
-                    h2 #{val}
-                    i As of #{val}
-                    .row
-                        .cases
-                            h3 Confirmed
-                            .row
-                                .new 
-                                    h4 New
-                                    .count #{val}
-                                .total 
-                                    h4 Total
-                                    .count  #{val}
-                        .deaths
-                            h3 Deaths
-                            .row
-                                .new 
-                                    h4 New
-                                    .count  #{val}
-                                .total
-                                    h4 Total
-                                    .count  #{val}
-                        .recovered
-                            h3 Recovered
-                            .row
-                                .new 
-                                    h4 New
-                                    .count  #{val}
-                                .total
-                                    h4 Total
-                                    .count  #{val}
-    
+        select
+each variable in data
+option(value=variable) #{variable}
