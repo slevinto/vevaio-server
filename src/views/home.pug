@@ -3,5 +3,8 @@ extends layout
 block content
     .centered
         select
-each variable in data
-option(value=variable) #{variable}
+each val, index in data
+option(value=val) #{index}
+        
+        
+            
