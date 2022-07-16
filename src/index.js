@@ -1,19 +1,15 @@
 import express from 'express'
-import { router, database, allUsers } from './route.js'
+import { router, database } from './route.js'
 import axios from 'axios'
 import qs from 'qs'
 import { ref, push } from 'firebase/database'
-import { path } from 'path'
 
 const app = express()
 const port = process.env.PORT
-const __dirname = process.env.PWD
 
-app.set("views", path.join(__dirname, "/src/views"))
-app.set("view engine", "pug");
+app.set('view engine', 'pug');
+app.set('views', './src/views');
 app.use('/', router)
-app.use(express.static(__dirname + '/src/public'))
-
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 

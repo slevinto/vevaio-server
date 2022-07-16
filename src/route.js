@@ -29,8 +29,13 @@ router.get('/', (req, res) => {
       for(var attributename in allData){
         allUsers.push(attributename);
       } 
-      console.log("users: " + allUsers)       
-      res.end()
+      console.log("users: " + allUsers) 
+
+      res.render("home", {
+          appName: "Vevaio",
+          pageName: "Vevaio",
+          data: allUsers,
+        });
     } else {
     console.log("No data available")    
     }
