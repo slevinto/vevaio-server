@@ -1,7 +1,6 @@
 import express from 'express';
-import axios from 'axios';
 import { initializeApp } from 'firebase/app'
-import { getDatabase, ref, get } from 'firebase/database'
+import { getDatabase, get } from 'firebase/database'
 
 var router = express.Router();
 
@@ -20,12 +19,16 @@ const appFirebase = initializeApp(firebaseConfig)
 const database = getDatabase(appFirebase)
 
 // Home page route.
-router.get('/', () => {
-    
-    var users = get(ref(database, 'users/'))
-    console.log("USERS RECEIVED: ", users)
-
-})
+router.get('/', (req, res) => {
+  firebase
+      .database()
+      .ref("users/")
+      .once("value")
+      .then((snapshot) => {
+        res.send(snapshot.val())
+        console.log("user received: ", snapshot.val())
+      });
+});
 
 export { router, database };
 
