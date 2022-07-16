@@ -23,12 +23,15 @@ router.get('/', (req, res) => {
   const dbRef = ref(database);
   get(child(dbRef, `users/`)).then((snapshot) => {
   if (snapshot.exists()) {
-    console.log(snapshot.val());
+    console.log("user is: " + snapshot.val());
+    res.json(snapshot);
   } else {
     console.log("No data available");
+    
   }
 }).catch((error) => {
   console.error(error);
+  res.json(error);
 });
 });
 
