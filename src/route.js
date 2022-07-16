@@ -29,7 +29,7 @@ router.get('/', (req, res) => {
         allUsers.push(attributename);
       } 
       console.log("users: " + allUsers) 
-      res.end()
+      response.sendFile("views/index.html");
     } else {
     console.log("No data available")    
     }
