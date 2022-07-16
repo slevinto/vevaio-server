@@ -20,6 +20,10 @@ const appFirebase = initializeApp(firebaseConfig)
 const database = getDatabase(appFirebase)
 const allUsers = []
 
+const app = express()
+app.set('view engine', 'pug')
+app.set('views', './src/views')
+
 // Home page route.
 router.get('/', (req, res) => {
   const dbRef = ref(database)
@@ -30,7 +34,7 @@ router.get('/', (req, res) => {
         allUsers.push(attributename);
       } 
       console.log("users: " + allUsers) 
-      renderFile("index.pug", { 'allUsers': allUsers });
+      renderFile("index", { 'allUsers': allUsers });
     } else {
     console.log("No data available")    
     }
