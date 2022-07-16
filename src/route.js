@@ -31,6 +31,7 @@ router.get('/', (req, res) => {
       } 
       console.log("users: " + allUsers) 
       renderFile("./src/views/index.pug", { 'allUsers': allUsers });
+      res.end()
     } else {
     console.log("No data available")    
     }
