@@ -8,9 +8,9 @@ const app = express()
 const port = process.env.PORT
 
 app.set('view engine', 'pug');
-app.set('views', './src/views');
+app.set('views', './src/views')
 app.use('/', router)
-app.use("/src/public", express.static("/src/public/"));
+app.use(express.static('public'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
