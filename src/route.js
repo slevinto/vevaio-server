@@ -1,6 +1,6 @@
 import express from 'express';
 import { initializeApp } from 'firebase/app'
-import { getDatabase, get } from 'firebase/database'
+import { getDatabase, ref } from 'firebase/database'
 
 var router = express.Router();
 
