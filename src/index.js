@@ -3,14 +3,18 @@ import { router, database } from './route.js'
 import axios from 'axios'
 import qs from 'qs'
 import { ref, push } from 'firebase/database'
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
 
 const app = express()
 const port = process.env.PORT
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 app.set('view engine', 'pug');
 app.set('views', './src/views')
 app.use('/', router)
-app.use(express.static('public'))
+app.use('/images', express.static(path.resolve(__dirname, '../public')))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
