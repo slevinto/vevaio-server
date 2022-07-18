@@ -2,10 +2,9 @@ html
     head
         title #{appName}
         style
-            include ../public/styles/style.css
             include ../public/styles/tailwind.css
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js")            
     body
-        .container
-            .centered                
-                block content
+        .container.grid.place-items-center   
+            block content
                 

@@ -19,25 +19,31 @@ const appFirebase = initializeApp(firebaseConfig)
 const database = getDatabase(appFirebase)
 var allUsers = []
 
+
 // Home page route.
 router.get('/', (req, res) => {
   const dbRef = ref(database)
   get(child(dbRef, `users/`)).then((snapshot) => {
     if (snapshot.exists()) {
       allUsers = []
-      const allData = snapshot.val()    
-      for(var attributename in allData){
-        allUsers.push(attributename);
+      const allData = snapshot.val()
+      for(var patientname in allData){
+        for (var section in snapshot.child(patientname).val()){
+          for(var subsection in snapshot.child(patientname).child(section).val()){
+            for(var dirsubsection in snapshot.child(patientname).child(section).child(subsection).val()){
+              allUsers.push([patientname, section, subsection, snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
+              snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('value').val()]) 
+            }           
+          } 
+        }     
       } 
-      console.log("users: " + allUsers) 
-
       res.render("home", {
           appName: "Vevaio",
           pageName: "Vevaio",
           data: allUsers,
         });
     } else {
-    console.log("No data available")    
+        console.log("No data available")    
     }
   }).catch((error) => {
     console.error(error)
