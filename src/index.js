@@ -47,7 +47,8 @@ const pg_config = {
     ssl: true
 }
 
-const client = new pg.Client(pg_config);
+const client = new pg.Client(pg_config)
+const pool = new pg.Pool()
 
 function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value) {
     const query = `
@@ -273,7 +274,7 @@ function GetDynamicValues(url, partnerUserID)
 
 function writeUserData(token, folder_path, json) {    
     push(ref(database, 'users/' + token + folder_path), json)
-    client.connect(err => {
+    pool.connect(err => {
         if (err) {
             console.log("error: connection to postgresql " + err)
             throw err
