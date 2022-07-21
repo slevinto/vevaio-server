@@ -3,7 +3,7 @@ import { router, database } from './route.js'
 import axios from 'axios'
 import qs from 'qs'
 import { ref, push } from 'firebase/database'
-import { pg } from 'pg'
+import pg from 'pg'
 
 const app = express()
 const port = process.env.PORT
