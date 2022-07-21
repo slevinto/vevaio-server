@@ -50,7 +50,7 @@ const pg_config = {
 const client = new pg.Client(pg_config)
 
 function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value) {
-    await client.connect()  // creates connection
+    client.connect()  // creates connection
     const query = `    
             INSERT INTO "users" ("name", "main_folder", "secondary_folder", "createdAtUnix", "value") VALUES('a', 'a', 'a', 'a', 'a')           
     `
