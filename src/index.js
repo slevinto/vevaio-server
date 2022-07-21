@@ -62,7 +62,7 @@ function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value
             console.log('row added successfully!');
             client.end(console.log('Closed client connection'))
         })
-        .catch(err => console.log(err))
+        .catch(err => console.log("error insert " + err))
         .then(() => {
             console.log('Finished execution, exiting now')
             process.exit();
@@ -274,12 +274,14 @@ function GetDynamicValues(url, partnerUserID)
 
 function writeUserData(token, folder_path, json) {    
     push(ref(database, 'users/' + token + folder_path), json)
+    console.log("connection to postgresql begin")
     pool.connect(err => {
         if (err) {
             console.log("error: connection to postgresql " + err)
             throw err
         }
         else {
+            console.log("postgresql insert begin")
             queryDatabase(token, folder_path.split('/')[1], folder_path.split('/')[2], json.createdAtUnix, json.value)
         }
     })
