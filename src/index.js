@@ -55,9 +55,9 @@ function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value
             INSERT INTO "users" ("name", "main_folder", "secondary_folder", "createdAtUnix", "value") VALUES('a', 'a', 'a', 'a', 'a')           
     `
     try {
-        await client.query(query)  // sends query
+        client.query(query)  // sends query
     } finally {
-        await client.end()  // closes connection
+        client.end()  // closes connection
     }
 }
 
