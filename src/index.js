@@ -3,6 +3,7 @@ import { router, database } from './route.js'
 import axios from 'axios'
 import qs from 'qs'
 import { ref, push } from 'firebase/database'
+import { pg } from 'pg'
 
 const app = express()
 const port = process.env.PORT
@@ -27,13 +28,45 @@ var data = {
     displayTypeName: 'true'
 }
 
-const config = {
+const thryve_config = {
     headers: {
         'Authorization': 'Basic dmV2YWlvLWFwaTpUTng4Yzl3NXNadndYcUpo',
         'Content-Type': 'application/x-www-form-urlencoded',
         'AppAuthorization': 'Basic Z0g4eTlaS1VFMmZrdGtaVzo5ekxZaFAyN3FrZVZSYkY3azk1VHpEQ1pMQXpLTGpSWFQ1TmZnQTlNdUtjUjJ1RllxTnIyRHNBbmY5eGJIVmY5'
     }
 }    
+
+const pg_config = {
+    host: 'vevaiodwh.postgres.database.azure.com',
+    // Do not hard code your username and password.
+    // Consider using Node environment variables.
+    user: 'dwh',     
+    password: 'Dc@334455',
+    database: 'postgres',
+    port: 5432,
+    ssl: true
+}
+
+const client = new pg.Client(pg_config);
+
+function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value) {
+    const query = `
+        INSERT INTO [public.users] (name, main_folder, secondary_folder, createdAtUnix, value) VALUES ($1, $2, $3, $4, $5)
+    `
+    const values = [name, main_folder, secondary_folder, createdAtUnix, value]
+
+    client
+        .query(query, values)
+        .then(() => {
+            console.log('row added successfully!');
+            client.end(console.log('Closed client connection'))
+        })
+        .catch(err => console.log(err))
+        .then(() => {
+            console.log('Finished execution, exiting now')
+            process.exit();
+        })
+}
 
 // response from thryve with time and value to write in firebase
 var data_time_value = {
@@ -92,7 +125,7 @@ function GetDynamicValues(url, partnerUserID)
     axios.post(
         url,
         qs.stringify(data),
-        config,
+        thryve_config,
     ).then((res) => {
         res.data.forEach(dataSource => {
             dataSource.dataSources.forEach(dataElem => {
@@ -240,6 +273,15 @@ function GetDynamicValues(url, partnerUserID)
 
 function writeUserData(token, folder_path, json) {    
     push(ref(database, 'users/' + token + folder_path), json)
+    client.connect(err => {
+        if (err) {
+            console.log("error: connection to postgresql " + err)
+            throw err
+        }
+        else {
+            queryDatabase(token, folder_path.split('/')[1], folder_path.split('/')[2], json.createdAtUnix, json.value)
+        }
+    })
 }
 
 
