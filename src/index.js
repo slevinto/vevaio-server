@@ -48,7 +48,7 @@ const pg_config = {
 }
 
 const client = new pg.Client(pg_config)
-const pool = new pg.Pool()
+const pool = new pg.Pool(pg_config)
 
 function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value) {
     const query = `
