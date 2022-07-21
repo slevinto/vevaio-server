@@ -48,25 +48,17 @@ const pg_config = {
 }
 
 const client = new pg.Client(pg_config)
-const pool = new pg.Pool(pg_config)
 
 function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value) {
-    const query = `
-        INSERT INTO [public.users] (name, main_folder, secondary_folder, createdAtUnix, value) VALUES ($1, $2, $3, $4, $5)
+    await client.connect()  // creates connection
+    const query = `    
+            INSERT INTO "users" ("name", "main_folder", "secondary_folder", "createdAtUnix", "value") VALUES('a', 'a', 'a', 'a', 'a')           
     `
-    const values = [name, main_folder, secondary_folder, createdAtUnix, value]
-
-    client
-        .query(query, values)
-        .then(() => {
-            console.log('row added successfully!');
-            client.end(console.log('Closed client connection'))
-        })
-        .catch(err => console.log("error insert " + err))
-        .then(() => {
-            console.log('Finished execution, exiting now')
-            process.exit();
-        })
+    try {
+        await client.query(query)  // sends query
+    } finally {
+        await client.end()  // closes connection
+    }
 }
 
 // response from thryve with time and value to write in firebase
@@ -275,16 +267,7 @@ function GetDynamicValues(url, partnerUserID)
 function writeUserData(token, folder_path, json) {    
     push(ref(database, 'users/' + token + folder_path), json)
     console.log("connection to postgresql begin")
-    pool.connect(err => {
-        if (err) {
-            console.log("error: connection to postgresql " + err)
-            throw err
-        }
-        else {
-            console.log("postgresql insert begin")
-            queryDatabase(token, folder_path.split('/')[1], folder_path.split('/')[2], json.createdAtUnix, json.value)
-        }
-    })
+    queryDatabase(token, folder_path.split('/')[1], folder_path.split('/')[2], json.createdAtUnix, json.value)
 }
 
 
