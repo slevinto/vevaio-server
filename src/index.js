@@ -3,7 +3,7 @@ import { router, database } from './route.js'
 import axios from 'axios'
 import qs from 'qs'
 import { ref, push } from 'firebase/database'
-import Client from 'pg'
+import pg from 'pg'
 
 const app = express()
 const port = process.env.PORT
@@ -255,7 +255,7 @@ function writeUserData(token, folder_path, json) {
 }
 
 function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value) {
-    const client = new Client(pg_config)
+    const client = pg.Client(pg_config)
     client.connect()  // creates connection
     const query = `    
             INSERT INTO "users" ("name", "main_folder", "secondary_folder", "createdAtUnix", "value") VALUES('a', 'a', 'a', 'a', 'a')           
