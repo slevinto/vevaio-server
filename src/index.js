@@ -251,9 +251,7 @@ function GetDynamicValues(url, partnerUserID)
 }
 
 function writeUserData(token, folder_path, json) {    
-    push(ref(database, 'users/' + token + folder_path), json)
-    console.log("connection to postgresql begin")
-    
+    push(ref(database, 'users/' + token + folder_path), json)    
 }
 
 function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value) {
