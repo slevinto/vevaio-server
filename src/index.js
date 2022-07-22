@@ -243,7 +243,7 @@ function GetDynamicValues(url, partnerUserID)
                 })      
             })       
             console.log("received token: ", qs.parse(dataSource.authenticationToken))
-            queryDatabase(partnerUserID, folder_path.split('/')[1], folder_path.split('/')[2], json.createdAtUnix, json.value)
+            queryDatabase(partnerUserID, "a", "a", data_time_value.createdAtUnix, data_time_value.value)
         })
     }).catch(function (error) {
         console.log("ERROR RECEIVED: ", error)
