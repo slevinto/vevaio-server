@@ -3,7 +3,7 @@ import { router, database } from './route.js'
 import axios from 'axios'
 import qs from 'qs'
 import { ref, push } from 'firebase/database'
-import { Client } from 'pg'
+import Client from 'pg'
 
 const app = express()
 const port = process.env.PORT
@@ -43,8 +43,7 @@ const pg_config = {
     user: 'dwh',     
     password: 'Dc@334455',
     database: 'postgres',
-    port: 5432,
-    ssl: true
+    port: 5432
 }
 
 // response from thryve with time and value to write in firebase
