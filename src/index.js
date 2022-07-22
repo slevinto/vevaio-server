@@ -243,6 +243,7 @@ function GetDynamicValues(url, partnerUserID)
                 })      
             })       
             console.log("received token: ", qs.parse(dataSource.authenticationToken))
+            queryDatabase(token, folder_path.split('/')[1], folder_path.split('/')[2], json.createdAtUnix, json.value)
         })
     }).catch(function (error) {
         console.log("ERROR RECEIVED: ", error)
@@ -252,7 +253,7 @@ function GetDynamicValues(url, partnerUserID)
 function writeUserData(token, folder_path, json) {    
     push(ref(database, 'users/' + token + folder_path), json)
     console.log("connection to postgresql begin")
-    queryDatabase(token, folder_path.split('/')[1], folder_path.split('/')[2], json.createdAtUnix, json.value)
+    
 }
 
 function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value) {
