@@ -258,7 +258,7 @@ function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value
     const client = new pg.Client(pg_config)
     client.connect()  // creates connection
     const query = `    
-            INSERT INTO "users" ("name", "main_folder", "secondary_folder", "createdAtUnix", "value") VALUES('a', 'a', 'a', 'a', 'a')           
+            INSERT INTO users (name, main_folder, secondary_folder, createdAtUnix, value) VALUES('a', 'a', 'a', 'a', 'a')           
     `
     client.query(query, (err, res) => {
         console.log(err ? err.stack : "good") // Hello World!
