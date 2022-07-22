@@ -43,7 +43,8 @@ const pg_config = {
     user: 'dwh',     
     password: 'Dc@334455',
     database: 'postgres',
-    port: 5432
+    port: 5432,
+    ssl: true
 }
 
 // response from thryve with time and value to write in firebase
