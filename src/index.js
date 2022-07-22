@@ -241,7 +241,7 @@ function GetDynamicValues(url, partnerUserID)
                             folder_path = '/Other/' + name    
                     }
                     writeUserData(partnerUserID, folder_path, data_time_value)
-                    queryDatabase(partnerUserID, "a", "a", data_time_value.createdAtUnix, data_time_value.value)
+                    queryDatabase(partnerUserID, folder_path.split('/')[1], folder_path.split('/')[2], data_time_value.createdAtUnix, data_time_value.value)
                 })      
             })       
             console.log("received token: ", qs.parse(dataSource.authenticationToken))
@@ -260,9 +260,9 @@ function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value
     const client = new pg.Client(pg_config)
     client.connect()  // creates connection
     const query = `    
-            INSERT INTO users (name, main_folder, secondary_folder, createdAtUnix, value) VALUES('a', 'a', 'a', 'a', 'a')           
+            INSERT INTO users (name, main_folder, secondary_folder, createdAtUnix, value) VALUES($1, $2, $3, $4, $5)           
     `
-    client.query(query, (err, res) => {
+    client.query(query, [name, main_folder, secondary_folder, createdAtUnix, value], (err, res) => {
         console.log(err ? err.stack : "good") // Hello World!
         client.end()
       })
