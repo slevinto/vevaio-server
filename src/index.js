@@ -241,10 +241,11 @@ function GetDynamicValues(url, partnerUserID)
                             folder_path = '/Other/' + name    
                     }
                     writeUserData(partnerUserID, folder_path, data_time_value)
+                    queryDatabase(partnerUserID, "a", "a", data_time_value.createdAtUnix, data_time_value.value)
                 })      
             })       
             console.log("received token: ", qs.parse(dataSource.authenticationToken))
-            queryDatabase(partnerUserID, "a", "a", data_time_value.createdAtUnix, data_time_value.value)
+            
         })
     }).catch(function (error) {
         console.log("ERROR RECEIVED: ", error)
