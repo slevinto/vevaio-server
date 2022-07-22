@@ -3,7 +3,7 @@ import { router, database } from './route.js'
 import axios from 'axios'
 import qs from 'qs'
 import { ref, push } from 'firebase/database'
-import pg from 'pg'
+import { Client } from 'pg'
 
 const app = express()
 const port = process.env.PORT
@@ -45,21 +45,6 @@ const pg_config = {
     database: 'postgres',
     port: 5432,
     ssl: true
-}
-
-
-
-function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value) {
-    const client = new pg.Client(pg_config)
-    client.connect()  // creates connection
-    const query = `    
-            INSERT INTO "users" ("name", "main_folder", "secondary_folder", "createdAtUnix", "value") VALUES('a', 'a', 'a', 'a', 'a')           
-    `
-    try {
-        client.query(query)  // sends query
-    } finally {
-        client.end()  // closes connection
-    }
 }
 
 // response from thryve with time and value to write in firebase
@@ -269,6 +254,18 @@ function writeUserData(token, folder_path, json) {
     push(ref(database, 'users/' + token + folder_path), json)
     console.log("connection to postgresql begin")
     queryDatabase(token, folder_path.split('/')[1], folder_path.split('/')[2], json.createdAtUnix, json.value)
+}
+
+function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value) {
+    const client = new Client(pg_config)
+    client.connect()  // creates connection
+    const query = `    
+            INSERT INTO "users" ("name", "main_folder", "secondary_folder", "createdAtUnix", "value") VALUES('a', 'a', 'a', 'a', 'a')           
+    `
+    client.query(query, (err, res) => {
+        console.log(err ? err.stack : "good") // Hello World!
+        client.end()
+      })
 }
 
 
