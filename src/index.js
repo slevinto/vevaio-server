@@ -97,7 +97,7 @@ app.get('/', (req, res) => {
         password: ''
     }
     req.cookies  
-    if (typeof req.cookies !== 'undefined')
+    if (typeof req.cookies.email !== 'undefined')
     {
         cookies = req.cookies
     } 
