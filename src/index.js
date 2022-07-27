@@ -1,31 +1,32 @@
 import express from 'express'
-import { router, database } from './route.js'
 import axios from 'axios'
 import qs from 'qs'
-import { ref, push } from 'firebase/database'
+import { initializeApp } from 'firebase/app'
+import { getDatabase, ref, child, get, push } from 'firebase/database'
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
 import pg from 'pg'
+import cookieParser from 'cookie-parser'
 
 const app = express()
 const port = process.env.PORT
 
 app.set('view engine', 'pug');
 app.set('views', './src/views')
-app.use('/', router)
 app.use(express.static('./src/public'))
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(cookieParser())
 
-// build from webhook response to send to thryve for receiving new data
-var data = {
-    authenticationToken: '',
-    partnerUserID: '',
-    startTimestampUnix: '',
-    endTimestampUnix: '',
-    dataSources: '',
-    valueTypes: '',
-    detailed: 'true',
-    displayTypeName: 'true'
+const firebaseConfig = {
+    apiKey: "AIzaSyC_nEOSyUepPuf8mKNa0oT7CB8Mz6Qi0wM",
+    authDomain: "vevaio.firebaseapp.com",
+    databaseURL: "https://vevaio-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "vevaio",
+    storageBucket: "vevaio.appspot.com",
+    messagingSenderId: "1053328596166",
+    appId: "1:1053328596166:web:ba066b9f2fa3bc3e49cbc7",
+    measurementId: "G-CCSQ6252KD"
 }
 
 const thryve_config = {
@@ -47,6 +48,23 @@ const pg_config = {
     ssl: true
 }
 
+const appFirebase = initializeApp(firebaseConfig)
+const database = getDatabase(appFirebase)
+const dbRef = ref(database)
+const auth = getAuth()
+
+// build from webhook response to send to thryve for receiving new data
+var data = {
+    authenticationToken: '',
+    partnerUserID: '',
+    startTimestampUnix: '',
+    endTimestampUnix: '',
+    dataSources: '',
+    valueTypes: '',
+    detailed: 'true',
+    displayTypeName: 'true'
+}
+
 // response from thryve with time and value to write in firebase
 var data_time_value = {
     createdAtUnix: '',
@@ -56,9 +74,113 @@ var data_time_value = {
 // path to write in firebase
 var folder_path = ''
 
+// from firebase to display in dropdown
+var allUsers = []
+
+// to register doctor in firebase
+var doctor_info = {
+    fullname: '',
+    telephone: '',
+    email: '',
+    password: ''
+}
+
+app.get('/register', (req, res) => {  
+    res.render('register')
+})
+  
+// Home page route.
+app.get('/', (req, res) => {  
+    const cookies = req.cookies   
+    res.render("login", {credentials: cookies})
+})  
+
+//  register doctor in firebase
+app.post('/save_doctor_in_firebase', (req, res)=>{    
+    doctor_info.fullname = req.body.fullname
+    doctor_info.telephone = req.body.telephone
+    doctor_info.email = req.body.email
+    doctor_info.password = req.body.password
+
+    createUserWithEmailAndPassword(auth, doctor_info.email, doctor_info.password)
+        .then(userData => {  
+            push(ref(database, 'doctors/' + doctor_info.fullname), doctor_info)   
+
+            res.cookie(`email`, doctor_info.email, {expires: new Date(Date.now() + 1000*60*60*24*365*2)});
+            res.cookie(`password`, doctor_info.password, {expires: new Date(Date.now() + 1000*60*60*24*365*2)});
+            
+            get(child(dbRef, `users/`)).then((snapshot) => {
+                if (snapshot.exists()) {
+                  allUsers = []
+                   
+                  const allData = snapshot.val()
+                  for(var patientname in allData)
+                  {
+                    for (var section in snapshot.child(patientname).val()){
+                        for(var subsection in snapshot.child(patientname).child(section).val()){
+                            for(var dirsubsection in snapshot.child(patientname).child(section).child(subsection).val()){
+                                allUsers.push([patientname, 
+                                             section, 
+                                             subsection, 
+                                             snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
+                                             snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('value').val()]) 
+                            }           
+                        } 
+                    }     
+                  }
+                  res.render('home', { appName: "Vevaio", pageName: "Vevaio", data: allUsers } )    
+                }
+                else
+                {
+                    console.log('no data')
+                }
+            })     
+        })
+        .catch((error) => {
+            console.log(error.message)
+            // ..
+        })
+        
+})
+
+// login doctor in firebase
+app.post('/login_doctor', (req, res)=>{   
+    signInWithEmailAndPassword(auth, req.body.email, req.body.password)
+    .then((result) => {
+        get(child(dbRef, `users/`)).then((snapshot) => {
+            if (snapshot.exists()) {
+              allUsers = []
+               
+              const allData = snapshot.val()
+              for(var patientname in allData)
+              {
+                for (var section in snapshot.child(patientname).val()){
+                    for(var subsection in snapshot.child(patientname).child(section).val()){
+                        for(var dirsubsection in snapshot.child(patientname).child(section).child(subsection).val()){
+                            allUsers.push([patientname, 
+                                         section, 
+                                         subsection, 
+                                         snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
+                                         snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('value').val()]) 
+                        }           
+                    } 
+                }     
+              }
+              res.render('home', { appName: "Vevaio", pageName: "Vevaio", data: allUsers } )    
+            }
+            else
+            {
+                console.log('no data')
+            }
+        })     
+    })
+    .catch((error) => {
+      // Handle Errors here.      
+  });
+}) 
+
 // received webhook from thryve that exists new data
 app.post( '/', ( req, res ) => {
-
     const answer = qs.parse(req.body.sourceUpdate)
     console.log("received webhook: ", answer)
     
@@ -67,7 +189,6 @@ app.post( '/', ( req, res ) => {
     const dataSources = answer.dataSource
     const authenticationToken = answer.authenticationToken  
     const partnerUserID = answer.partnerUserID  
-
 
     var url = ''
     if (dailyDynamicValues.startTimestampUnix)
@@ -91,8 +212,7 @@ app.post( '/', ( req, res ) => {
         data.dataSources = dataSources
         url = 'https://api.und-gesund.de/v5/dynamicEpochValues'  
         GetDynamicValues(url, partnerUserID)      
-    }    
-   
+    }      
     res.sendStatus( 200 )
 })
 
@@ -256,6 +376,7 @@ function writeUserData(token, folder_path, json) {
     push(ref(database, 'users/' + token + folder_path), json)    
 }
 
+// write to postgresql
 function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value) {
     const client = new pg.Client(pg_config)
     client.connect()  // creates connection
@@ -263,7 +384,8 @@ function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value
             INSERT INTO users (name, main_folder, secondary_folder, createdAtUnix, value) VALUES($1, $2, $3, $4, $5)           
     `
     client.query(query, [name, main_folder, secondary_folder, createdAtUnix, value], (err, res) => {
-        console.log(err ? err.stack : "good") // Hello World!
+        if (err)
+            console.log(err.stack) 
         client.end()
       })
 }
