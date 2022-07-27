@@ -91,11 +91,15 @@ app.get('/register', (req, res) => {
   
 // Home page route.
 app.get('/', (req, res) => {  
-    const cookies = req.cookies  
-    if (typeof cookies === 'undefined')
+    var cookies = 
     {
-        cookies.email = ''
-        cookies.password = ''
+        email: '',
+        password: ''
+    }
+    req.cookies  
+    if (typeof req.cookies !== 'undefined')
+    {
+        cookies = req.cookies
     } 
     res.render("login", {credentials: cookies})
 })  
