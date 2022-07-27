@@ -97,7 +97,7 @@ app.get('/', (req, res) => {
         email: '',
         password: ''
     }
-    req.cookies  
+      
     if (typeof req.cookies.email !== 'undefined')
     {
         cookies = req.cookies
@@ -147,7 +147,8 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
             })     
         })
         .catch((error) => {
-            alert('failed to register in firebase: ' + error.message, 'xmessage')
+            alert('failed to register in firebase: ' + error.message)
+            res.render('login', {credentials: {email: '', password: ''}} )
             // ..
         })
         
@@ -186,7 +187,8 @@ app.post('/login_doctor', (req, res)=>{
     })
     .catch((error) => {
       // Handle Errors here.  
-      alert('failed to login in firebase: ' + error.message, 'xmessage')
+      alert('failed to login in firebase: ' + error.message)
+      res.render('login', {credentials: {email: '', password: ''}} )
   })
 }) 
 
