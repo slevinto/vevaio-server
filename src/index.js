@@ -150,11 +150,11 @@ app.post('/login_doctor', (req, res)=>{
         email: '',
         password: ''
     }
-    if (req.body.email)
+    if (typeof req.body.email !== "undefined")
     {
         credentials.email = req.body.email
     }
-    if (req.body.password)
+    if (typeof req.body.password !== "undefined")
     {
         credentials.password = req.body.password
     }
