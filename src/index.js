@@ -91,7 +91,12 @@ app.get('/register', (req, res) => {
   
 // Home page route.
 app.get('/', (req, res) => {  
-    const cookies = req.cookies   
+    const cookies = req.cookies  
+    if (typeof cookies === 'undefined')
+    {
+        cookies.email = ''
+        cookies.password = ''
+    } 
     res.render("login", {credentials: cookies})
 })  
 
@@ -145,20 +150,7 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
 
 // login doctor in firebase
 app.post('/login_doctor', (req, res)=>{   
-    var credentials = 
-    {
-        email: '',
-        password: ''
-    }
-    if (typeof req.body.email !== "undefined")
-    {
-        credentials.email = req.body.email
-    }
-    if (typeof req.body.password !== "undefined")
-    {
-        credentials.password = req.body.password
-    }
-    signInWithEmailAndPassword(auth, credentials.email, credentials.password)
+    signInWithEmailAndPassword(auth, req.body.email, req.body.password)
     .then((result) => {
         get(child(dbRef, `users/`)).then((snapshot) => {
             if (snapshot.exists()) {
