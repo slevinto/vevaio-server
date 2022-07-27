@@ -187,7 +187,7 @@ app.post('/login_doctor', (req, res)=>{
     })
     .catch((error) => {
       // Handle Errors here.  
-      alert('failed to login in firebase: ' + error.message, 'kdialog')
+      alert('failed to login in firebase: ' + error.message, 'dialog')
       res.render('login', {credentials: {email: '', password: ''}} )
   })
 }) 
