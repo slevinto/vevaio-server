@@ -6,11 +6,12 @@ import { getDatabase, ref, child, get, push } from 'firebase/database'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
 import pg from 'pg'
 import cookieParser from 'cookie-parser'
+import alert from 'alert'
 
 const app = express()
 const port = process.env.PORT
 
-app.set('view engine', 'pug');
+app.set('view engine', 'pug')
 app.set('views', './src/views')
 app.use(express.static('./src/public'))
 
@@ -115,8 +116,8 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
         .then(userData => {  
             push(ref(database, 'doctors/' + doctor_info.fullname), doctor_info)   
 
-            res.cookie(`email`, doctor_info.email, {expires: new Date(Date.now() + 1000*60*60*24*365*2)});
-            res.cookie(`password`, doctor_info.password, {expires: new Date(Date.now() + 1000*60*60*24*365*2)});
+            res.cookie(`email`, doctor_info.email, {expires: new Date(Date.now() + 1000*60*60*24*365*2)})
+            res.cookie(`password`, doctor_info.password, {expires: new Date(Date.now() + 1000*60*60*24*365*2)})
             
             get(child(dbRef, `users/`)).then((snapshot) => {
                 if (snapshot.exists()) {
@@ -146,7 +147,7 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
             })     
         })
         .catch((error) => {
-            console.log(error.message)
+            alert('failed to register in firebase: ' + error.message)
             // ..
         })
         
@@ -184,8 +185,9 @@ app.post('/login_doctor', (req, res)=>{
         })     
     })
     .catch((error) => {
-      // Handle Errors here.      
-  });
+      // Handle Errors here.  
+      alert('failed to login in firebase: ' + error.message)
+  })
 }) 
 
 // received webhook from thryve that exists new data
@@ -276,19 +278,19 @@ function GetDynamicValues(url, partnerUserID)
                             break
                         case 'ActivityDuration':
                             folder_path = '/Activity/Activity Duration'                          
-                            break;  
+                            break
                         case 'Speed':
                             folder_path = '/Activity/Speed'                          
-                            break;  
+                            break  
                         case 'VO2max':
                             folder_path = '/Activity/Vo2 Max'                          
-                            break;  
+                            break  
                         case 'ActivityTypeDetail2':
                             if (data_time_value.value == "361")
                                 folder_path = '/Activity/Wheel Chair Push'    
                             else
                                 folder_path = '/Other/' + name                         
-                            break; 
+                            break 
                         // Body Measurement   
                         case 'MetabolicEquivalent':
                             folder_path = '/Body Measurement/Basal Metabolic Rate'                          
@@ -316,7 +318,7 @@ function GetDynamicValues(url, partnerUserID)
                             break
                         case 'Weight':
                             folder_path = '/Body Measurement/Weight'                          
-                            break;     
+                            break    
                         // Cycle tracking
                         case 'MenstrualBleeding':
                             folder_path = '/Cycle tracking/Cervical Mucus'                          
@@ -329,18 +331,18 @@ function GetDynamicValues(url, partnerUserID)
                             break
                         case 'SexualEvent':
                             folder_path = '/Cycle tracking/Sexual Activity'                          
-                            break;  
+                            break  
                         // Nutrition
                         case 'Hydration':
                             folder_path = '/Nutrition/Hydration'                          
                             break
                         case 'ConsumedCalories':
                             folder_path = '/Nutrition/Nutrition'                          
-                            break;   
+                            break   
                         // Sleep
                         case 'SleepDuration':
                             folder_path = '/Sleep/Sleep'                          
-                            break;  
+                            break  
                         // Vitals
                         case 'BloodGlucose':
                             folder_path = '/Vitals/Blood Glucose'                          
@@ -377,7 +379,7 @@ function GetDynamicValues(url, partnerUserID)
             
         })
     }).catch(function (error) {
-        console.log("ERROR RECEIVED: ", error)
+        console.log("ERROR RECEIVED: ", error.message)
     })
 }
 
