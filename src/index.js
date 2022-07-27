@@ -147,7 +147,7 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
             })     
         })
         .catch((error) => {
-            alert('failed to register in firebase: ' + error.message)
+            alert('failed to register in firebase: ' + error.message, 'xmessage')
             // ..
         })
         
@@ -186,7 +186,7 @@ app.post('/login_doctor', (req, res)=>{
     })
     .catch((error) => {
       // Handle Errors here.  
-      alert('failed to login in firebase: ' + error.message)
+      alert('failed to login in firebase: ' + error.message, 'xmessage')
   })
 }) 
 
