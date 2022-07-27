@@ -145,7 +145,20 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
 
 // login doctor in firebase
 app.post('/login_doctor', (req, res)=>{   
-    signInWithEmailAndPassword(auth, req.body.email, req.body.password)
+    var credentials = 
+    {
+        email: '',
+        password: ''
+    }
+    if (req.body.email)
+    {
+        credentials.email = req.body.email
+    }
+    if (req.body.password)
+    {
+        credentials.password = req.body.password
+    }
+    signInWithEmailAndPassword(auth, credentials.email, credentials.password)
     .then((result) => {
         get(child(dbRef, `users/`)).then((snapshot) => {
             if (snapshot.exists()) {
