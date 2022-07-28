@@ -6,7 +6,6 @@ import { getDatabase, ref, child, get, push } from 'firebase/database'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
 import pg from 'pg'
 import cookieParser from 'cookie-parser'
-import alert from 'alert'
 
 const app = express()
 const port = process.env.PORT
@@ -147,8 +146,7 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
             })     
         })
         .catch((error) => {
-            alert('failed to register in firebase: ' + error.message)
-            res.render('login', {credentials: {email: '', password: ''}} )
+            res.render('login', { credentials: {email: '', password: '' }, err: 'failed to login in firebase: ' + error.message } )
             // ..
         })
         
@@ -187,8 +185,7 @@ app.post('/login_doctor', (req, res)=>{
     })
     .catch((error) => {
       // Handle Errors here.  
-      alert('failed to login in firebase: ' + error.message)
-      res.render('login', {credentials: {email: '', password: ''}} )
+      res.render('login', { credentials: { email: '', password: '' }, err: 'failed to login in firebase: ' + error.message } )
   })
 }) 
 

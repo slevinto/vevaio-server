@@ -20,3 +20,7 @@ block content
             div.mt-12.flex.justify-center                
                 div.text-purple-700.font-bold
                     a(href='/register') Register me      
+
+    script. 
+        if ( !{JSON.stringify(err)} !== 'undefined' )
+            alert(!{JSON.stringify(err)})
