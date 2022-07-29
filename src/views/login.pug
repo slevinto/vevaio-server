@@ -22,5 +22,5 @@ block content
                     a(href='/register') Register me      
 
     script. 
-        if ( !{JSON.stringify(err)} !== 'undefined' )
+        if ( typeof err !== 'undefined' )
             alert(!{JSON.stringify(err)})

@@ -4,6 +4,8 @@ import qs from 'qs'
 import { initializeApp } from 'firebase/app'
 import { getDatabase, ref, child, get, push } from 'firebase/database'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
+import admin from 'firebase-admin'
+import serviceAccount from '../vevaio-firebase-adminsdk-vv0bl-3be2a90905.json'
 import pg from 'pg'
 import cookieParser from 'cookie-parser'
 
@@ -48,6 +50,10 @@ const pg_config = {
     ssl: true
 }
 
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://vevaio-default-rtdb.europe-west1.firebasedatabase.app"
+  })
 const appFirebase = initializeApp(firebaseConfig)
 const database = getDatabase(appFirebase)
 const dbRef = ref(database)
@@ -76,6 +82,8 @@ var folder_path = ''
 
 // from firebase to display in dropdown
 var allUsers = []
+
+var allFirebaseUsers = []
 
 // to register doctor in firebase
 var doctor_info = {
@@ -114,74 +122,24 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
     createUserWithEmailAndPassword(auth, doctor_info.email, doctor_info.password)
         .then(userData => {  
             push(ref(database, 'doctors/' + doctor_info.fullname), doctor_info)   
-
-            res.cookie(`email`, doctor_info.email, {expires: new Date(Date.now() + 1000*60*60*24*365*2)})
-            res.cookie(`password`, doctor_info.password, {expires: new Date(Date.now() + 1000*60*60*24*365*2)})
             
-            get(child(dbRef, `users/`)).then((snapshot) => {
-                if (snapshot.exists()) {
-                  allUsers = []
-                   
-                  const allData = snapshot.val()
-                  for(var patientname in allData)
-                  {
-                    for (var section in snapshot.child(patientname).val()){
-                        for(var subsection in snapshot.child(patientname).child(section).val()){
-                            for(var dirsubsection in snapshot.child(patientname).child(section).child(subsection).val()){
-                                allUsers.push([patientname, 
-                                             section, 
-                                             subsection, 
-                                             snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
-                                             snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('value').val()]) 
-                            }           
-                        } 
-                    }     
-                  }
-                  res.render('home', { appName: "Vevaio", pageName: "Vevaio", data: allUsers } )    
-                }
-                else
-                {
-                    console.log('no data')
-                }
-            })     
+            const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
+            res.cookie(`email`, doctor_info.email, { expires: two_years })
+            res.cookie(`password`, doctor_info.password, { expires: two_years })
+            
+            home_page(res)
         })
         .catch((error) => {
             res.render('login', { credentials: {email: '', password: '' }, err: 'failed to login in firebase: ' + error.message } )
             // ..
-        })
-        
+        })        
 })
 
 // login doctor in firebase
 app.post('/login_doctor', (req, res)=>{   
     signInWithEmailAndPassword(auth, req.body.email, req.body.password)
     .then((result) => {
-        get(child(dbRef, `users/`)).then((snapshot) => {
-            if (snapshot.exists()) {
-              allUsers = []
-               
-              const allData = snapshot.val()
-              for(var patientname in allData)
-              {
-                for (var section in snapshot.child(patientname).val()){
-                    for(var subsection in snapshot.child(patientname).child(section).val()){
-                        for(var dirsubsection in snapshot.child(patientname).child(section).child(subsection).val()){
-                            allUsers.push([patientname, 
-                                         section, 
-                                         subsection, 
-                                         snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
-                                         snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('value').val()]) 
-                        }           
-                    } 
-                }     
-              }
-              res.render('home', { appName: "Vevaio", pageName: "Vevaio", data: allUsers } )    
-            }
-            else
-            {
-                console.log('no data')
-            }
-        })     
+        home_page(res)
     })
     .catch((error) => {
       // Handle Errors here.  
@@ -400,6 +358,47 @@ function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value
       })
 }
 
+// go to home page
+function home_page(res)
+{
+    get(child(dbRef, `users/`)).then((snapshot) => {
+        if (snapshot.exists()) {
+          allUsers = []
+           
+          const allData = snapshot.val()
+          for(var patientname in allData)
+          {
+            for (var section in snapshot.child(patientname).val()){
+                for(var subsection in snapshot.child(patientname).child(section).val()){
+                    for(var dirsubsection in snapshot.child(patientname).child(section).child(subsection).val()){
+                        allUsers.push([patientname, 
+                                     section, 
+                                     subsection, 
+                                     snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
+                                     snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('value').val()]) 
+                    }           
+                } 
+            }     
+          }
 
+          allFirebaseUsers = []
+          admin.auth().listUsers(1000)
+              .then((listUsersResult) => {
+                listUsersResult.users.forEach((userRecord) => {
+                  allFirebaseUsers.push(userRecord.toJSON())
+                }) 
+                const firebaseUsers = allFirebaseUsers.map(a => a.email)
+                res.render('home', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers } )                   
+              })
+              .catch((error) => {
+                console.log('Error listing users:', error)
+              })             
+        }
+        else
+        {
+            console.log('no data')
+        }
+    })     
+}
 
   
