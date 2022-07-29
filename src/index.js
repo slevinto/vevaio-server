@@ -5,7 +5,7 @@ import { initializeApp } from 'firebase/app'
 import { getDatabase, ref, child, get, push } from 'firebase/database'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
 import admin from 'firebase-admin'
-import serviceAccount from '../vevaio-firebase-adminsdk-vv0bl-3be2a90905.json'
+import { readFileSync } from 'fs'
 import pg from 'pg'
 import cookieParser from 'cookie-parser'
 
@@ -50,6 +50,8 @@ const pg_config = {
     ssl: true
 }
 
+const fileUrl = new URL('../vevaio-firebase-adminsdk-vv0bl-3be2a90905.json', import.meta.url)
+const serviceAccount = JSON.parse(readFileSync(fileUrl))
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://vevaio-default-rtdb.europe-west1.firebasedatabase.app"
