@@ -1,0 +1,26 @@
+extends layout
+            
+block content
+    div.my-8
+        img(src='main_logo.png')
+    button(onclick='chooseBrand()').my-8.text-purple-700.text-xl.font-bold Please click to choose brand
+
+    script. 
+        function chooseBrand()
+        {
+            var win = window.open('#{url}', "ChooseBrand", "width=900, height=900")
+            var interval = window.setInterval(function() {
+                try {
+                    if (win == null || win.closed) {
+                        window.clearInterval(interval)
+                        window.location.reload()
+                    }
+                }
+                catch (e) {
+                }
+            }, 1000);
+            return win
+        }
+        
+        
+    

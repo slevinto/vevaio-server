@@ -1,0 +1,267 @@
+extends layout
+            
+block content
+    div.my-8
+        img(src='main_logo.png')
+    div.mt-18     
+        h1.text-purple-700.text-xl.font-bold Welcome back, #{username}    
+        h1.text-purple-700.text-xl.font-bold Here's your overview
+
+    div.mt-8
+        div(id='heartrate', style={width: '90%'}).overflow-x-scroll.invisible    
+            .chart-container
+                canvas(id="heartratechart", width='1200px')      
+    div.mt-8
+        div(id='steps', style={width: '90%'}).overflow-x-scroll.invisible   
+            .chart-container
+                canvas(id="stepschart", width='1200px')   
+    div.mt-8
+        div(id='burnedcalories', style={width: '90%'}).overflow-x-scroll.invisible   
+            .chart-container
+                canvas(id="burnedcalorieschart", width='1200px')     
+    div.mt-8
+        div(id='activityduration', style={width: '90%'}).overflow-x-scroll.invisible   
+            .chart-container
+                canvas(id="activitydurationchart", width='1200px')                                     
+
+    script. 
+        
+            var jsonvalues = !{JSON.stringify(data)}
+            
+            document.getElementById('heartrate').style.visibility='visible'
+            document.getElementById('steps').style.visibility='visible'
+            document.getElementById('burnedcalories').style.visibility='visible'
+            document.getElementById('activityduration').style.visibility='visible'
+                             
+            var heartratevalues = []
+            for (let i = 0; i < jsonvalues.length; i++){
+                if(jsonvalues[i][0] === 'Vitals' && jsonvalues[i][1] === 'Resting Heart Rate')
+                    heartratevalues.push([jsonvalues[i][2], jsonvalues[i][3]]) 
+            }
+            heartratevalues = Array.from(new Set(heartratevalues.map(JSON.stringify))).map(JSON.parse)
+            heartratevalues = heartratevalues.sort((a, b) => a[0] - b[0])
+            
+            var stepvalues = []
+            for (let i = 0; i < jsonvalues.length; i++){
+                if(jsonvalues[i][0] === 'Activity' && jsonvalues[i][1] === 'Steps')
+                    stepvalues.push([jsonvalues[i][2], jsonvalues[i][3]]) 
+            }
+            stepvalues = Array.from(new Set(stepvalues.map(JSON.stringify))).map(JSON.parse)
+            stepvalues = stepvalues.sort((a, b) => a[0] - b[0])
+            
+            var burnedcaloriesvalues = []
+            for (let i = 0; i < jsonvalues.length; i++){
+                if(jsonvalues[i][0] === 'Activity' && jsonvalues[i][1] === 'Burned Calories')
+                    burnedcaloriesvalues.push([jsonvalues[i][2], jsonvalues[i][3]]) 
+            }
+            burnedcaloriesvalues = Array.from(new Set(burnedcaloriesvalues.map(JSON.stringify))).map(JSON.parse)
+            burnedcaloriesvalues = burnedcaloriesvalues.sort((a, b) => a[0] - b[0])
+
+            var activitydurationvalues = []
+            for (let i = 0; i < jsonvalues.length; i++){
+                if(jsonvalues[i][0] === 'Activity' && jsonvalues[i][1] === 'Activity Duration')
+                    activitydurationvalues.push([jsonvalues[i][2], jsonvalues[i][3]]) 
+            }
+            activitydurationvalues = Array.from(new Set(activitydurationvalues.map(JSON.stringify))).map(JSON.parse)
+            activitydurationvalues = activitydurationvalues.sort((a, b) => a[0] - b[0])
+
+            var ctxheartrate = document.getElementById("heartratechart").getContext('2d')
+            var heartratechart = new Chart(ctxheartrate, {
+                type: 'line',
+                data: {
+                    labels: heartratevalues.map(item => new Date(item[0]).toLocaleString("en", {month: "2-digit", day: "numeric"})),
+                    datasets: [{
+                        data: heartratevalues.map(item => item[1]),                                 
+                        backgroundColor: 'PaleTurquoise'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    title: {
+                        display: true,
+                        text: "Heart Rate",
+                        fontSize: 24,
+                        fontColor: 'purple'
+                    },
+                    legend: {
+                        display: false                                    
+                    },
+                    elements: {
+                        point:{
+                            radius: 0
+                        }
+                    },
+                    scales: {
+                        xAxes: [{                                            
+                            stacked: false,
+                            gridLines: {
+                                    display:false
+                            },
+                            ticks: { 
+                                fontColor: 'purple',                                              
+                            },                                                                                      
+                        }],
+                        yAxes: [{
+                            stacked: false,
+                            gridLines: {
+                                    display:false
+                            },
+                            ticks: {
+                                fontColor: 'purple',   
+                            }
+                        }]
+                    }
+                }
+            })                        
+        
+            var ctxsteps = document.getElementById("stepschart").getContext('2d')
+            var stepschart = new Chart(ctxsteps, {
+                type: 'line',
+                data: {
+                    labels: stepvalues.map(item => new Date(item[0]).toLocaleString("en", {month: "2-digit", day: "numeric"})),
+                    datasets: [{
+                        data: stepvalues.map(item => item[1]),
+                        backgroundColor: 'PaleTurquoise'                                 
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    title: {
+                        display: true,
+                        text: "Steps",
+                        fontSize: 24,
+                        fontColor: 'purple'
+                    },
+                    legend: {
+                        display: false                                    
+                    },
+                    elements: {
+                        point:{
+                            radius: 0
+                        }
+                    },
+                    scales: {
+                        xAxes: [{
+                            stacked: false,
+                            gridLines: {
+                                    display:false
+                            },
+                            ticks: {
+                                fontColor: 'purple',   
+                            },
+                        }],
+                        yAxes: [{
+                            stacked: true,
+                            gridLines: {
+                                    display:false
+                            },
+                            ticks: {
+                                fontColor: 'purple',   
+                            }
+                        }]
+                    }
+                }
+            }) 
+
+            var ctxburnedcalories = document.getElementById("burnedcalorieschart").getContext('2d')
+            var burnedcalorieschart = new Chart(ctxburnedcalories, {
+                type: 'line',
+                data: {
+                    labels: burnedcaloriesvalues.map(item => new Date(item[0]).toLocaleString("en", {month: "2-digit", day: "numeric"})),
+                    datasets: [{
+                        data: burnedcaloriesvalues.map(item => item[1]),                                 
+                        backgroundColor: 'PaleTurquoise'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    title: {
+                        display: true,
+                        text: "Burned Calories",
+                        fontSize: 24,
+                        fontColor: 'purple'
+                    },
+                    legend: {
+                        display: false                                    
+                    },
+                    elements: {
+                        point:{
+                            radius: 0
+                        }
+                    },
+                    scales: {
+                        xAxes: [{                                            
+                            stacked: false,
+                            gridLines: {
+                                    display:false
+                            },
+                            ticks: { 
+                                fontColor: 'purple',                                              
+                            },                                                                                      
+                        }],
+                        yAxes: [{
+                            stacked: false,
+                            gridLines: {
+                                    display:false
+                            },
+                            ticks: {
+                                fontColor: 'purple',   
+                            }
+                        }]
+                    }
+                }
+            })    
+
+            var ctxactivityduration = document.getElementById("activitydurationchart").getContext('2d')
+            var activitydurationchart = new Chart(ctxactivityduration, {
+                type: 'line',
+                data: {
+                    labels: activitydurationvalues.map(item => new Date(item[0]).toLocaleString("en", {month: "2-digit", day: "numeric"})),
+                    datasets: [{
+                        data: activitydurationvalues.map(item => item[1]),                                 
+                        backgroundColor: 'PaleTurquoise'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    title: {
+                        display: true,
+                        text: "Activity Duration",
+                        fontSize: 24,
+                        fontColor: 'purple'
+                    },
+                    legend: {
+                        display: false                                    
+                    },
+                    elements: {
+                        point:{
+                            radius: 0
+                        }
+                    },
+                    scales: {
+                        xAxes: [{                                            
+                            stacked: false,
+                            gridLines: {
+                                    display:false
+                            },
+                            ticks: { 
+                                fontColor: 'purple',                                              
+                            },                                                                                      
+                        }],
+                        yAxes: [{
+                            stacked: false,
+                            gridLines: {
+                                    display:false
+                            },
+                            ticks: {
+                                fontColor: 'purple',   
+                            }
+                        }]
+                    }
+                }
+            })                             
+            

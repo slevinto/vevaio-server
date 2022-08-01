@@ -5,7 +5,7 @@ block content
         div.mt-36
             div.mt-8.flex.justify-center
                 img(src='main_logo.png')
-            form(action="/login_doctor", method="POST")        
+            form(action="/login", method="POST")        
                 div.mt-16.flex.justify-center
                     div.justify-start
                         i.fa.fa-user.fa-solid.absolute.px-2.mt-1.text-green-500
@@ -19,8 +19,8 @@ block content
                         button(type="submit") Login
             div.mt-12.flex.justify-center                
                 div.text-purple-700.font-bold
-                    a(href='/register') Register me      
+                    a(href='/welcome') Register me      
 
-    script. 
+    script.                 
         if ( typeof err !== 'undefined' )
             alert(!{JSON.stringify(err)})

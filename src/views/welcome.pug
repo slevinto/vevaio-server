@@ -1,0 +1,23 @@
+extends layout
+            
+block content
+    div.h-screen.w-screen.bg-gradient-to-r.from-blue-400
+        div.mt-28
+            div.my-16.flex.justify-center
+                img(src='main_logo.png')
+        div.py-16.flex.justify-center
+            h1.text-purple-700.text-xl.font-bold Please choose if you        
+        div.flex.justify-center            
+            div.inline-block
+                button(onclick='registerDoctor()').mx-8.px-8.py-2.bg-purple-200.rounded Doctor
+                button(onclick='registerPatient()').mx-8.px-8.py-2.bg-purple-200.rounded Patient
+
+    script. 
+        function registerDoctor()
+        {
+            window.location.href = './register_doctor'
+        } 
+        function registerPatient()
+        {
+            window.location.href = './register_patient'
+        }       
