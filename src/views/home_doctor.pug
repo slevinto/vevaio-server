@@ -31,7 +31,7 @@ block content
                 div.search-box(id='searchboxinvite')                      
                     input(type='text', placeholder='Search...') 
 
-        button.inline-block.bg-purple-200.p-2.invisible Send Email
+        button(id='sendEmail', onClick='sendEmail()').inline-block.bg-purple-200.p-2.invisible Send Email
 
     div.mt-8
         div(id='heartrate', style={width: '90%'}).overflow-x-scroll.invisible    
@@ -304,14 +304,6 @@ block content
             })                             
         }
 
-        btn.addEventListener("click", () => {
-            var link = "mailto:" + selectedInvite.innerHTML.trim() +
-                       "&subject=" + encodeURIComponent("This is my subject") +
-                       "&body=" + encodeURIComponent("hello slava")
-    
-            window.location.href = link
-        })
-
         selectedInvite.addEventListener("click", () => {
             optionsContainerInvite.classList.toggle("active")
             searchBoxInvite.value = ""
@@ -418,7 +410,17 @@ block content
                     option.style.marginTop = '0px' 
                 }
             })
-        }        
+        }   
+
+        function sendEmail()
+        {
+            var request = new XMLHttpRequest()
+            $.ajax({
+                url: "/sendEmail",
+                method: "POST",
+                data: {userEmail: selectedInvite.innerHTML.trim()} 
+            }) 
+        }     
         
     style. 
         .select-box {

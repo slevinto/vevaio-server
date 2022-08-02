@@ -14,6 +14,8 @@ const path_1 = __importDefault(require("path"));
 const fs_1 = require("fs");
 const pg_1 = __importDefault(require("pg"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const googleapis_1 = require("googleapis");
+const mail_composer_1 = __importDefault(require("nodemailer/lib/mail-composer"));
 const app = (0, express_1.default)();
 const port = process.env.PORT;
 app.set('view engine', 'pug');
@@ -59,6 +61,46 @@ const appFirebase = (0, app_1.initializeApp)(firebaseConfig);
 const database = (0, database_1.getDatabase)(appFirebase);
 const dbRef = (0, database_1.ref)(database);
 const auth = (0, auth_1.getAuth)();
+const credentialsUrl = path_1.default.join(__dirname, '..', './credentials.json');
+const credentials = JSON.parse((0, fs_1.readFileSync)(credentialsUrl).toString());
+const { client_secret, client_id, redirect_uris } = credentials.web;
+const oAuth2Client = new googleapis_1.google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+const GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send'];
+const url = oAuth2Client.generateAuthUrl({
+    access_type: 'offline',
+    prompt: 'consent',
+    scope: GMAIL_SCOPES,
+});
+const encodeMessage = (message) => {
+    return Buffer.from(message).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+};
+const createMail = async (options) => {
+    const mailComposer = new mail_composer_1.default(options);
+    const message = await mailComposer.compile().build();
+    return encodeMessage(message);
+};
+const sendMail = async (options) => {
+    console.log('url to get token: ' + url);
+    const code = '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'; // here get token from url
+    const token = oAuth2Client.getToken(code)
+        .catch((error) => {
+        console.log('error get token: ' + error.message);
+    });
+    if (options) {
+        var request = new XMLHttpRequest();
+        var url = 'https://www.googleapis.com/gmail/v1/users/me/messages/send';
+        var params = JSON.stringify({ 'raw': options });
+        request.open('POST', url, true);
+        request.setRequestHeader("Authorization", "Bearer " + token);
+        request.setRequestHeader("Content-type", "application/json");
+        request.send(params);
+        request.onload = function () {
+            if (200 === request.status) {
+                alert("Email sent successfully");
+            }
+        };
+    }
+};
 // build from webhook response to send to thryve for receiving new data
 var data = {
     authenticationToken: '',
@@ -130,8 +172,15 @@ app.post('/save_doctor_in_firebase', (req, res) => {
         home_page_doctor(res);
     })
         .catch((error) => {
-        res.render('login', { credentials: { email: '', password: '' }, err: 'failed to login in firebase: ' + error.message });
-        // ..
+        if (error.code === 'auth/email-already-exists') {
+            const two_years = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2);
+            res.cookie(`email`, doctor_info.email, { expires: two_years });
+            res.cookie(`password`, doctor_info.password, { expires: two_years });
+            res.cookie(`type`, 'doctor', { expires: two_years });
+            home_page_doctor(res);
+        }
+        else
+            res.render('login', { credentials: { email: '', password: '' }, err: 'failed to register in firebase: ' + error.message });
     });
 });
 //  register patient in firebase
@@ -163,28 +212,59 @@ app.post('/save_patient_in_firebase', (req, res) => {
                 res.render('choose_brand', { url: thryveDataSourcesUrl });
             }
             else {
-                home_page_patient(res, patient_info.email);
+                home_page_patient(res, patient_info.email, patient_info.name);
             }
         });
     })
         .catch((error) => {
-        res.render('login', { credentials: { email: '', password: '' }, err: 'failed to login in firebase: ' + error.message });
+        // Handle Errors here. 
+        if (error.code === 'auth/email-already-exists') {
+            const two_years = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2);
+            res.cookie(`email`, patient_info.email, { expires: two_years });
+            res.cookie(`password`, patient_info.password, { expires: two_years });
+            res.cookie(`type`, 'patient', { expires: two_years });
+            getThryveDataSources(patientData, function (thryveDataSourcesItem) {
+                const thryveDataSources = thryveDataSourcesItem.dataSources;
+                const thryveDataSourcesUrl = thryveDataSourcesItem.url;
+                if (thryveDataSources.length === 0) {
+                    res.render('choose_brand', { url: thryveDataSourcesUrl });
+                }
+                else {
+                    home_page_patient(res, patient_info.email, patient_info.name);
+                }
+            });
+        }
+        else
+            res.render('login', { credentials: { email: '', password: '' }, err: 'failed to login in firebase: ' + error.message });
         // ..
     });
 });
-// login doctor in firebase
+// login in firebase
 app.post('/login', (req, res) => {
     (0, auth_1.signInWithEmailAndPassword)(auth, req.body.email, req.body.password)
         .then((result) => {
         if (req.cookies.type === 'patient') {
-            home_page_patient(res, req.body.email);
+            home_page_patient(res, req.body.email, result.user.displayName);
         }
         else if (req.cookies.type === 'doctor') {
             home_page_doctor(res);
         }
+        else if (result.user.displayName.length > 0) {
+            const two_years = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2);
+            res.cookie(`email`, patient_info.email, { expires: two_years });
+            res.cookie(`password`, patient_info.password, { expires: two_years });
+            res.cookie(`type`, 'patient', { expires: two_years });
+            home_page_patient(res, req.body.email, result.user.displayName);
+        }
+        else {
+            const two_years = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2);
+            res.cookie(`email`, patient_info.email, { expires: two_years });
+            res.cookie(`password`, patient_info.password, { expires: two_years });
+            res.cookie(`type`, 'doctor', { expires: two_years });
+            home_page_doctor(res);
+        }
     })
         .catch((error) => {
-        // Handle Errors here.  
         res.render('login', { credentials: { email: '', password: '' }, err: 'failed to login in firebase: ' + error.message });
     });
 });
@@ -219,6 +299,21 @@ app.post('/', (req, res) => {
         GetDynamicValues(url, partnerUserID);
     }
     res.sendStatus(200);
+});
+//send Email to invite user
+app.post('/sendEmail', (req, res) => {
+    console.log(req.body.userEmail.toString());
+    const options = {
+        to: req.body.userEmail.toString(),
+        subject: 'Hello Amit 🚀',
+        text: 'This email is sent from the command line',
+        html: `<p>🙋🏻‍♀️  &mdash; This is a <b>test email</b> from <a href="https://digitalinspiration.com">Digital Inspiration</a>.</p>`,
+        headers: [
+            { key: 'X-Application-Developer', value: 'Amit Agarwal' },
+            { key: 'X-Application-Version', value: 'v1.0.0.2' },
+        ],
+    };
+    sendMail(options);
 });
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
 function GetDynamicValues(url, partnerUserID) {
@@ -357,8 +452,8 @@ function GetDynamicValues(url, partnerUserID) {
                         default:
                             folder_path = '/Other/' + name;
                     }
-                    writeUserData(partnerUserID, folder_path, data_time_value);
-                    queryDatabase(partnerUserID, folder_path.split('/')[1], folder_path.split('/')[2], data_time_value.createdAtUnix, data_time_value.value);
+                    writeUserData(partnerUserID.toString(), folder_path, data_time_value);
+                    queryDatabase(partnerUserID.toString(), folder_path.split('/')[1], folder_path.split('/')[2], data_time_value.createdAtUnix, data_time_value.value);
                 });
             });
             console.log("received token: ", qs_1.default.parse(dataSource.authenticationToken));
@@ -386,62 +481,52 @@ function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value
 // go to home doctor page
 function home_page_doctor(res) {
     (0, database_1.get)((0, database_1.child)(dbRef, `users/`)).then((snapshot) => {
-        if (snapshot.exists()) {
-            allUsers = [];
-            const allData = snapshot.val();
-            for (var patientname in allData) {
-                for (var section in snapshot.child(patientname).val()) {
-                    for (var subsection in snapshot.child(patientname).child(section).val()) {
-                        for (var dirsubsection in snapshot.child(patientname).child(section).child(subsection).val()) {
-                            allUsers.push([patientname,
-                                section,
-                                subsection,
-                                snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
-                                snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('value').val()]);
-                        }
+        allUsers = [];
+        const allData = snapshot.val();
+        for (var patientname in allData) {
+            for (var section in snapshot.child(patientname).val()) {
+                for (var subsection in snapshot.child(patientname).child(section).val()) {
+                    for (var dirsubsection in snapshot.child(patientname).child(section).child(subsection).val()) {
+                        allUsers.push([patientname,
+                            section,
+                            subsection,
+                            snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
+                            snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('value').val()]);
                     }
                 }
             }
-            allFirebaseUsers = [];
-            firebase_admin_1.default.auth().listUsers(1000)
-                .then((listUsersResult) => {
-                listUsersResult.users.forEach((userRecord) => {
-                    allFirebaseUsers.push(userRecord.toJSON());
-                });
-                const firebaseUsers = allFirebaseUsers.map(a => a.email);
-                res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers });
-            })
-                .catch((error) => {
-                console.log('Error listing users:', error);
+        }
+        allFirebaseUsers = [];
+        firebase_admin_1.default.auth().listUsers(1000)
+            .then((listUsersResult) => {
+            listUsersResult.users.forEach((userRecord) => {
+                allFirebaseUsers.push(userRecord.toJSON());
             });
-        }
-        else {
-            console.log('no data');
-        }
+            const firebaseUsers = allFirebaseUsers.map(a => a.email);
+            res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers });
+        })
+            .catch((error) => {
+            console.log('Error listing users:', error);
+        });
     });
 }
-function home_page_patient(res, userEmail) {
+function home_page_patient(res, userEmail, userName) {
     firebase_admin_1.default.auth().getUserByEmail(userEmail)
         .then((userRecord) => {
         var dataItems = [];
-        (0, database_1.get)((0, database_1.child)(dbRef, `users/` + userRecord.displayName)).then((snapshot) => {
-            if (snapshot.exists()) {
-                const allData = snapshot.val();
-                for (var section in allData) {
-                    for (var subsection in snapshot.child(section).val()) {
-                        for (var dirsubsection in snapshot.child(section).child(subsection).val()) {
-                            dataItems.push([section,
-                                subsection,
-                                snapshot.child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
-                                snapshot.child(section).child(subsection).child(dirsubsection).child('value').val()]);
-                        }
+        (0, database_1.get)((0, database_1.child)(dbRef, `users/` + userName)).then((snapshot) => {
+            const allData = snapshot.val();
+            for (var section in allData) {
+                for (var subsection in snapshot.child(section).val()) {
+                    for (var dirsubsection in snapshot.child(section).child(subsection).val()) {
+                        dataItems.push([section,
+                            subsection,
+                            snapshot.child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
+                            snapshot.child(section).child(subsection).child(dirsubsection).child('value').val()]);
                     }
                 }
-                res.render('home_patient', { username: userRecord.displayName, data: dataItems });
             }
-            else {
-                console.log('no data');
-            }
+            res.render('home_patient', { username: userName, data: dataItems });
         });
     });
 }

@@ -6,10 +6,14 @@ import { getDatabase, ref, child, get, push } from 'firebase/database'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
 import admin from 'firebase-admin'
 import path from 'path'
-import { readFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
 import pg from 'pg'
 import cookieParser from 'cookie-parser'  
-  
+import { google } from 'googleapis'
+import MailComposer from 'nodemailer/lib/mail-composer'
+import { Options } from 'nodemailer/lib/mailer'
+import { Response } from 'express-serve-static-core'
+
 const app = express()
 const port = process.env.PORT
 
@@ -51,7 +55,7 @@ const pg_config = {
     ssl: true
 }
 
-const fileUrl = path.join(__dirname, '..', 'vevaio-firebase-adminsdk-vv0bl-3be2a90905.json');
+const fileUrl = path.join(__dirname, '..', 'vevaio-firebase-adminsdk-vv0bl-3be2a90905.json')
 const serviceAccount = JSON.parse(readFileSync(fileUrl).toString())
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -61,6 +65,48 @@ const appFirebase = initializeApp(firebaseConfig)
 const database = getDatabase(appFirebase)
 const dbRef = ref(database)
 const auth = getAuth()
+
+const credentialsUrl = path.join(__dirname, '..', './credentials.json')
+const credentials = JSON.parse(readFileSync(credentialsUrl).toString())
+const { client_secret, client_id, redirect_uris } = credentials.web
+const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0])
+const GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+const url = oAuth2Client.generateAuthUrl({
+  access_type: 'offline',
+  prompt: 'consent',
+  scope: GMAIL_SCOPES,
+})
+
+const encodeMessage = (message: Buffer | ArrayBuffer | { valueOf(): ArrayBuffer | SharedArrayBuffer }) => {
+    return Buffer.from(message).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+const createMail = async (options: Options) => {
+    const mailComposer = new MailComposer(options)
+    const message = await mailComposer.compile().build()
+    return encodeMessage(message)
+}
+const sendMail = async (options: Options) => {
+    console.log('url to get token: ' + url)
+    const code = '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' // here get token from url
+    const token = oAuth2Client.getToken(code)
+    .catch((error) => {
+        console.log('error get token: ' + error.message)
+    })
+    if (options) {
+        var request = new XMLHttpRequest()
+        var url = 'https://www.googleapis.com/gmail/v1/users/me/messages/send'
+        var params = JSON.stringify({'raw': options})
+        request.open('POST', url , true)
+        request.setRequestHeader("Authorization", "Bearer " + token)
+        request.setRequestHeader("Content-type", "application/json")
+        request.send(params)
+        request.onload = function() {
+            if (200 === request.status) {
+                alert("Email sent successfully")
+            }
+        }
+   }    
+}
 
 // build from webhook response to send to thryve for receiving new data
 var data = {
@@ -137,22 +183,29 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
     doctor_info.telephone = req.body.telephone
     doctor_info.email = req.body.email
     doctor_info.password = req.body.password
-
     createUserWithEmailAndPassword(auth, doctor_info.email, doctor_info.password)
-        .then(userData => {  
-            push(ref(database, 'doctors/' + doctor_info.fullname), doctor_info)   
+    .then(userData => {  
+        push(ref(database, 'doctors/' + doctor_info.fullname), doctor_info)   
             
+        const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
+        res.cookie(`email`, doctor_info.email, { expires: two_years })
+        res.cookie(`password`, doctor_info.password, { expires: two_years })
+        res.cookie(`type`, 'doctor', { expires: two_years })
+
+        home_page_doctor(res)
+    })
+    .catch((error) => {
+        if (error.code === 'auth/email-already-exists') 
+        {
             const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
             res.cookie(`email`, doctor_info.email, { expires: two_years })
             res.cookie(`password`, doctor_info.password, { expires: two_years })
             res.cookie(`type`, 'doctor', { expires: two_years })
-
             home_page_doctor(res)
-        })
-        .catch((error) => {
-            res.render('login', { credentials: {email: '', password: '' }, err: 'failed to login in firebase: ' + error.message } )
-            // ..
-        })        
+        }
+        else
+            res.render('login', { credentials: {email: '', password: '' }, err: 'failed to register in firebase: ' + error.message } )            
+    })        
 })
 
 //  register patient in firebase
@@ -190,32 +243,69 @@ app.post('/save_patient_in_firebase', (req, res)=>{
             }
             else
             {
-                home_page_patient(res, patient_info.email)
+                home_page_patient(res, patient_info.email, patient_info.name)
             }
         })
     })
     .catch((error) => {
-        res.render('login', { credentials: {email: '', password: '' }, err: 'failed to login in firebase: ' + error.message } )
+        // Handle Errors here. 
+        if (error.code === 'auth/email-already-exists') 
+        {
+            const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
+            res.cookie(`email`, patient_info.email, { expires: two_years })
+            res.cookie(`password`, patient_info.password, { expires: two_years })
+            res.cookie(`type`, 'patient', { expires: two_years })            
+    
+            getThryveDataSources(patientData, function(thryveDataSourcesItem) {
+                const thryveDataSources = thryveDataSourcesItem.dataSources
+                const thryveDataSourcesUrl = thryveDataSourcesItem.url
+                if (thryveDataSources.length === 0)
+                {
+                    res.render('choose_brand', {url: thryveDataSourcesUrl})
+                }
+                else
+                {
+                    home_page_patient(res, patient_info.email, patient_info.name)
+                }
+            })
+        }
+        else
+            res.render('login', { credentials: {email: '', password: '' }, err: 'failed to login in firebase: ' + error.message } )
         // ..
     })        
 })
 
-// login doctor in firebase
+// login in firebase
 app.post('/login', (req, res)=>{  
     signInWithEmailAndPassword(auth, req.body.email, req.body.password)
     .then((result) => {
         if (req.cookies.type === 'patient')
         {
-            home_page_patient(res, req.body.email)
+            home_page_patient(res, req.body.email, result.user.displayName)
         }
         else if (req.cookies.type === 'doctor')
         {
             home_page_doctor(res)
         }
+        else if (result.user.displayName.length > 0)
+        {
+            const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
+            res.cookie(`email`, patient_info.email, { expires: two_years })
+            res.cookie(`password`, patient_info.password, { expires: two_years })
+            res.cookie(`type`, 'patient', { expires: two_years })     
+            home_page_patient(res, req.body.email, result.user.displayName)
+        }
+        else
+        {
+            const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
+            res.cookie(`email`, patient_info.email, { expires: two_years })
+            res.cookie(`password`, patient_info.password, { expires: two_years })
+            res.cookie(`type`, 'doctor', { expires: two_years })     
+            home_page_doctor(res)
+        }
     })
-    .catch((error) => {
-      // Handle Errors here.  
-      res.render('login', { credentials: { email: '', password: '' }, err: 'failed to login in firebase: ' + error.message } )
+    .catch((error) => {        
+        res.render('login', { credentials: { email: '', password: '' }, err: 'failed to login in firebase: ' + error.message } )
     })
 }) 
 
@@ -256,9 +346,25 @@ app.post( '/', ( req, res ) => {
     res.sendStatus( 200 )
 })
 
+//send Email to invite user
+app.post('/sendEmail', (req, res) => {  
+    console.log(req.body.userEmail.toString())
+    const options = {
+        to: req.body.userEmail.toString(),
+        subject: 'Hello Amit 🚀',
+        text: 'This email is sent from the command line',
+        html: `<p>🙋🏻‍♀️  &mdash; This is a <b>test email</b> from <a href="https://digitalinspiration.com">Digital Inspiration</a>.</p>`,
+        headers: [
+          { key: 'X-Application-Developer', value: 'Amit Agarwal' },
+          { key: 'X-Application-Version', value: 'v1.0.0.2' },
+        ],
+    }
+    sendMail(options)
+})
+
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
 
-function GetDynamicValues(url, partnerUserID)
+function GetDynamicValues(url: string, partnerUserID: string | string[] | qs.ParsedQs | qs.ParsedQs[])
 {
     console.log("send post: ", data, "url: ", url)  
     axios.post(
@@ -400,8 +506,8 @@ function GetDynamicValues(url, partnerUserID)
                         default:
                             folder_path = '/Other/' + name    
                     }
-                    writeUserData(partnerUserID, folder_path, data_time_value)
-                    queryDatabase(partnerUserID, folder_path.split('/')[1], folder_path.split('/')[2], data_time_value.createdAtUnix, data_time_value.value)
+                    writeUserData(partnerUserID.toString(), folder_path, data_time_value)
+                    queryDatabase(partnerUserID.toString(), folder_path.split('/')[1], folder_path.split('/')[2], data_time_value.createdAtUnix, data_time_value.value)
                 })      
             })       
             console.log("received token: ", qs.parse(dataSource.authenticationToken))
@@ -412,12 +518,12 @@ function GetDynamicValues(url, partnerUserID)
     })
 }
 
-function writeUserData(token, folder_path, json) {    
+function writeUserData(token: string, folder_path: string, json: unknown) {    
     push(ref(database, 'users/' + token + folder_path), json)    
 }
 
 // write to postgresql
-function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value) {
+function queryDatabase(name: string, main_folder: string, secondary_folder: string, createdAtUnix: string, value: string) {
     const client = new pg.Client(pg_config)
     client.connect()  // creates connection
     const query = `    
@@ -431,15 +537,13 @@ function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value
 }
 
 // go to home doctor page
-function home_page_doctor(res)
+function home_page_doctor(res: Response<any, Record<string, any>, number>)
 {
     get(child(dbRef, `users/`)).then((snapshot) => {
-        if (snapshot.exists()) {
-          allUsers = []
-           
-          const allData = snapshot.val()
-          for(var patientname in allData)
-          {
+        allUsers = []
+        const allData = snapshot.val()
+        for(var patientname in allData)
+        {
             for (var section in snapshot.child(patientname).val()){
                 for(var subsection in snapshot.child(patientname).child(section).val()){
                     for(var dirsubsection in snapshot.child(patientname).child(section).child(subsection).val()){
@@ -451,53 +555,42 @@ function home_page_doctor(res)
                     }           
                 } 
             }     
-          }
+        }
 
-          allFirebaseUsers = []
-          admin.auth().listUsers(1000)
-              .then((listUsersResult) => {
-                listUsersResult.users.forEach((userRecord) => {
-                  allFirebaseUsers.push(userRecord.toJSON())
-                }) 
-                const firebaseUsers = allFirebaseUsers.map(a => a.email)
-                res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers } )                   
-              })
-              .catch((error) => {
-                console.log('Error listing users:', error)
-              })             
-        }
-        else
-        {
-            console.log('no data')
-        }
+        allFirebaseUsers = []
+        admin.auth().listUsers(1000)
+        .then((listUsersResult) => {
+            listUsersResult.users.forEach((userRecord) => {
+                allFirebaseUsers.push(userRecord.toJSON())
+            }) 
+            const firebaseUsers = allFirebaseUsers.map(a => a.email)
+            res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers } )                   
+        })
+        .catch((error) => {
+            console.log('Error listing users:', error)
+        })       
     })     
 }
 
-function home_page_patient(res, userEmail)
+function home_page_patient(res: Response<any, Record<string, any>, number>, userEmail: string, userName: string)
 {
     admin.auth().getUserByEmail(userEmail)
     .then((userRecord) => {
         var dataItems = []
        
-        get(child(dbRef, `users/` + userRecord.displayName)).then((snapshot) => {
-            if (snapshot.exists()) {
-                const allData = snapshot.val()
-                for (var section in allData) {
-                    for(var subsection in snapshot.child(section).val()) {
-                        for(var dirsubsection in snapshot.child(section).child(subsection).val()) {
-                            dataItems.push([section, 
-                                            subsection, 
-                                            snapshot.child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
-                                            snapshot.child(section).child(subsection).child(dirsubsection).child('value').val()]) 
-                        }           
-                    } 
-                }     
-                res.render('home_patient', { username: userRecord.displayName, data:dataItems } )  
-            }
-            else
-            {
-                console.log('no data')
-            }
+        get(child(dbRef, `users/` + userName)).then((snapshot) => {
+            const allData = snapshot.val()
+            for (var section in allData) {
+                for(var subsection in snapshot.child(section).val()) {
+                    for(var dirsubsection in snapshot.child(section).child(subsection).val()) {
+                        dataItems.push([section, 
+                                        subsection, 
+                                        snapshot.child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
+                                        snapshot.child(section).child(subsection).child(dirsubsection).child('value').val()]) 
+                    }           
+                } 
+            }     
+            res.render('home_patient', { username: userName, data:dataItems } )              
         })     
     })   
 }

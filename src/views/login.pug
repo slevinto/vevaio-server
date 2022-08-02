@@ -21,6 +21,8 @@ block content
                 div.text-purple-700.font-bold
                     a(href='/welcome') Register me      
 
-    script.                 
-        if ( typeof err !== 'undefined' )
-            alert(!{JSON.stringify(err)})
+    script. 
+        if ( '#{err}'.length !== 0 )
+        {           
+            alert('#{err}')
+        }
