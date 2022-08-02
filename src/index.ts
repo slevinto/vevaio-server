@@ -197,11 +197,20 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
     .catch((error) => {
         if (['auth/email-already-exists', 'auth/email-already-in-use'].includes(error.code)) 
         {
-            const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
-            res.cookie(`email`, doctor_info.email, { expires: two_years })
-            res.cookie(`password`, doctor_info.password, { expires: two_years })
-            res.cookie(`type`, 'doctor', { expires: two_years })
-            home_page_doctor(res)
+            signInWithEmailAndPassword(auth, doctor_info.email, doctor_info.password)
+            .then((result) => {
+
+                push(ref(database, 'doctors/' + doctor_info.fullname), doctor_info)   
+
+                const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
+                res.cookie(`email`, doctor_info.email, { expires: two_years })
+                res.cookie(`password`, doctor_info.password, { expires: two_years })
+                res.cookie(`type`, 'doctor', { expires: two_years })
+                home_page_doctor(res)
+            })
+            .catch((error) => {
+                res.render('login', { credentials: {email: '', password: '' }, err: 'failed to register in firebase: ' + error.message } ) 
+            })
         }
         else
             res.render('login', { credentials: {email: '', password: '' }, err: 'failed to register in firebase: ' + error.message } )            
@@ -251,27 +260,34 @@ app.post('/save_patient_in_firebase', (req, res)=>{
         // Handle Errors here. 
         if (['auth/email-already-exists', 'auth/email-already-in-use'].includes(error.code)) 
         {
-            const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
-            res.cookie(`email`, patient_info.email, { expires: two_years })
-            res.cookie(`password`, patient_info.password, { expires: two_years })
-            res.cookie(`type`, 'patient', { expires: two_years })            
+            signInWithEmailAndPassword(auth, patient_info.email, patient_info.password)
+            .then((result) => {
+                push(ref(database, 'users/' + patient_info.name + '/info/'), patient_info)  
+
+                const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
+                res.cookie(`email`, patient_info.email, { expires: two_years })
+                res.cookie(`password`, patient_info.password, { expires: two_years })
+                res.cookie(`type`, 'patient', { expires: two_years })            
     
-            getThryveDataSources(patientData, function(thryveDataSourcesItem) {
-                const thryveDataSources = thryveDataSourcesItem.dataSources
-                const thryveDataSourcesUrl = thryveDataSourcesItem.url
-                if (thryveDataSources.length === 0)
-                {
-                    res.render('choose_brand', {url: thryveDataSourcesUrl})
-                }
-                else
-                {
-                    home_page_patient(res, patient_info.email, patient_info.name)
-                }
+                getThryveDataSources(patientData, function(thryveDataSourcesItem) {
+                    const thryveDataSources = thryveDataSourcesItem.dataSources
+                    const thryveDataSourcesUrl = thryveDataSourcesItem.url
+                    if (thryveDataSources.length === 0)
+                    {
+                        res.render('choose_brand', {url: thryveDataSourcesUrl})
+                    }
+                    else
+                    {
+                        home_page_patient(res, patient_info.email, patient_info.name)
+                    } 
+                })
+            })
+            .catch((error) => {
+                res.render('login', { credentials: {email: '', password: '' }, err: 'failed to login in firebase: ' + error.message } )
             })
         }
         else
             res.render('login', { credentials: {email: '', password: '' }, err: 'failed to login in firebase: ' + error.message } )
-        // ..
     })        
 })
 
