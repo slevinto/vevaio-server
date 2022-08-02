@@ -195,7 +195,7 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
         home_page_doctor(res)
     })
     .catch((error) => {
-        if (error.code === 'auth/email-already-exists') 
+        if (['auth/email-already-exists', 'auth/email-already-in-use'].includes(error.code)) 
         {
             const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
             res.cookie(`email`, doctor_info.email, { expires: two_years })
@@ -249,7 +249,7 @@ app.post('/save_patient_in_firebase', (req, res)=>{
     })
     .catch((error) => {
         // Handle Errors here. 
-        if (error.code === 'auth/email-already-exists') 
+        if (['auth/email-already-exists', 'auth/email-already-in-use'].includes(error.code)) 
         {
             const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
             res.cookie(`email`, patient_info.email, { expires: two_years })
