@@ -156,7 +156,7 @@ app.get('/', (req, res) => {
     }
     res.render("login", { credentials: cookies });
 });
-//  register doctor in firebase
+// register doctor in firebase
 app.post('/save_doctor_in_firebase', (req, res) => {
     doctor_info.fullname = req.body.fullname;
     doctor_info.telephone = req.body.telephone;
@@ -165,6 +165,7 @@ app.post('/save_doctor_in_firebase', (req, res) => {
     (0, auth_1.createUserWithEmailAndPassword)(auth, doctor_info.email, doctor_info.password)
         .then(userData => {
         (0, database_1.push)((0, database_1.ref)(database, 'doctors/' + doctor_info.fullname), doctor_info);
+        write_registered_in_postgresql('doctor', doctor_info.fullname, doctor_info.email, doctor_info.telephone);
         const two_years = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2);
         res.cookie(`email`, doctor_info.email, { expires: two_years });
         res.cookie(`password`, doctor_info.password, { expires: two_years });
@@ -176,6 +177,7 @@ app.post('/save_doctor_in_firebase', (req, res) => {
             (0, auth_1.signInWithEmailAndPassword)(auth, doctor_info.email, doctor_info.password)
                 .then((result) => {
                 (0, database_1.push)((0, database_1.ref)(database, 'doctors/' + doctor_info.fullname), doctor_info);
+                write_registered_in_postgresql('doctor', doctor_info.fullname, doctor_info.email, doctor_info.telephone);
                 const two_years = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2);
                 res.cookie(`email`, doctor_info.email, { expires: two_years });
                 res.cookie(`password`, doctor_info.password, { expires: two_years });
@@ -208,6 +210,7 @@ app.post('/save_patient_in_firebase', (req, res) => {
     })
         .then(userData => {
         (0, database_1.push)((0, database_1.ref)(database, 'users/' + patient_info.name + '/info/'), patient_info);
+        write_registered_in_postgresql('patient', patient_info.name, patient_info.email, '');
         const two_years = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2);
         res.cookie(`email`, patient_info.email, { expires: two_years });
         res.cookie(`password`, patient_info.password, { expires: two_years });
@@ -229,6 +232,7 @@ app.post('/save_patient_in_firebase', (req, res) => {
             (0, auth_1.signInWithEmailAndPassword)(auth, patient_info.email, patient_info.password)
                 .then((result) => {
                 (0, database_1.push)((0, database_1.ref)(database, 'users/' + patient_info.name + '/info/'), patient_info);
+                write_registered_in_postgresql('patient', patient_info.name, patient_info.email, '');
                 const two_years = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2);
                 res.cookie(`email`, patient_info.email, { expires: two_years });
                 res.cookie(`password`, patient_info.password, { expires: two_years });
@@ -478,7 +482,7 @@ function GetDynamicValues(url, partnerUserID) {
 function writeUserData(token, folder_path, json) {
     (0, database_1.push)((0, database_1.ref)(database, 'users/' + token + folder_path), json);
 }
-// write to postgresql
+// write to postgresql user data for graphs
 function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value) {
     const client = new pg_1.default.Client(pg_config);
     client.connect(); // creates connection
@@ -486,6 +490,19 @@ function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value
             INSERT INTO users (name, main_folder, secondary_folder, createdAtUnix, value) VALUES($1, $2, $3, $4, $5)           
     `;
     client.query(query, [name, main_folder, secondary_folder, createdAtUnix, value], (err, res) => {
+        if (err)
+            console.log(err.stack);
+        client.end();
+    });
+}
+// write to postgresql doctor register info
+function write_registered_in_postgresql(type, fullname, email, telephone) {
+    const client = new pg_1.default.Client(pg_config);
+    client.connect(); // creates connection
+    const query = `    
+            INSERT INTO registered (type, fullname, email, telephone) VALUES($1, $2, $3, $4)           
+    `;
+    client.query(query, [type, fullname, email, telephone], (err, res) => {
         if (err)
             console.log(err.stack);
         client.end();
@@ -558,16 +575,16 @@ function getThryveDataSources(patientData, callback) {
             })
                 .catch((error) => {
                 // Handle Errors here.  
-                console.log(error);
+                console.log(error.message);
             });
         })
             .catch((error) => {
             // Handle Errors here.  
-            console.log(error);
+            console.log(error.message);
         });
     })
         .catch((error) => {
         // Handle Errors here.  
-        console.log(error);
+        console.log(error.message);
     });
 }

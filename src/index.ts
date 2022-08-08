@@ -178,13 +178,13 @@ app.get('/', (req, res) => {
 })  
 
 // register doctor in firebase
-app.post('/save_doctor_in_firebase', (req, res)=>{    
+app.post('/save_doctor_in_firebase', (req, res)=>{  
     doctor_info.fullname = req.body.fullname
     doctor_info.telephone = req.body.telephone
     doctor_info.email = req.body.email
     doctor_info.password = req.body.password
     createUserWithEmailAndPassword(auth, doctor_info.email, doctor_info.password)
-    .then(userData => {  
+    .then(userData => { 
         push(ref(database, 'doctors/' + doctor_info.fullname), doctor_info)   
         write_registered_in_postgresql('doctor', doctor_info.fullname, doctor_info.email, doctor_info.telephone)    
         const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
@@ -199,9 +199,9 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
         {
             signInWithEmailAndPassword(auth, doctor_info.email, doctor_info.password)
             .then((result) => {
-
                 push(ref(database, 'doctors/' + doctor_info.fullname), doctor_info)   
-                write_registered_in_postgresql('doctor', doctor_info.fullname, doctor_info.email, doctor_info.telephone)    
+                write_registered_in_postgresql('doctor', doctor_info.fullname, doctor_info.email, doctor_info.telephone)  
+
                 const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
                 res.cookie(`email`, doctor_info.email, { expires: two_years })
                 res.cookie(`password`, doctor_info.password, { expires: two_years })
@@ -265,7 +265,7 @@ app.post('/save_patient_in_firebase', (req, res)=>{
             .then((result) => {
                 push(ref(database, 'users/' + patient_info.name + '/info/'), patient_info)  
                 write_registered_in_postgresql('patient', patient_info.name, patient_info.email, '')  
-                
+
                 const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
                 res.cookie(`email`, patient_info.email, { expires: two_years })
                 res.cookie(`password`, patient_info.password, { expires: two_years })
@@ -565,7 +565,7 @@ function write_registered_in_postgresql(type: string, fullname: string, email: s
         if (err)
             console.log(err.stack) 
         client.end()
-      })
+    })
 }
 
 // go to home doctor page
@@ -655,16 +655,16 @@ function getThryveDataSources(patientData, callback)
             })
             .catch((error) => {
                 // Handle Errors here.  
-                console.log(error)
+                console.log(error.message)
             }) 
         })
         .catch((error) => {
             // Handle Errors here.  
-            console.log(error)
+            console.log(error.message)
         }) 
     })
     .catch((error) => {
         // Handle Errors here.  
-        console.log(error)
+        console.log(error.message)
     })    
 }
