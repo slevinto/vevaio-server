@@ -177,7 +177,7 @@ app.get('/', (req, res) => {
     res.render("login", {credentials: cookies})
 })  
 
-//  register doctor in firebase
+// register doctor in firebase
 app.post('/save_doctor_in_firebase', (req, res)=>{    
     doctor_info.fullname = req.body.fullname
     doctor_info.telephone = req.body.telephone
@@ -186,7 +186,7 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
     createUserWithEmailAndPassword(auth, doctor_info.email, doctor_info.password)
     .then(userData => {  
         push(ref(database, 'doctors/' + doctor_info.fullname), doctor_info)   
-            
+        write_registered_in_postgresql('doctor', doctor_info.fullname, doctor_info.email, doctor_info.telephone)    
         const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
         res.cookie(`email`, doctor_info.email, { expires: two_years })
         res.cookie(`password`, doctor_info.password, { expires: two_years })
@@ -201,7 +201,7 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
             .then((result) => {
 
                 push(ref(database, 'doctors/' + doctor_info.fullname), doctor_info)   
-
+                write_registered_in_postgresql('doctor', doctor_info.fullname, doctor_info.email, doctor_info.telephone)    
                 const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
                 res.cookie(`email`, doctor_info.email, { expires: two_years })
                 res.cookie(`password`, doctor_info.password, { expires: two_years })
@@ -237,7 +237,8 @@ app.post('/save_patient_in_firebase', (req, res)=>{
     })
     .then(userData => {  
         push(ref(database, 'users/' + patient_info.name + '/info/'), patient_info)   
-            
+        write_registered_in_postgresql('patient', patient_info.name, patient_info.email, '')    
+                    
         const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
         res.cookie(`email`, patient_info.email, { expires: two_years })
         res.cookie(`password`, patient_info.password, { expires: two_years })
@@ -263,7 +264,8 @@ app.post('/save_patient_in_firebase', (req, res)=>{
             signInWithEmailAndPassword(auth, patient_info.email, patient_info.password)
             .then((result) => {
                 push(ref(database, 'users/' + patient_info.name + '/info/'), patient_info)  
-
+                write_registered_in_postgresql('patient', patient_info.name, patient_info.email, '')  
+                
                 const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
                 res.cookie(`email`, patient_info.email, { expires: two_years })
                 res.cookie(`password`, patient_info.password, { expires: two_years })
@@ -538,7 +540,7 @@ function writeUserData(token: string, folder_path: string, json: unknown) {
     push(ref(database, 'users/' + token + folder_path), json)    
 }
 
-// write to postgresql
+// write to postgresql user data for graphs
 function queryDatabase(name: string, main_folder: string, secondary_folder: string, createdAtUnix: string, value: string) {
     const client = new pg.Client(pg_config)
     client.connect()  // creates connection
@@ -546,6 +548,20 @@ function queryDatabase(name: string, main_folder: string, secondary_folder: stri
             INSERT INTO users (name, main_folder, secondary_folder, createdAtUnix, value) VALUES($1, $2, $3, $4, $5)           
     `
     client.query(query, [name, main_folder, secondary_folder, createdAtUnix, value], (err, res) => {
+        if (err)
+            console.log(err.stack) 
+        client.end()
+      })
+}
+
+// write to postgresql doctor register info
+function write_registered_in_postgresql(type: string, fullname: string, email: string, telephone: string) {
+    const client = new pg.Client(pg_config)
+    client.connect()  // creates connection
+    const query = `    
+            INSERT INTO registered (type, fullname, email, telephone) VALUES($1, $2, $3, $4)           
+    `
+    client.query(query, [type, fullname, email, telephone], (err, res) => {
         if (err)
             console.log(err.stack) 
         client.end()
