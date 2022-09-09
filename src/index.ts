@@ -9,8 +9,7 @@ import path from 'path'
 import { readFileSync, writeFileSync } from 'fs'
 import pg from 'pg'
 import cookieParser from 'cookie-parser'  
-import { google } from 'googleapis'
-import MailComposer from 'nodemailer/lib/mail-composer'
+import { createTransport } from 'nodemailer'
 import { Options } from 'nodemailer/lib/mailer'
 import { Response } from 'express-serve-static-core'
 
@@ -66,45 +65,25 @@ const database = getDatabase(appFirebase)
 const dbRef = ref(database)
 const auth = getAuth()
 
-const credentialsUrl = path.join(__dirname, '..', './credentials.json')
-const credentials = JSON.parse(readFileSync(credentialsUrl).toString())
-const { client_secret, client_id, redirect_uris } = credentials.web
-const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0])
-const GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
-const url = oAuth2Client.generateAuthUrl({
-  access_type: 'offline',
-  prompt: 'consent',
-  scope: GMAIL_SCOPES,
-})
+// send email SMTP gmail
+// create transporter object with smtp server details
+const transporter = createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    auth: {
+        user: 'slevinto',
+        pass: 'eerzqsjcfghrzkkn'
+    }
+});
 
-const encodeMessage = (message: Buffer | ArrayBuffer | { valueOf(): ArrayBuffer | SharedArrayBuffer }) => {
-    return Buffer.from(message).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-}
-const createMail = async (options: Options) => {
-    const mailComposer = new MailComposer(options)
-    const message = await mailComposer.compile().build()
-    return encodeMessage(message)
-}
-const sendMail = async (options: Options) => {
-    console.log('url to get token: ' + url)
-    const code = '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' // here get token from url
-    const token = oAuth2Client.getToken(code)
-    .catch((error) => {
-        console.log('error get token: ' + error.message)
-    })
+const sendMail = async (options: Options) => {    
     if (options) {
-        var request = new XMLHttpRequest()
-        var url = 'https://www.googleapis.com/gmail/v1/users/me/messages/send'
-        var params = JSON.stringify({'raw': options})
-        request.open('POST', url , true)
-        request.setRequestHeader("Authorization", "Bearer " + token)
-        request.setRequestHeader("Content-type", "application/json")
-        request.send(params)
-        request.onload = function() {
-            if (200 === request.status) {
-                alert("Email sent successfully")
-            }
-        }
+        transporter.sendMail({
+            from: 'slevinto@gmail.com',
+            to: options.to,
+            subject: 'Test Email Subject',
+            html: options.html 
+        });
    }    
 }
 
@@ -165,6 +144,7 @@ app.get('/register_patient', (req, res) => {
 app.get('/', (req, res) => {  
     var cookies = 
     {
+        name: '',
         email: '',
         password: '',
         type: ''
@@ -188,11 +168,12 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
         push(ref(database, 'doctors/' + doctor_info.fullname), doctor_info)   
         write_registered_in_postgresql('doctor', doctor_info.fullname, doctor_info.email, doctor_info.telephone)    
         const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
+        res.cookie(`name`, doctor_info.fullname, { expires: two_years })
         res.cookie(`email`, doctor_info.email, { expires: two_years })
         res.cookie(`password`, doctor_info.password, { expires: two_years })
         res.cookie(`type`, 'doctor', { expires: two_years })
 
-        home_page_doctor(res)
+        home_page_doctor(res, doctor_info.fullname)
     })
     .catch((error) => {
         if (['auth/email-already-exists', 'auth/email-already-in-use'].includes(error.code)) 
@@ -203,10 +184,11 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
                 write_registered_in_postgresql('doctor', doctor_info.fullname, doctor_info.email, doctor_info.telephone)  
 
                 const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
+                res.cookie(`name`, doctor_info.fullname, { expires: two_years })
                 res.cookie(`email`, doctor_info.email, { expires: two_years })
                 res.cookie(`password`, doctor_info.password, { expires: two_years })
                 res.cookie(`type`, 'doctor', { expires: two_years })
-                home_page_doctor(res)
+                home_page_doctor(res, doctor_info.fullname)
             })
             .catch((error) => {
                 res.render('login', { credentials: {email: '', password: '' }, err: 'failed to register in firebase: ' + error.message } ) 
@@ -240,6 +222,7 @@ app.post('/save_patient_in_firebase', (req, res)=>{
         write_registered_in_postgresql('patient', patient_info.name, patient_info.email, '')    
                     
         const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
+        res.cookie(`name`, patient_info.name, { expires: two_years })
         res.cookie(`email`, patient_info.email, { expires: two_years })
         res.cookie(`password`, patient_info.password, { expires: two_years })
         res.cookie(`type`, 'patient', { expires: two_years })            
@@ -267,6 +250,7 @@ app.post('/save_patient_in_firebase', (req, res)=>{
                 write_registered_in_postgresql('patient', patient_info.name, patient_info.email, '')  
 
                 const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
+                res.cookie(`name`, patient_info.name, { expires: two_years })
                 res.cookie(`email`, patient_info.email, { expires: two_years })
                 res.cookie(`password`, patient_info.password, { expires: two_years })
                 res.cookie(`type`, 'patient', { expires: two_years })            
@@ -303,11 +287,12 @@ app.post('/login', (req, res)=>{
         }
         else if (req.cookies.type === 'doctor')
         {
-            home_page_doctor(res)
+            home_page_doctor(res, req.cookies.name)
         }
         else if (result.user.displayName.length > 0)
         {
             const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
+            res.cookie(`name`, patient_info.name, { expires: two_years })
             res.cookie(`email`, patient_info.email, { expires: two_years })
             res.cookie(`password`, patient_info.password, { expires: two_years })
             res.cookie(`type`, 'patient', { expires: two_years })     
@@ -316,10 +301,11 @@ app.post('/login', (req, res)=>{
         else
         {
             const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
-            res.cookie(`email`, patient_info.email, { expires: two_years })
-            res.cookie(`password`, patient_info.password, { expires: two_years })
+            res.cookie(`name`, doctor_info.fullname, { expires: two_years })
+            res.cookie(`email`, doctor_info.email, { expires: two_years })
+            res.cookie(`password`, doctor_info.password, { expires: two_years })
             res.cookie(`type`, 'doctor', { expires: two_years })     
-            home_page_doctor(res)
+            home_page_doctor(res, doctor_info.fullname)
         }
     })
     .catch((error) => {        
@@ -336,7 +322,7 @@ app.post( '/', ( req, res ) => {
     const dynamicEpochValues = qs.parse(answer["/v5/dynamicEpochValues"].toString())
     const dataSources = answer.dataSource
     const authenticationToken = answer.authenticationToken  
-    const partnerUserID = answer.partnerUserID  
+    const partnerUserID = answer.partnerUserID.toString()  
 
     var url = ''
     if (dailyDynamicValues.startTimestampUnix)
@@ -366,23 +352,35 @@ app.post( '/', ( req, res ) => {
 
 //send Email to invite user
 app.post('/sendEmail', (req, res) => {  
-    console.log(req.body.userEmail.toString())
+    var doctorName = req.cookies.name
     const options = {
         to: req.body.userEmail.toString(),
-        subject: 'Hello Amit 🚀',
-        text: 'This email is sent from the command line',
-        html: `<p>🙋🏻‍♀️  &mdash; This is a <b>test email</b> from <a href="https://digitalinspiration.com">Digital Inspiration</a>.</p>`,
-        headers: [
-          { key: 'X-Application-Developer', value: 'Amit Agarwal' },
-          { key: 'X-Application-Version', value: 'v1.0.0.2' },
-        ],
+        html: '<h1>Dr. ' + doctorName + ' is asking permission to view your medical and fitness data.</h1>' +
+               '<h1 style="padding-bottom: 50px">Do you approve?</h1>' +
+               '<div><a style="background-color: green; text-decoration: none; vertical-align: middle; text-align: center; color: white; font-size: 20px; font-weight: bold; line-height: 100px; padding: 30px" href=' + 
+               req.protocol + '://' + req.get('host') + '/addUserToDoctor/' +  req.body.userEmail.toString() + '/' + doctorName.replace(' ', '%20') +
+               '>Yes</a><span style="margin-left: 20px"/>' +
+               '<a style="background-color:grey; text-decoration: none; vertical-align: middle; text-align:center; color:black; font-size:20px; font-weight: bold; line-height: 100px; padding: 30px" href=' + 
+               req.protocol + '://' + req.get('host') + '/addUserToDoctor/No>No</a></div>'               
     }
     sendMail(options)
 })
 
+app.get('/addUserToDoctor/:userID/:doctorName', (req, res) => {  
+    if (req.params.userID == "No") // User answer No to invite email
+    {
+        res.send('Dr. ' + req.params.doctorName.replace('%20', ' ') + ' not received permission to view your medical and fitness data.')
+    }
+    else {
+        //console.log(req.params.userID)
+        push(ref(database, 'doctors/' + req.params.doctorName.replace('%20', ' ') + '/patients/'), req.params.userID)         
+        res.send('Dr. ' + req.params.doctorName.replace('%20', ' ') + ' succeeded to receive permission to view your medical and fitness data.')
+    }
+})
+
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
 
-function GetDynamicValues(url: string, partnerUserID: string | string[] | qs.ParsedQs | qs.ParsedQs[])
+function GetDynamicValues(url: string, partnerUserID: string)
 {
     console.log("send post: ", data, "url: ", url)  
     axios.post(
@@ -569,38 +567,45 @@ function write_registered_in_postgresql(type: string, fullname: string, email: s
 }
 
 // go to home doctor page
-function home_page_doctor(res: Response<any, Record<string, any>, number>)
+function home_page_doctor(res: Response<any, Record<string, any>, number>, doctor_name: string)
 {
-    get(child(dbRef, `users/`)).then((snapshot) => {
-        allUsers = []
-        const allData = snapshot.val()
-        for(var patientname in allData)
-        {
-            for (var section in snapshot.child(patientname).val()){
-                for(var subsection in snapshot.child(patientname).child(section).val()){
-                    for(var dirsubsection in snapshot.child(patientname).child(section).child(subsection).val()){
-                        allUsers.push([patientname, 
-                                     section, 
-                                     subsection, 
-                                     snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
-                                     snapshot.child(patientname).child(section).child(subsection).child(dirsubsection).child('value').val()]) 
-                    }           
-                } 
-            }     
-        }
-
+    var firebaseUsers = []
+    get(child(dbRef, `doctors/` + doctor_name + '/patients/')).then((snapshot) => {
+        const allDataPatients = snapshot.val()
+        
         allFirebaseUsers = []
-        admin.auth().listUsers(1000)
-        .then((listUsersResult) => {
+        admin.auth().listUsers(1000).then((listUsersResult) => {
             listUsersResult.users.forEach((userRecord) => {
                 allFirebaseUsers.push(userRecord.toJSON())
             }) 
-            const firebaseUsers = allFirebaseUsers.map(a => a.email)
-            res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers } )                   
+            firebaseUsers = allFirebaseUsers.map(a => a.email)     
+            get(child(dbRef, `users/` )).then((snapshotUsers) => {
+                allUsers = []
+                const allDataUsers = snapshotUsers.val()
+                for(var patientname in allDataUsers)
+                {
+                    var emailUser = ''
+                    if (allFirebaseUsers.find(x => x.displayName == patientname) != undefined)
+                        emailUser = allFirebaseUsers.find(x => x.displayName == patientname).email
+                    if (Object.values(allDataPatients).indexOf(emailUser) > -1)
+                        for (var section in snapshotUsers.child(patientname).val()){
+                            for(var subsection in snapshotUsers.child(patientname).child(section).val()){
+                                for(var dirsubsection in snapshotUsers.child(patientname).child(section).child(subsection).val()){
+                                    allUsers.push([patientname, 
+                                                 section, 
+                                                 subsection, 
+                                                 snapshotUsers.child(patientname).child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
+                                                 snapshotUsers.child(patientname).child(section).child(subsection).child(dirsubsection).child('value').val()]) 
+                                }           
+                            } 
+                        }     
+                }
+                res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers } )                   
+            })                         
         })
         .catch((error) => {
             console.log('Error listing users:', error)
-        })       
+        })        
     })     
 }
 
