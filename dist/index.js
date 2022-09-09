@@ -536,6 +536,7 @@ function home_page_doctor(res, doctor_name) {
                             }
                         }
                 }
+                firebaseUsers = firebaseUsers.filter((el) => !Object.values(allDataPatients).includes(el));
                 res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers });
             });
         })

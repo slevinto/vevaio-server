@@ -578,7 +578,8 @@ function home_page_doctor(res: Response<any, Record<string, any>, number>, docto
             listUsersResult.users.forEach((userRecord) => {
                 allFirebaseUsers.push(userRecord.toJSON())
             }) 
-            firebaseUsers = allFirebaseUsers.map(a => a.email)     
+            firebaseUsers = allFirebaseUsers.map(a => a.email)
+            
             get(child(dbRef, `users/` )).then((snapshotUsers) => {
                 allUsers = []
                 const allDataUsers = snapshotUsers.val()
@@ -600,6 +601,7 @@ function home_page_doctor(res: Response<any, Record<string, any>, number>, docto
                             } 
                         }     
                 }
+                firebaseUsers = firebaseUsers.filter( ( el ) => !Object.values(allDataPatients).includes( el ) )  
                 res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers } )                   
             })                         
         })
