@@ -2,7 +2,7 @@ import express from 'express'
 import axios from 'axios'
 import qs from 'qs'
 import { initializeApp } from 'firebase/app'
-import { getDatabase, ref, child, get, set, update } from 'firebase/database'
+import { getDatabase, ref, child, get, set, update, push } from 'firebase/database'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
 import admin from 'firebase-admin'
 import path from 'path'
@@ -161,7 +161,7 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
     doctor_info.password = req.body.password
     createUserWithEmailAndPassword(auth, doctor_info.email, doctor_info.password)
     .then(userData => { 
-        update(ref(database, 'doctors/' + doctor_info.fullname), doctor_info)   
+        update(ref(database, 'doctors/' + doctor_info.fullname + '/info/'), doctor_info)   
         write_registered_in_postgresql('doctor', doctor_info.fullname, doctor_info.email, doctor_info.telephone)    
         const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
         res.cookie(`email`, doctor_info.email, { expires: two_years })
@@ -173,7 +173,7 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
         {
             signInWithEmailAndPassword(auth, doctor_info.email, doctor_info.password)
             .then((result) => {
-                update(ref(database, 'doctors/' + doctor_info.fullname), doctor_info)   
+                update(ref(database, 'doctors/' + doctor_info.fullname + '/info/'), doctor_info)   
                 write_registered_in_postgresql('doctor', doctor_info.fullname, doctor_info.email, doctor_info.telephone)  
 
                 const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
@@ -284,7 +284,7 @@ app.post('/login', (req, res)=>{
             const allDataUsers = snapshotUsers.val()
             for(var doctorname in allDataUsers)
             {
-                if (snapshotUsers.child(doctorname).child('email').val() == req.body.email)
+                if (snapshotUsers.child(doctorname).child('info').child('email').val() == req.body.email)
                 {
                     const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
                     res.cookie(`email`, req.body.email, { expires: two_years })
@@ -338,7 +338,7 @@ app.post( '/', ( req, res ) => {
 
 //send Email to invite user
 app.post('/sendEmail', (req, res) => {  
-    var doctorName = req.cookies.name
+    var doctorName = req.body.doctorName
     const options = {
         to: req.body.userEmail.toString(),
         html: '<h1>Dr. ' + doctorName + ' is asking permission to view your medical and fitness data.</h1>' +
@@ -359,7 +359,7 @@ app.get('/addUserToDoctor/:userID/:doctorName', (req, res) => {
     }
     else {
         //console.log(req.params.userID)
-        set(ref(database, 'doctors/' + req.params.doctorName.replace('%20', ' ') + '/patients/'), req.params.userID)         
+        push(ref(database, 'doctors/' + req.params.doctorName.replace('%20', ' ') + '/patients/'), req.params.userID)         
         res.send('Dr. ' + req.params.doctorName.replace('%20', ' ') + ' succeeded to receive permission to view your medical and fitness data.')
     }
 })
@@ -521,7 +521,7 @@ function GetDynamicValues(url: string, partnerUserID: string)
 }
 
 function writeUserData(token: string, folder_path: string, json) {    
-    update(ref(database, 'users/' + token + folder_path), json)    
+    push(ref(database, 'users/' + token + folder_path), json)    
 }
 
 // write to postgresql user data for graphs
@@ -557,7 +557,7 @@ function home_page_doctor(res: Response<any, Record<string, any>, number>, docto
 {
     allUsers = []
     get(child(dbRef, `doctors/` + doctor_name + '/patients/')).then((snapshot) => {
-        const allDataPatients = snapshot.val()
+        const allDataPatients = Object.values(snapshot.val())
         
         for(var patientname in allDataPatients)
         {
@@ -584,10 +584,9 @@ function home_page_doctor(res: Response<any, Record<string, any>, number>, docto
             { 
                 firebaseUsers.push(snapshotUsers.child(el).child('info').child('email').val())
             }
-            
             if (allDataPatients != null)
                 firebaseUsers = firebaseUsers.filter(n => !allDataPatients.includes(n))
-            res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers } )         
+            res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers, doctor_name: doctor_name } )         
         })                
     })
 }

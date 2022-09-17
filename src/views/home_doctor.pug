@@ -418,7 +418,7 @@ block content
             $.ajax({
                 url: "/sendEmail",
                 method: "POST",
-                data: {userEmail: selectedInvite.innerHTML.trim()} 
+                data: {userEmail: selectedInvite.innerHTML.trim(), doctorName: '#{doctor_name}'} 
             }) 
         }     
         

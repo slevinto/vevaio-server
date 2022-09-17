@@ -141,7 +141,7 @@ app.post('/save_doctor_in_firebase', (req, res) => {
     doctor_info.password = req.body.password;
     (0, auth_1.createUserWithEmailAndPassword)(auth, doctor_info.email, doctor_info.password)
         .then(userData => {
-        (0, database_1.update)((0, database_1.ref)(database, 'doctors/' + doctor_info.fullname), doctor_info);
+        (0, database_1.update)((0, database_1.ref)(database, 'doctors/' + doctor_info.fullname + '/info/'), doctor_info);
         write_registered_in_postgresql('doctor', doctor_info.fullname, doctor_info.email, doctor_info.telephone);
         const two_years = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2);
         res.cookie(`email`, doctor_info.email, { expires: two_years });
@@ -152,7 +152,7 @@ app.post('/save_doctor_in_firebase', (req, res) => {
         if (['auth/email-already-exists', 'auth/email-already-in-use'].includes(error.code)) {
             (0, auth_1.signInWithEmailAndPassword)(auth, doctor_info.email, doctor_info.password)
                 .then((result) => {
-                (0, database_1.update)((0, database_1.ref)(database, 'doctors/' + doctor_info.fullname), doctor_info);
+                (0, database_1.update)((0, database_1.ref)(database, 'doctors/' + doctor_info.fullname + '/info/'), doctor_info);
                 write_registered_in_postgresql('doctor', doctor_info.fullname, doctor_info.email, doctor_info.telephone);
                 const two_years = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2);
                 res.cookie(`email`, doctor_info.email, { expires: two_years });
@@ -246,7 +246,7 @@ app.post('/login', (req, res) => {
         (0, database_1.get)((0, database_1.child)(dbRef, `doctors/`)).then((snapshotUsers) => {
             const allDataUsers = snapshotUsers.val();
             for (var doctorname in allDataUsers) {
-                if (snapshotUsers.child(doctorname).child('email').val() == req.body.email) {
+                if (snapshotUsers.child(doctorname).child('info').child('email').val() == req.body.email) {
                     const two_years = new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 2);
                     res.cookie(`email`, req.body.email, { expires: two_years });
                     res.cookie(`password`, req.body.password, { expires: two_years });
@@ -293,7 +293,7 @@ app.post('/', (req, res) => {
 });
 //send Email to invite user
 app.post('/sendEmail', (req, res) => {
-    var doctorName = req.cookies.name;
+    var doctorName = req.body.doctorName;
     const options = {
         to: req.body.userEmail.toString(),
         html: '<h1>Dr. ' + doctorName + ' is asking permission to view your medical and fitness data.</h1>' +
@@ -313,7 +313,7 @@ app.get('/addUserToDoctor/:userID/:doctorName', (req, res) => {
     }
     else {
         //console.log(req.params.userID)
-        (0, database_1.set)((0, database_1.ref)(database, 'doctors/' + req.params.doctorName.replace('%20', ' ') + '/patients/'), req.params.userID);
+        (0, database_1.push)((0, database_1.ref)(database, 'doctors/' + req.params.doctorName.replace('%20', ' ') + '/patients/'), req.params.userID);
         res.send('Dr. ' + req.params.doctorName.replace('%20', ' ') + ' succeeded to receive permission to view your medical and fitness data.');
     }
 });
@@ -465,7 +465,7 @@ function GetDynamicValues(url, partnerUserID) {
     });
 }
 function writeUserData(token, folder_path, json) {
-    (0, database_1.update)((0, database_1.ref)(database, 'users/' + token + folder_path), json);
+    (0, database_1.push)((0, database_1.ref)(database, 'users/' + token + folder_path), json);
 }
 // write to postgresql user data for graphs
 function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value) {
@@ -497,7 +497,7 @@ function write_registered_in_postgresql(type, fullname, email, telephone) {
 function home_page_doctor(res, doctor_name) {
     allUsers = [];
     (0, database_1.get)((0, database_1.child)(dbRef, `doctors/` + doctor_name + '/patients/')).then((snapshot) => {
-        const allDataPatients = snapshot.val();
+        const allDataPatients = Object.values(snapshot.val());
         for (var patientname in allDataPatients) {
             (0, database_1.get)((0, database_1.child)(dbRef, `users/` + patientname.replace(/[^a-z0-9]/gi, '') + `/`)).then((snapshotUsers) => {
                 for (var section in snapshotUsers.val()) {
@@ -521,7 +521,7 @@ function home_page_doctor(res, doctor_name) {
             }
             if (allDataPatients != null)
                 firebaseUsers = firebaseUsers.filter(n => !allDataPatients.includes(n));
-            res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers });
+            res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers, doctor_name: doctor_name });
         });
     });
 }
