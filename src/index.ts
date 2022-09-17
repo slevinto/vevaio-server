@@ -2,7 +2,7 @@ import express from 'express'
 import axios from 'axios'
 import qs from 'qs'
 import { initializeApp } from 'firebase/app'
-import { getDatabase, ref, child, get, push } from 'firebase/database'
+import { getDatabase, ref, child, get, set, update } from 'firebase/database'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
 import admin from 'firebase-admin'
 import path from 'path'
@@ -111,8 +111,6 @@ var folder_path = ''
 // from firebase to display in dropdown
 var allUsers = []
 
-var allFirebaseUsers = []
-
 // to register doctor in firebase
 var doctor_info = {
     fullname: '',
@@ -123,9 +121,9 @@ var doctor_info = {
 
 // to register patient in firebase
 var patient_info = {
-    name: '',
+    firstname: '',
     email: '',
-    password: ''
+    password: '',
 }
 
 app.get('/welcome', (req, res) => {  
@@ -144,10 +142,8 @@ app.get('/register_patient', (req, res) => {
 app.get('/', (req, res) => {  
     var cookies = 
     {
-        name: '',
         email: '',
-        password: '',
-        type: ''
+        password: ''
     }
       
     if (typeof req.cookies.email !== 'undefined')
@@ -165,14 +161,11 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
     doctor_info.password = req.body.password
     createUserWithEmailAndPassword(auth, doctor_info.email, doctor_info.password)
     .then(userData => { 
-        push(ref(database, 'doctors/' + doctor_info.fullname), doctor_info)   
+        update(ref(database, 'doctors/' + doctor_info.fullname), doctor_info)   
         write_registered_in_postgresql('doctor', doctor_info.fullname, doctor_info.email, doctor_info.telephone)    
         const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
-        res.cookie(`name`, doctor_info.fullname, { expires: two_years })
         res.cookie(`email`, doctor_info.email, { expires: two_years })
-        res.cookie(`password`, doctor_info.password, { expires: two_years })
-        res.cookie(`type`, 'doctor', { expires: two_years })
-
+        res.cookie(`password`, doctor_info.password, { expires: two_years })        
         home_page_doctor(res, doctor_info.fullname)
     })
     .catch((error) => {
@@ -180,14 +173,12 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
         {
             signInWithEmailAndPassword(auth, doctor_info.email, doctor_info.password)
             .then((result) => {
-                push(ref(database, 'doctors/' + doctor_info.fullname), doctor_info)   
+                update(ref(database, 'doctors/' + doctor_info.fullname), doctor_info)   
                 write_registered_in_postgresql('doctor', doctor_info.fullname, doctor_info.email, doctor_info.telephone)  
 
                 const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
-                res.cookie(`name`, doctor_info.fullname, { expires: two_years })
                 res.cookie(`email`, doctor_info.email, { expires: two_years })
                 res.cookie(`password`, doctor_info.password, { expires: two_years })
-                res.cookie(`type`, 'doctor', { expires: two_years })
                 home_page_doctor(res, doctor_info.fullname)
             })
             .catch((error) => {
@@ -201,12 +192,12 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
 
 //  register patient in firebase
 app.post('/save_patient_in_firebase', (req, res)=>{    
-    patient_info.name = req.body.name
     patient_info.email = req.body.email
     patient_info.password = req.body.password
-    
+    patient_info.firstname = req.body.name
+
     const patientData = {
-        partnerUserID: patient_info.name,
+        partnerUserID: patient_info.email.replace(/[^a-z0-9]/gi, ''),
         language: "en",
     }     
 
@@ -214,18 +205,15 @@ app.post('/save_patient_in_firebase', (req, res)=>{
         email: patient_info.email,
         emailVerified: false,
         password: patient_info.password,
-        displayName: patient_info.name,
         disabled: false,
     })
     .then(userData => {  
-        push(ref(database, 'users/' + patient_info.name + '/info/'), patient_info)   
-        write_registered_in_postgresql('patient', patient_info.name, patient_info.email, '')    
+        update(ref(database, 'users/' + patient_info.email.replace(/[^a-z0-9]/gi, '') + '/info/'), patient_info)   
+        write_registered_in_postgresql('patient', patient_info.email.replace(/[^a-z0-9]/gi, ''), patient_info.email, '')    
                     
         const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
-        res.cookie(`name`, patient_info.name, { expires: two_years })
         res.cookie(`email`, patient_info.email, { expires: two_years })
         res.cookie(`password`, patient_info.password, { expires: two_years })
-        res.cookie(`type`, 'patient', { expires: two_years })            
 
         getThryveDataSources(patientData, function(thryveDataSourcesItem) {
             const thryveDataSources = thryveDataSourcesItem.dataSources
@@ -236,7 +224,7 @@ app.post('/save_patient_in_firebase', (req, res)=>{
             }
             else
             {
-                home_page_patient(res, patient_info.email, patient_info.name)
+                home_page_patient(res, patient_info.email, patient_info.firstname)
             }
         })
     })
@@ -246,15 +234,13 @@ app.post('/save_patient_in_firebase', (req, res)=>{
         {
             signInWithEmailAndPassword(auth, patient_info.email, patient_info.password)
             .then((result) => {
-                push(ref(database, 'users/' + patient_info.name + '/info/'), patient_info)  
-                write_registered_in_postgresql('patient', patient_info.name, patient_info.email, '')  
+                update(ref(database, 'users/' + patient_info.email.replace(/[^a-z0-9]/gi, '') + '/info/'), patient_info)  
+                write_registered_in_postgresql('patient', patient_info.email.replace(/[^a-z0-9]/gi, ''), patient_info.email, '')  
 
                 const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
-                res.cookie(`name`, patient_info.name, { expires: two_years })
                 res.cookie(`email`, patient_info.email, { expires: two_years })
                 res.cookie(`password`, patient_info.password, { expires: two_years })
-                res.cookie(`type`, 'patient', { expires: two_years })            
-    
+                   
                 getThryveDataSources(patientData, function(thryveDataSourcesItem) {
                     const thryveDataSources = thryveDataSourcesItem.dataSources
                     const thryveDataSourcesUrl = thryveDataSourcesItem.url
@@ -264,7 +250,7 @@ app.post('/save_patient_in_firebase', (req, res)=>{
                     }
                     else
                     {
-                        home_page_patient(res, patient_info.email, patient_info.name)
+                        home_page_patient(res, patient_info.email, patient_info.firstname)
                     } 
                 })
             })
@@ -281,32 +267,32 @@ app.post('/save_patient_in_firebase', (req, res)=>{
 app.post('/login', (req, res)=>{  
     signInWithEmailAndPassword(auth, req.body.email, req.body.password)
     .then((result) => {
-        if (req.cookies.type === 'patient')
-        {
-            home_page_patient(res, req.body.email, result.user.displayName)
-        }
-        else if (req.cookies.type === 'doctor')
-        {
-            home_page_doctor(res, req.cookies.name)
-        }
-        else if (result.user.displayName.length > 0)
-        {
-            const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
-            res.cookie(`name`, patient_info.name, { expires: two_years })
-            res.cookie(`email`, patient_info.email, { expires: two_years })
-            res.cookie(`password`, patient_info.password, { expires: two_years })
-            res.cookie(`type`, 'patient', { expires: two_years })     
-            home_page_patient(res, req.body.email, result.user.displayName)
-        }
-        else
-        {
-            const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
-            res.cookie(`name`, doctor_info.fullname, { expires: two_years })
-            res.cookie(`email`, doctor_info.email, { expires: two_years })
-            res.cookie(`password`, doctor_info.password, { expires: two_years })
-            res.cookie(`type`, 'doctor', { expires: two_years })     
-            home_page_doctor(res, doctor_info.fullname)
-        }
+        get(child(dbRef, `users/` )).then((snapshotUsers) => {
+            const allDataUsers = snapshotUsers.val()
+            for(var patientname in allDataUsers)
+            {
+                if (patientname  == req.body.email.replace(/[^a-z0-9]/gi, ''))
+                {
+                    const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
+                    res.cookie(`email`, req.body.email, { expires: two_years })
+                    res.cookie(`password`, req.body.password, { expires: two_years })
+                    home_page_patient(res, req.body.email, snapshotUsers.child(patientname).child('info').child('firstname').val())
+                }
+            }   
+        })
+        get(child(dbRef, `doctors/` )).then((snapshotUsers) => {
+            const allDataUsers = snapshotUsers.val()
+            for(var doctorname in allDataUsers)
+            {
+                if (snapshotUsers.child(doctorname).child('email').val() == req.body.email)
+                {
+                    const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
+                    res.cookie(`email`, req.body.email, { expires: two_years })
+                    res.cookie(`password`, req.body.password, { expires: two_years })
+                    home_page_doctor(res, doctorname)
+                }
+            }   
+        })            
     })
     .catch((error) => {        
         res.render('login', { credentials: { email: '', password: '' }, err: 'failed to login in firebase: ' + error.message } )
@@ -373,7 +359,7 @@ app.get('/addUserToDoctor/:userID/:doctorName', (req, res) => {
     }
     else {
         //console.log(req.params.userID)
-        push(ref(database, 'doctors/' + req.params.doctorName.replace('%20', ' ') + '/patients/'), req.params.userID)         
+        set(ref(database, 'doctors/' + req.params.doctorName.replace('%20', ' ') + '/patients/'), req.params.userID)         
         res.send('Dr. ' + req.params.doctorName.replace('%20', ' ') + ' succeeded to receive permission to view your medical and fitness data.')
     }
 })
@@ -534,8 +520,8 @@ function GetDynamicValues(url: string, partnerUserID: string)
     })
 }
 
-function writeUserData(token: string, folder_path: string, json: unknown) {    
-    push(ref(database, 'users/' + token + folder_path), json)    
+function writeUserData(token: string, folder_path: string, json) {    
+    update(ref(database, 'users/' + token + folder_path), json)    
 }
 
 // write to postgresql user data for graphs
@@ -569,55 +555,50 @@ function write_registered_in_postgresql(type: string, fullname: string, email: s
 // go to home doctor page
 function home_page_doctor(res: Response<any, Record<string, any>, number>, doctor_name: string)
 {
-    var firebaseUsers = []
+    allUsers = []
     get(child(dbRef, `doctors/` + doctor_name + '/patients/')).then((snapshot) => {
         const allDataPatients = snapshot.val()
         
-        allFirebaseUsers = []
-        admin.auth().listUsers(1000).then((listUsersResult) => {
-            listUsersResult.users.forEach((userRecord) => {
-                allFirebaseUsers.push(userRecord.toJSON())
-            }) 
-            firebaseUsers = allFirebaseUsers.map(a => a.email)
-            
-            get(child(dbRef, `users/` )).then((snapshotUsers) => {
-                allUsers = []
-                const allDataUsers = snapshotUsers.val()
-                for(var patientname in allDataUsers)
-                {
-                    var emailUser = ''
-                    if (allFirebaseUsers.find(x => x.displayName == patientname) != undefined)
-                        emailUser = allFirebaseUsers.find(x => x.displayName == patientname).email
-                    if (Object.values(allDataPatients).indexOf(emailUser) > -1)
-                        for (var section in snapshotUsers.child(patientname).val()){
-                            for(var subsection in snapshotUsers.child(patientname).child(section).val()){
-                                for(var dirsubsection in snapshotUsers.child(patientname).child(section).child(subsection).val()){
-                                    allUsers.push([patientname, 
-                                                 section, 
-                                                 subsection, 
-                                                 snapshotUsers.child(patientname).child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
-                                                 snapshotUsers.child(patientname).child(section).child(subsection).child(dirsubsection).child('value').val()]) 
-                                }           
-                            } 
-                        }     
+        for(var patientname in allDataPatients)
+        {
+            get(child(dbRef, `users/` + patientname.replace(/[^a-z0-9]/gi, '') + `/`)).then((snapshotUsers) => {
+                for (var section in snapshotUsers.val()) {
+                    if (section != 'info')
+                        for(var subsection in snapshotUsers.child(section).val()){
+                            for(var dirsubsection in snapshotUsers.child(section).child(subsection).val()) {
+                                allUsers.push([patientname, 
+                                               section, 
+                                               subsection, 
+                                               snapshotUsers.child(patientname.replace(/[^a-z0-9]/gi, '')).child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
+                                               snapshotUsers.child(patientname.replace(/[^a-z0-9]/gi, '')).child(section).child(subsection).child(dirsubsection).child('value').val()]) 
+                            }           
+                        } 
+                                      
                 }
-                firebaseUsers = firebaseUsers.filter( ( el ) => !Object.values(allDataPatients).includes( el ) )  
-                res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers } )                   
-            })                         
-        })
-        .catch((error) => {
-            console.log('Error listing users:', error)
-        })        
-    })     
+            })           
+        }
+        
+        get(child(dbRef, `users/` )).then((snapshotUsers) => {
+            var firebaseUsers = []
+            for (var el in snapshotUsers.val())
+            { 
+                firebaseUsers.push(snapshotUsers.child(el).child('info').child('email').val())
+            }
+            
+            if (allDataPatients != null)
+                firebaseUsers = firebaseUsers.filter(n => !allDataPatients.includes(n))
+            res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers } )         
+        })                
+    })
 }
 
-function home_page_patient(res: Response<any, Record<string, any>, number>, userEmail: string, userName: string)
+function home_page_patient(res: Response<any, Record<string, any>, number>, userEmail: string, firstname: string)
 {
     admin.auth().getUserByEmail(userEmail)
     .then((userRecord) => {
         var dataItems = []
        
-        get(child(dbRef, `users/` + userName)).then((snapshot) => {
+        get(child(dbRef, `users/` + userEmail.replace(/[^a-z0-9]/gi, ''))).then((snapshot) => {
             const allData = snapshot.val()
             for (var section in allData) {
                 for(var subsection in snapshot.child(section).val()) {
@@ -629,7 +610,7 @@ function home_page_patient(res: Response<any, Record<string, any>, number>, user
                     }           
                 } 
             }     
-            res.render('home_patient', { username: userName, data:dataItems } )              
+            res.render('home_patient', { username: firstname, data:dataItems } )              
         })     
     })   
 }
