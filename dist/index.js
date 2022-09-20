@@ -497,7 +497,9 @@ function write_registered_in_postgresql(type, fullname, email, telephone) {
 function home_page_doctor(res, doctor_name) {
     allUsers = [];
     (0, database_1.get)((0, database_1.child)(dbRef, `doctors/` + doctor_name + '/patients/')).then((snapshot) => {
-        const allDataPatients = Object.values(snapshot.val());
+        var allDataPatients = null;
+        if (snapshot.val() != null)
+            allDataPatients = Object.values(snapshot.val());
         for (var patientname in allDataPatients) {
             (0, database_1.get)((0, database_1.child)(dbRef, `users/` + patientname.replace(/[^a-z0-9]/gi, '') + `/`)).then((snapshotUsers) => {
                 for (var section in snapshotUsers.val()) {
