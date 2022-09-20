@@ -557,7 +557,9 @@ function home_page_doctor(res: Response<any, Record<string, any>, number>, docto
 {
     allUsers = []
     get(child(dbRef, `doctors/` + doctor_name + '/patients/')).then((snapshot) => {
-        const allDataPatients = Object.values(snapshot.val())
+        var allDataPatients = null
+        if (snapshot.val() != null)
+            allDataPatients = Object.values(snapshot.val())
         
         for(var patientname in allDataPatients)
         {
