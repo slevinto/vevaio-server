@@ -277,15 +277,14 @@ app.post('/', (req, res) => {
         data.authenticationToken = authenticationToken.toString();
         data.partnerUserID = partnerUserID.toString();
         data.dataSources = dataSources.toString();
-        console.log(data);
         url = 'https://api.und-gesund.de/v5/dailyDynamicValues';
         GetDynamicValues(url, partnerUserID);
     }
     if (dynamicInfoArrived) {
-        const dynamicEpochValues = qs_1.default.parse(answer["/v5/dynamicEpochValues"].toString());
-        data.startTimestampUnix = dynamicEpochValues.startTimestampUnix.toString();
-        data.endTimestampUnix = dynamicEpochValues.endTimestampUnix.toString();
-        data.valueTypes = qs_1.default.stringify(dynamicEpochValues.dynamicValueTypes).replace('[', '').replace(']', '').replace(/[0-9]+=/g, '').replace(/&/g, ',');
+        const dynamicEpochValues = JSON.parse(JSON.stringify(answer["/v5/dynamicEpochValues"]));
+        data.startTimestampUnix = dynamicEpochValues['startTimestampUnix'].toString();
+        data.endTimestampUnix = dynamicEpochValues['endTimestampUnix'].toString();
+        data.valueTypes = qs_1.default.stringify(dynamicEpochValues['dynamicValueTypes']).replace('[', '').replace(']', '').replace(/[0-9]+=/g, '').replace(/&/g, ',');
         data.authenticationToken = authenticationToken.toString();
         data.partnerUserID = partnerUserID.toString();
         data.dataSources = dataSources.toString();
@@ -501,19 +500,21 @@ function home_page_doctor(res, doctor_name) {
     allUsers = [];
     (0, database_1.get)((0, database_1.child)(dbRef, `doctors/` + doctor_name + '/patients/')).then((snapshot) => {
         var allDataPatients = null;
-        if (snapshot.val() != null)
+        if (snapshot.val() != null) {
             allDataPatients = Object.values(snapshot.val());
+            allDataPatients = Array.from(new Set(allDataPatients));
+        }
         for (var patientname in allDataPatients) {
-            (0, database_1.get)((0, database_1.child)(dbRef, `users/` + patientname.replace(/[^a-z0-9]/gi, '') + `/`)).then((snapshotUsers) => {
+            (0, database_1.get)((0, database_1.child)(dbRef, `users/` + allDataPatients[patientname].replace(/[^a-z0-9]/gi, '') + `/`)).then((snapshotUsers) => {
                 for (var section in snapshotUsers.val()) {
                     if (section != 'info')
                         for (var subsection in snapshotUsers.child(section).val()) {
                             for (var dirsubsection in snapshotUsers.child(section).child(subsection).val()) {
-                                allUsers.push([patientname,
+                                allUsers.push([allDataPatients[patientname],
                                     section,
                                     subsection,
-                                    snapshotUsers.child(patientname.replace(/[^a-z0-9]/gi, '')).child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
-                                    snapshotUsers.child(patientname.replace(/[^a-z0-9]/gi, '')).child(section).child(subsection).child(dirsubsection).child('value').val()]);
+                                    snapshotUsers.child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
+                                    snapshotUsers.child(section).child(subsection).child(dirsubsection).child('value').val()]);
                             }
                         }
                 }

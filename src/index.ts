@@ -563,20 +563,25 @@ function home_page_doctor(res: Response<any, Record<string, any>, number>, docto
     get(child(dbRef, `doctors/` + doctor_name + '/patients/')).then((snapshot) => {
         var allDataPatients = null
         if (snapshot.val() != null)
+        {
             allDataPatients = Object.values(snapshot.val())
+            allDataPatients = Array.from(new Set(allDataPatients))
+        }
         
         for(var patientname in allDataPatients)
         {
-            get(child(dbRef, `users/` + patientname.replace(/[^a-z0-9]/gi, '') + `/`)).then((snapshotUsers) => {
+            get(child(dbRef, `users/` + allDataPatients[patientname].replace(/[^a-z0-9]/gi, '') + `/`)).then((snapshotUsers) => {
+                
                 for (var section in snapshotUsers.val()) {
+                    
                     if (section != 'info')
                         for(var subsection in snapshotUsers.child(section).val()){
                             for(var dirsubsection in snapshotUsers.child(section).child(subsection).val()) {
-                                allUsers.push([patientname, 
+                                allUsers.push([allDataPatients[patientname], 
                                                section, 
                                                subsection, 
-                                               snapshotUsers.child(patientname.replace(/[^a-z0-9]/gi, '')).child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
-                                               snapshotUsers.child(patientname.replace(/[^a-z0-9]/gi, '')).child(section).child(subsection).child(dirsubsection).child('value').val()]) 
+                                               snapshotUsers.child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
+                                               snapshotUsers.child(section).child(subsection).child(dirsubsection).child('value').val()])                                 
                             }           
                         } 
                                       
