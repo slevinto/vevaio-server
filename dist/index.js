@@ -270,10 +270,10 @@ app.post('/', (req, res) => {
     const dynamicInfoArrived = (answer["/v5/dynamicEpochValues"] != null);
     var url = '';
     if (dailyInfoArrived) {
-        const dailyDynamicValues = qs_1.default.parse(JSON.stringify(dailyInfoArrived));
+        const dailyDynamicValues = qs_1.default.parse(JSON.stringify(answer["/v5/dailyDynamicValues"]));
         console.log(dailyDynamicValues);
-        console.log(dailyInfoArrived);
-        console.log(JSON.stringify(dailyInfoArrived));
+        console.log(dailyDynamicValues['startTimestampUnix']);
+        console.log(JSON.stringify(answer["/v5/dailyDynamicValues"]));
         data.startTimestampUnix = dailyDynamicValues.startTimestampUnix.toString();
         data.endTimestampUnix = dailyDynamicValues.endTimestampUnix.toString();
         data.valueTypes = qs_1.default.stringify(dailyDynamicValues.dailyDynamicValueTypes).replace('[', '').replace(']', '').replace(/[0-9]+=/g, '').replace(/&/g, ',');
