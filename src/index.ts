@@ -320,17 +320,16 @@ app.post( '/', ( req, res ) => {
         data.authenticationToken = authenticationToken.toString()       
         data.partnerUserID = partnerUserID.toString()   
         data.dataSources = dataSources.toString()
-        console.log(data)
         url = 'https://api.und-gesund.de/v5/dailyDynamicValues' 
         GetDynamicValues(url, partnerUserID)     
     }
     
     if (dynamicInfoArrived)
     {
-        const dynamicEpochValues = qs.parse(answer["/v5/dynamicEpochValues"].toString())
-        data.startTimestampUnix = dynamicEpochValues.startTimestampUnix.toString()
-        data.endTimestampUnix = dynamicEpochValues.endTimestampUnix.toString()
-        data.valueTypes = qs.stringify(dynamicEpochValues.dynamicValueTypes).replace('[', '').replace(']', '').replace(/[0-9]+=/g,'').replace(/&/g,',')
+        const dynamicEpochValues = JSON.parse(JSON.stringify(answer["/v5/dynamicEpochValues"]))
+        data.startTimestampUnix = dynamicEpochValues['startTimestampUnix'].toString()
+        data.endTimestampUnix = dynamicEpochValues['endTimestampUnix'].toString()
+        data.valueTypes = qs.stringify(dynamicEpochValues['dynamicValueTypes']).replace('[', '').replace(']', '').replace(/[0-9]+=/g,'').replace(/&/g,',')
         data.authenticationToken = authenticationToken.toString()  
         data.partnerUserID = partnerUserID.toString()         
         data.dataSources = dataSources.toString()
