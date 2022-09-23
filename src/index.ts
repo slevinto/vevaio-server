@@ -304,15 +304,16 @@ app.post( '/', ( req, res ) => {
     const answer = qs.parse(req.body.sourceUpdate)
     console.log("received webhook: ", answer)
     
-    const dailyDynamicValues = qs.parse(answer["/v5/dailyDynamicValues"].toString())
-    const dynamicEpochValues = qs.parse(answer["/v5/dynamicEpochValues"].toString())
     const dataSources = answer.dataSource
     const authenticationToken = answer.authenticationToken  
     const partnerUserID = answer.partnerUserID.toString()  
-
+    const dailyInfoArrived = (answer["/v5/dailyDynamicValues"] != null)
+    const dynamicInfoArrived = (answer["/v5/dynamicEpochValues"] != null)   
     var url = ''
-    if (dailyDynamicValues.startTimestampUnix)
-    {        
+    
+    if (dailyInfoArrived)
+    {
+        const dailyDynamicValues = qs.parse(answer["/v5/dailyDynamicValues"].toString())
         data.startTimestampUnix = dailyDynamicValues.startTimestampUnix.toString()
         data.endTimestampUnix = dailyDynamicValues.endTimestampUnix.toString()
         data.valueTypes = qs.stringify(dailyDynamicValues.dailyDynamicValueTypes).replace('[', '').replace(']', '').replace(/[0-9]+=/g,'').replace(/&/g,',')
@@ -320,10 +321,12 @@ app.post( '/', ( req, res ) => {
         data.partnerUserID = partnerUserID.toString()   
         data.dataSources = dataSources.toString()
         url = 'https://api.und-gesund.de/v5/dailyDynamicValues' 
-        GetDynamicValues(url, partnerUserID)       
+        GetDynamicValues(url, partnerUserID)     
     }
-    if (dynamicEpochValues.startTimestampUnix)
+    
+    if (dynamicInfoArrived)
     {
+        const dynamicEpochValues = qs.parse(answer["/v5/dynamicEpochValues"].toString())
         data.startTimestampUnix = dynamicEpochValues.startTimestampUnix.toString()
         data.endTimestampUnix = dynamicEpochValues.endTimestampUnix.toString()
         data.valueTypes = qs.stringify(dynamicEpochValues.dynamicValueTypes).replace('[', '').replace(']', '').replace(/[0-9]+=/g,'').replace(/&/g,',')
@@ -331,8 +334,9 @@ app.post( '/', ( req, res ) => {
         data.partnerUserID = partnerUserID.toString()         
         data.dataSources = dataSources.toString()
         url = 'https://api.und-gesund.de/v5/dynamicEpochValues'  
-        GetDynamicValues(url, partnerUserID)      
-    }      
+        GetDynamicValues(url, partnerUserID)    
+    }   
+   
     res.sendStatus( 200 )
 })
 
