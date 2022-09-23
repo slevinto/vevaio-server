@@ -270,16 +270,14 @@ app.post('/', (req, res) => {
     const dynamicInfoArrived = (answer["/v5/dynamicEpochValues"] != null);
     var url = '';
     if (dailyInfoArrived) {
-        const dailyDynamicValues = qs_1.default.parse(JSON.stringify(answer["/v5/dailyDynamicValues"]));
-        console.log(dailyDynamicValues);
-        console.log(dailyDynamicValues['startTimestampUnix']);
-        console.log(JSON.parse(JSON.stringify(answer["/v5/dailyDynamicValues"]))['startTimestampUnix']);
-        data.startTimestampUnix = dailyDynamicValues.startTimestampUnix.toString();
-        data.endTimestampUnix = dailyDynamicValues.endTimestampUnix.toString();
-        data.valueTypes = qs_1.default.stringify(dailyDynamicValues.dailyDynamicValueTypes).replace('[', '').replace(']', '').replace(/[0-9]+=/g, '').replace(/&/g, ',');
+        const dailyDynamicValues = JSON.parse(JSON.stringify(answer["/v5/dailyDynamicValues"]));
+        data.startTimestampUnix = dailyDynamicValues['startTimestampUnix'].toString();
+        data.endTimestampUnix = dailyDynamicValues['endTimestampUnix'].toString();
+        data.valueTypes = qs_1.default.stringify(dailyDynamicValues['dailyDynamicValueTypes']).replace('[', '').replace(']', '').replace(/[0-9]+=/g, '').replace(/&/g, ',');
         data.authenticationToken = authenticationToken.toString();
         data.partnerUserID = partnerUserID.toString();
         data.dataSources = dataSources.toString();
+        console.log(data);
         url = 'https://api.und-gesund.de/v5/dailyDynamicValues';
         GetDynamicValues(url, partnerUserID);
     }
