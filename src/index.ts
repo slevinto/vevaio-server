@@ -310,10 +310,11 @@ app.post( '/', ( req, res ) => {
     const dailyInfoArrived = (answer["/v5/dailyDynamicValues"] != null)
     const dynamicInfoArrived = (answer["/v5/dynamicEpochValues"] != null)   
     var url = ''
-    
+
     if (dailyInfoArrived)
     {
         const dailyDynamicValues = qs.parse(answer["/v5/dailyDynamicValues"].toString())
+        console.log(dailyDynamicValues)
         data.startTimestampUnix = dailyDynamicValues.startTimestampUnix.toString()
         data.endTimestampUnix = dailyDynamicValues.endTimestampUnix.toString()
         data.valueTypes = qs.stringify(dailyDynamicValues.dailyDynamicValueTypes).replace('[', '').replace(']', '').replace(/[0-9]+=/g,'').replace(/&/g,',')

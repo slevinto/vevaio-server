@@ -271,6 +271,7 @@ app.post('/', (req, res) => {
     var url = '';
     if (dailyInfoArrived) {
         const dailyDynamicValues = qs_1.default.parse(answer["/v5/dailyDynamicValues"].toString());
+        console.log(dailyDynamicValues);
         data.startTimestampUnix = dailyDynamicValues.startTimestampUnix.toString();
         data.endTimestampUnix = dailyDynamicValues.endTimestampUnix.toString();
         data.valueTypes = qs_1.default.stringify(dailyDynamicValues.dailyDynamicValueTypes).replace('[', '').replace(']', '').replace(/[0-9]+=/g, '').replace(/&/g, ',');
