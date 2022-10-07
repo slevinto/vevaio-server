@@ -2,11 +2,11 @@ import express from 'express'
 import axios from 'axios'
 import qs from 'qs'
 import { initializeApp } from 'firebase/app'
-import { getDatabase, ref, child, get, set, update, push } from 'firebase/database'
+import { getDatabase, ref, child, get, update, push } from 'firebase/database'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
 import admin from 'firebase-admin'
 import path from 'path'
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync } from 'fs'
 import pg from 'pg'
 import cookieParser from 'cookie-parser'  
 import { createTransport } from 'nodemailer'
@@ -362,7 +362,6 @@ app.get('/addUserToDoctor/:userID/:doctorName', (req, res) => {
         res.send('Dr. ' + req.params.doctorName.replace('%20', ' ') + ' not received permission to view your medical and fitness data.')
     }
     else {
-        //console.log(req.params.userID)
         push(ref(database, 'doctors/' + req.params.doctorName.replace('%20', ' ') + '/patients/'), req.params.userID)         
         res.send('Dr. ' + req.params.doctorName.replace('%20', ' ') + ' succeeded to receive permission to view your medical and fitness data.')
     }
@@ -556,50 +555,60 @@ function write_registered_in_postgresql(type: string, fullname: string, email: s
     })
 }
 
+function getUserInfo(username: string)
+{
+    return new Promise(function(resolve, reject){
+        get(child(dbRef, `users/` + username.replace(/[^a-z0-9]/gi, '') + `/`)).then((snapshotUsers) => {
+            for (var section in snapshotUsers.val()) {
+                if (section != 'info')
+                    for(var subsection in snapshotUsers.child(section).val()){
+                        for(var dirsubsection in snapshotUsers.child(section).child(subsection).val()) {
+                            allUsers.push([username, 
+                                           section, 
+                                           subsection, 
+                                           snapshotUsers.child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
+                                           snapshotUsers.child(section).child(subsection).child(dirsubsection).child('value').val()])                                 
+                        }           
+                    }                                       
+            } 
+            resolve("")              
+        })                  
+    })
+}
+
 // go to home doctor page
 function home_page_doctor(res: Response<any, Record<string, any>, number>, doctor_name: string)
 {
     allUsers = []
+    var allDataPatients = null
+    var firebaseUsers = []
+    var promises = []
+
     get(child(dbRef, `doctors/` + doctor_name + '/patients/')).then((snapshot) => {
-        var allDataPatients = null
+        
         if (snapshot.val() != null)
         {
             allDataPatients = Object.values(snapshot.val())
-            allDataPatients = Array.from(new Set(allDataPatients))
+            allDataPatients = Array.from(new Set(allDataPatients))            
         }
-        
-        for(var patientname in allDataPatients)
-        {
-            get(child(dbRef, `users/` + allDataPatients[patientname].replace(/[^a-z0-9]/gi, '') + `/`)).then((snapshotUsers) => {
-                
-                for (var section in snapshotUsers.val()) {
-                    
-                    if (section != 'info')
-                        for(var subsection in snapshotUsers.child(section).val()){
-                            for(var dirsubsection in snapshotUsers.child(section).child(subsection).val()) {
-                                allUsers.push([allDataPatients[patientname], 
-                                               section, 
-                                               subsection, 
-                                               snapshotUsers.child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
-                                               snapshotUsers.child(section).child(subsection).child(dirsubsection).child('value').val()])                                 
-                            }           
-                        } 
-                                      
-                }
-            })           
-        }
-        
+    }).then(() => {
         get(child(dbRef, `users/` )).then((snapshotUsers) => {
-            var firebaseUsers = []
             for (var el in snapshotUsers.val())
             { 
                 firebaseUsers.push(snapshotUsers.child(el).child('info').child('email').val())
             }
             if (allDataPatients != null)
-                firebaseUsers = firebaseUsers.filter(n => !allDataPatients.includes(n))
-            res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers, doctor_name: doctor_name } )         
-        })                
-    })
+                firebaseUsers = firebaseUsers.filter(n => !allDataPatients.includes(n) && n != null)              
+        })     
+    }).then(() => {    
+        for(var patientname in allDataPatients)
+        {
+            promises.push(getUserInfo(allDataPatients[patientname]))            
+        }
+        Promise.all(promises).then(() => {
+            res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers, doctor_name: doctor_name } )  
+        })     
+    })   
 }
 
 function home_page_patient(res: Response<any, Record<string, any>, number>, userEmail: string, firstname: string)
