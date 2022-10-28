@@ -6,12 +6,11 @@ import { getDatabase, ref, child, get, update, push } from 'firebase/database'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
 import admin from 'firebase-admin'
 import path from 'path'
+import { fileURLToPath } from 'url'
 import { readFileSync } from 'fs'
 import pg from 'pg'
 import cookieParser from 'cookie-parser'  
 import { createTransport } from 'nodemailer'
-import { Options } from 'nodemailer/lib/mailer'
-import { Response } from 'express-serve-static-core'
 
 const app = express()
 const port = process.env.PORT
@@ -54,6 +53,8 @@ const pg_config = {
     ssl: true
 }
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 const fileUrl = path.join(__dirname, '..', 'vevaio-firebase-adminsdk-vv0bl-3be2a90905.json')
 const serviceAccount = JSON.parse(readFileSync(fileUrl).toString())
 admin.initializeApp({
@@ -76,7 +77,7 @@ const transporter = createTransport({
     }
 });
 
-const sendMail = async (options: Options) => {    
+const sendMail = async (options) => {    
     if (options) {
         transporter.sendMail({
             from: 'slevinto@gmail.com',
@@ -351,7 +352,7 @@ app.post('/sendEmail', (req, res) => {
                req.protocol + '://' + req.get('host') + '/addUserToDoctor/' +  req.body.userEmail.toString() + '/' + doctorName.replace(' ', '%20') +
                '>Yes</a><span style="margin-left: 20px"/>' +
                '<a style="background-color:grey; text-decoration: none; vertical-align: middle; text-align:center; color:black; font-size:20px; font-weight: bold; line-height: 100px; padding: 30px" href=' + 
-               req.protocol + '://' + req.get('host') + '/addUserToDoctor/No>No</a></div>'               
+               req.protocol + '://' + req.get('host') + '/addUserToDoctor/No/' + doctorName.replace(' ', '%20') + '>No</a></div>'               
     }
     sendMail(options)
 })
@@ -369,7 +370,7 @@ app.get('/addUserToDoctor/:userID/:doctorName', (req, res) => {
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
 
-function GetDynamicValues(url: string, partnerUserID: string)
+function GetDynamicValues(url, partnerUserID)
 {
     console.log("send post: ", data, "url: ", url)  
     axios.post(
@@ -523,12 +524,12 @@ function GetDynamicValues(url: string, partnerUserID: string)
     })
 }
 
-function writeUserData(token: string, folder_path: string, json) {    
+function writeUserData(token, folder_path, json) {    
     push(ref(database, 'users/' + token + folder_path), json)    
 }
 
 // write to postgresql user data for graphs
-function queryDatabase(name: string, main_folder: string, secondary_folder: string, createdAtUnix: string, value: string) {
+function queryDatabase(name, main_folder, secondary_folder, createdAtUnix, value) {
     const client = new pg.Client(pg_config)
     client.connect()  // creates connection
     const query = `    
@@ -542,7 +543,7 @@ function queryDatabase(name: string, main_folder: string, secondary_folder: stri
 }
 
 // write to postgresql doctor register info
-function write_registered_in_postgresql(type: string, fullname: string, email: string, telephone: string) {
+function write_registered_in_postgresql(type, fullname, email, telephone) {
     const client = new pg.Client(pg_config)
     client.connect()  // creates connection
     const query = `    
@@ -555,7 +556,7 @@ function write_registered_in_postgresql(type: string, fullname: string, email: s
     })
 }
 
-function getUserInfo(username: string)
+function getUserInfo(username)
 {
     return new Promise(function(resolve, reject){
         get(child(dbRef, `users/` + username.replace(/[^a-z0-9]/gi, '') + `/`)).then((snapshotUsers) => {
@@ -577,7 +578,7 @@ function getUserInfo(username: string)
 }
 
 // go to home doctor page
-function home_page_doctor(res: Response<any, Record<string, any>, number>, doctor_name: string)
+function home_page_doctor(res, doctor_name)
 {
     allUsers = []
     var allDataPatients = null
@@ -611,7 +612,7 @@ function home_page_doctor(res: Response<any, Record<string, any>, number>, docto
     })   
 }
 
-function home_page_patient(res: Response<any, Record<string, any>, number>, userEmail: string, firstname: string)
+function home_page_patient(res, userEmail, firstname)
 {
     admin.auth().getUserByEmail(userEmail)
     .then((userRecord) => {

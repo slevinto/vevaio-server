@@ -1,28 +1,33 @@
 extends layout
             
 block content
-    div.h-screen.w-screen.bg-gradient-to-r.from-blue-400
-        div.mt-36
-            div.mt-8.flex.justify-center
-                img(src='main_logo.png')
-            form(action="/login", method="POST")        
-                div.mt-16.flex.justify-center
-                    div.justify-start
-                        i.fa.fa-user.fa-solid.absolute.px-2.mt-1.text-green-500
-                        input(name='email', type='email', style={outline: 'none'}, value=`${credentials.email}`, required)#email.w-full.bg-green-200.pl-8.border.border-green-500          
-                div.mt-8.flex.justify-center
-                    div.justify-start
-                        i.fa.fa-unlock-keyhole.fa-solid.absolute.px-2.mt-1.text-green-500
-                        input(name='password', type='password', style={outline: 'none'}, value=`${credentials.password}`, required)#password.w-full.bg-green-200.pl-8.border.border-green-500 
-                div.mt-36.flex.justify-center                
-                    div.bg-purple-700.px-20.py-2.text-green-500.rounded.font-bold
-                        button(type="submit") Login
-            div.mt-12.flex.justify-center                
-                div.text-purple-700.font-bold
-                    a(href='/welcome') Register me      
+    div.w-screen.h-screen.flex.justify-center.items-center(style={background: 'linear-gradient(to right, #00FDC2 , #0097FE)'})
+        div.p-24.bg-white.rounded-xl.space-y-5
+            div.bg-white.rounded-lg.p-4.px-4(md:p-8).mb-6
+                form(action='/login', method='POST')    
+                    img(src='main_logo.png').mx-auto.w-32.mb-6
+                    p.text-center.font-extrabold.text-lg.mb-6(style={color: '#343434'}) LOGIN
+                    div.flex.flex-col.space-y-2.mb-6
+                        label(for='email').text-sm.font-light Email
+                        input(name='email', type='email', value=`${credentials.email}`, required)#email.w-96.px-3.py-2.rounded-full.border
+                    div.flex.flex-col.space-y-2.mb-6
+                        label(for='password').text-sm.font-light Password
+                        input(name='password', type='password', value=`${credentials.password}`, required)#password.w-96.px-3.py-2.rounded-full.border
+                    div.flow-root.mb-6
+                        div.float-left
+                            input(type='checkbox' name='remember' id='remember')
+                            label(for='remember').text-sm.font-light Remember me
+                        p.float-right
+                            a(href='http://www.vivaio.com').text-blue-600.text-sm.font-light(class='hover:underline') Forgot Password?
+                    button(type='submit').w-full.px-10.py-2.bg-blue-500.text-white.rounded-full.duration-300.ease-in(class='hover:bg-blue-400 hover:drop-shadow-md').mb-6 LOGIN
+                    div.flex.justify-center.items-center
+                        p Don't have an account? 
+                            a(href='/welcome').text-blue-600.text-sm.font-light(class='hover:underline') Create an account
+            </button> 
+            </div>
 
     script. 
         if ( '#{err}'.length !== 0 )
         {           
             alert('#{err}')
-        }
+        }            
