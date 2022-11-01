@@ -1,511 +1,425 @@
-extends layout
-            
+extends layout            
 block content
-    div.my-8
-        img(src='main_logo.png')
         
-    div.justify-start            
-        div.mr-32.inline-block
-            h1.text-purple-700.text-xl.font-bold Please choose the patient to see graphs
-            div.select-box
-                div.options-container(id='optionscontainergraph')
-                    each val, index in [...new Set(data.map(item => item[0]))] 
-                        div.option 
-                            input(type='radio').radio
-                            label #{val}        
+    div(style={background: '#F3F3F3', 'border-color': '#E7E7E7'}).w-screen.border.border-solid.inline-flex
+        // right part of navigation bar
+        // logo
+        div.bg-white
+            img(src='main_logo.png').w-32.mx-6.my-3
+        // navigation buttons
+        div.inline-flex.space-x-24.mx-24
+            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md text-blue-500') Overview
+            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md') Patients
+            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md') Calendar     
+        // left part of navigation bar
+        div.inline-flex.ml-auto.grid.grid-cols-2.justify-center.items-center.mx-12
+            // dark mode button
+            button.inline-flex.h-8.justify-center.items-center.ml-auto(class='hover:text-blue-500 hover:drop-shadow-md' style={'border-width': '0px 2px 0px 0px'})
+                img(src='dark mode icon.png')              
+                p.mx-2.text-sm Apply Dark Theme
+            
+            div.inline-flex.h-8.justify-center.items-center.mr-auto.space-x-12.mx-6
+                // doctor name
+                p.font-bold Dr. Eva Danum 
+                img.rounded-full.border.border-blue-500.w-8.h-8(src='main_logo.png')
+                // bell sign
+                div.inline-flex.relative.w-8.h-8.justify-center
+                    img(src='bell.svg').w-8.h-8        
+                    div.absolute.bottom-4.left-4.h-5.w-5.border-2.border-white.rounded-full.bg-red-400.z-2.justify-center.items-center
+                        p.text-white.font-bold.mx-1(style={'margin-top': '-5px'}) 3
+        
+    div.w-screen.shadow-lg
+        p.text-black.font-bold.text-2xl.mx-4.my-3 Overview
 
-                div.selected(id='selectedgraph')
-                div.search-box(id='searchboxgraph')                       
-                    input(type='text', placeholder='Search...') 
-                
-        div.mr-8.inline-block
-            h1.text-purple-700.text-xl.font-bold Please choose the patient to invite
-            div.select-box
-                div.options-container(id='optionscontainerinvite')
-                    each val, index in users
-                        div.option 
-                            input(type='radio').radio
-                            label #{val}        
+    div(style={background: '#F3F3F3'}).w-screen.inline-flex.h-24
+        // buttons
+        div.inline-flex.space-x-8.mx-12.justify-center.items-center
+            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md bg-blue-500 text-white rounded-md py-2 px-4 w-36') Dashboard
+            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36') Income
+            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36') Alerts   
+            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36') Usage     
+        // dropdowns 
+        div.inline-flex.ml-auto.justify-center.items-center.mx-12
+            // year
+            div.relative.inline-block.text-left
+                div.inline-flex
+                    button.justify-center.items-center(type='button' class='inline-flex w-full justify-center px-4 py-2 text-base font-medium text-black hover:text-blue-500' id='menu-button' aria-expanded='true' aria-haspopup='true') Year
+                        img.mx-3(src='arrow down icon.png')
+            // month
+            div.relative.inline-block.text-left
+                div.inline-flex
+                    button.justify-center.items-center(type='button' class='inline-flex w-full justify-center px-4 py-2 text-base font-medium text-black hover:text-blue-500' id='menu-button' aria-expanded='true' aria-haspopup='true') Month
+                        img.mx-3(src='arrow down icon.png')
+            // city
+            div.relative.inline-block.text-left
+                div.inline-flex
+                    button.justify-center.items-center(type='button' class='inline-flex w-full justify-center px-4 py-2 text-base font-medium text-black hover:text-blue-500' id='menu-button' aria-expanded='true' aria-haspopup='true') City
+                        img.mx-3(src='arrow down icon.png')
+            // clinic
+            div.relative.inline-block.text-left
+                div.inline-flex
+                    button.justify-center.items-center(type='button' class='inline-flex w-full justify-center px-4 py-2 text-base font-medium text-black hover:text-blue-500' id='menu-button' aria-expanded='true' aria-haspopup='true') Clinic
+                        img.mx-3(src='arrow down icon.png')
+                        div.relative.inline-block.text-left
+            // category
+            div.relative.inline-block.text-left
+                div.inline-flex
+                    button.justify-center.items-center(type='button' class='inline-flex w-full justify-center px-4 py-2 text-base font-medium text-black hover:text-blue-500' id='menu-button' aria-expanded='true' aria-haspopup='true') Category
+                        img.mx-3(src='arrow down icon.png')    
+            
+            button.justify-center.items-center(class='inline-flex font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md bg-blue-500 text-white rounded-md py-2 px-4 w-28') 
+                img(src='export white icon.svg').h-4.mr-auto    
+                p Export                                
+    // graphs cards
+    div(style={background: '#F3F3F3'}).w-screen.inline-flex        
+        // System usage
+        div.mx-4.mt-6.bg-white.rounded-xl.space-y-5.border.border-solid.shadow-lg(style={'border-color': '#E7E7E7'} class='w-1/4')   
+            div.justify-center.items-center.inline.flex  
+                p.text-2xl.font-thin.mx-5.mt-5 System usage  
+                img(src='export black icon.svg').h-4.ml-auto.mx-5.mt-5  
+            p.text-sm.mx-5.my-0.inline-flex Jan 2022 - Jan 2023 /   
+                span.font-bold.mx-1 1244 members 
+            // graph
+            canvas(id='chartSystemUsage').h-96.w-96 
+            img(src='bar graph icon.svg').h-4.ml-auto.mx-5
+            // labels
+            div.flex.border.border-gray-100.m-3(style={'border-width': '2px 0px 0px 0px'})
+            div.inline.m-3
+                div.flow-root.inline.m-3
+                    div.float-left.inline-flex
+                        div.left-4.h-5.w-5.rounded-md(style={background: 'rgba(255,171,109,1)'})
+                        p.text-sm.mx-3 Weeks 1-2
+                    div.float-right.inline-flex
+                        div.right-4.h-5.w-5.rounded-md(style={background: 'rgba(215,202,42,1)'})
+                        p.text-sm.mx-3 Weeks 3-4
+            div.inline.m-3
+                div.flow-root.inline.m-3
+                    div.float-left.inline-flex
+                        div.left-4.h-5.w-5.rounded-md(style={background: 'rgba(237,133,223,1)'})
+                        p.text-sm.mx-3 Weeks 5-6
+                    div.float-right.inline-flex
+                        div.right-4.h-5.w-5.rounded-md(style={background: 'rgba(117,73,200,1)'})
+                        p.text-sm.mx-3 Weeks 7-8
 
-                div.selected(id='selectedinvite')
-                div.search-box(id='searchboxinvite')                      
-                    input(type='text', placeholder='Search...') 
+        // Abnormal alerts
+        div.mx-4.mt-6.bg-white.rounded-xl.space-y-5.border.border-solid.shadow-lg(style={'border-color': '#E7E7E7'} class='w-1/4')   
+            div.justify-center.items-center.inline.flex  
+                p.text-2xl.font-thin.mx-5.mt-5 Abnormal alerts  
+                img(src='export black icon.svg').h-4.ml-auto.mx-5.mt-5  
+            p.text-sm.mx-5.my-0.inline-flex Jan 2022 - Jan 2023 /   
+                span.font-bold.mx-1 72 alerts 
+            // graph
+            canvas(id='chartAbnormalAlerts').h-96.w-96 
+            img(src='bar graph icon.svg').h-4.ml-auto.mx-5
+            // labels
+            div.flex.border.border-gray-100.m-3(style={'border-width': '2px 0px 0px 0px'})
+            div.inline.m-3
+                div.flow-root.inline.m-3
+                    div.float-left.inline-flex
+                        div.left-4.h-5.w-5.rounded-md(style={background: 'rgba(195,215,42,1)'})
+                        p.text-sm.mx-3 Blood Pressure
+                    div.float-right.inline-flex
+                        div.right-4.h-5.w-5.rounded-md(style={background: 'rgba(159,160,208,1)'})
+                        p.text-sm.mx-3 Blood oxygen level
+            div.inline.m-3
+                div.flow-root.inline.m-3
+                    div.float-left.inline-flex
+                        div.left-4.h-5.w-5.rounded-md(style={background: 'rgba(200,73,151,1)'})
+                        p.text-sm.mx-3 Pulse                    
 
-        button(id='sendEmail', onClick='sendEmail()').inline-block.bg-purple-200.p-2.invisible Send Email
+        // Subscriptions and revenue
+        div.mx-4.mt-6.bg-white.rounded-xl.space-y-5.border.border-solid.shadow-lg(style={'border-color': '#E7E7E7'} class='w-1/2')   
+            div.justify-center.items-center.inline.flex  
+                p.text-2xl.font-thin.mx-5.mt-5 Subscriptions and revenue  
+                img(src='export black icon.svg').h-4.ml-auto.mx-5.mt-5  
+            
+            // graph
+            div(style={position: 'relative', height: '360px'})
+                canvas(id='chartSubscriptionsAndRevenue').px-6          
+            
+            // labels
+            div.px-6.pb-6
+                div.inline
+                    div.inline-flex
+                        div.left-4.h-5.w-5.rounded-md(style={background: 'rgba(26,115,232,1)'})
+                        p.text-sm.mx-3 Subscriptions
+                    div.inline-flex
+                        div.right-4.h-5.w-5.rounded-md(style={background: 'rgba(195,215,42,1)'})
+                        p.text-sm.mx-3 Revenue
+            
+    div(style={background: '#F3F3F3'}).w-screen.inline-flex   
+        // Income
+        div.mx-4.mt-6.bg-white.rounded-xl.space-y-5.border.border-solid.shadow-lg(style={'border-color': '#E7E7E7'} class='w-1/2')   
+            div.justify-center.items-center.inline.flex
+                p.text-2xl.font-thin.mx-5.mt-5 Income
+                img(src='export black icon.svg').h-4.ml-auto.mx-5.mt-5  
+            p.text-sm.mx-5 Jan 2022 - Jan 2023
 
-    div.mt-8
-        div(id='heartrate', style={width: '90%'}).overflow-x-scroll.invisible    
-            .chart-container
-                canvas(id="heartratechart", width='1200px')      
-    div.mt-8
-        div(id='steps', style={width: '90%'}).overflow-x-scroll.invisible   
-            .chart-container
-                canvas(id="stepschart", width='1200px')   
-    div.mt-8
-        div(id='burnedcalories', style={width: '90%'}).overflow-x-scroll.invisible   
-            .chart-container
-                canvas(id="burnedcalorieschart", width='1200px')     
-    div.mt-8
-        div(id='activityduration', style={width: '90%'}).overflow-x-scroll.invisible   
-            .chart-container
-                canvas(id="activitydurationchart", width='1200px')                                     
+            div.justify-center.items-center.inline.flex
+                div.justify-center.items-center
+                    p.mx-5.justify-center.items-center.flex.text-4xl.font-medium $180,160 
+                    p.mx-5.justify-center.items-center.flex Last month
+                div.justify-center.items-center
+                    p.mx-5.justify-center.items-center.flex.text-4xl.font-medium $769,300 
+                    p.mx-5.justify-center.items-center.flex Last 12 months                    
+                  
+            // graph
+            div(style={position: 'relative', height: '200px'})
+                canvas(id='chartIncome').px-6          
+            
+            // labels
+            div.px-6.pb-6
+                div.inline
+                    div.inline-flex
+                        div.left-4.h-5.w-5.rounded-md(style={background: 'rgba(44,130,190,1)'})
+                        p.text-sm.mx-3 Existing members
+                    div.inline-flex
+                        div.right-4.h-5.w-5.rounded-md(style={background: 'rgba(103,218,251,1)'})
+                        p.text-sm.mx-3 New members    
+
+        // Clients
+        div.mx-4.mt-6.bg-white.rounded-xl.space-y-5.border.border-solid.shadow-lg(style={'border-color': '#E7E7E7'} class='w-1/2')   
+            div.justify-center.items-center.inline.flex
+                p.text-2xl.font-thin.mx-5.mt-5 Clients
+                img(src='export black icon.svg').h-4.ml-auto.mx-5.mt-5  
+            p.text-sm.mx-5 Jan 2022 - Jan 2023
+
+            div.justify-center.items-center.inline.flex
+                div.justify-center.items-center
+                    p.mx-5.justify-center.items-center.flex.text-4xl.font-medium 1350 
+                    p.mx-5.justify-center.items-center.flex Last month
+                div.justify-center.items-center
+                    p.mx-5.justify-center.items-center.flex.text-4xl.font-medium 4352 
+                    p.mx-5.justify-center.items-center.flex Last 12 months                    
+                  
+            // graph
+            div(style={position: 'relative', height: '200px'})
+                canvas(id='chartClients').px-6          
+            
+            // labels
+            div.px-6.pb-6
+                div.inline
+                    div.inline-flex
+                        div.left-4.h-5.w-5.rounded-md(style={background: 'rgba(117,73,200,1)'})
+                        p.text-sm.mx-3 Existing members
+                    div.inline-flex
+                        div.right-4.h-5.w-5.rounded-md(style={background: 'rgba(255,171,109,1)'})
+                        p.text-sm.mx-3 New members             
+
     script.
-        const selectedInvite = document.getElementById('selectedinvite')
-        const optionsContainerInvite = document.getElementById('optionscontainerinvite')
-        const searchBoxInvite = document.getElementById('searchboxinvite').querySelector(".search-box input")
-        const optionsListInvite = optionsContainerInvite.querySelectorAll(".option")
-
-        const selectedGraph = document.getElementById('selectedgraph')
-        const optionsContainerGraph = document.getElementById('optionscontainergraph')
-        const searchBoxGraph = document.getElementById('searchboxgraph').querySelector(".search-box input")
-        const optionsListGraph = optionsContainerGraph.querySelectorAll(".option")
-
-        const btn = document.querySelector('button')
-
-        function buildGraph(selectedPatient)
-        {
-            var jsonvalues = !{JSON.stringify(data)}
-            
-            document.getElementById('heartrate').style.visibility='visible'
-            document.getElementById('steps').style.visibility='visible'
-            document.getElementById('burnedcalories').style.visibility='visible'
-            document.getElementById('activityduration').style.visibility='visible'
-                             
-            var heartratevalues = []
-            for (let i = 0; i < jsonvalues.length; i++){
-                if(jsonvalues[i][0] == selectedPatient && jsonvalues[i][1] === 'Vitals' && jsonvalues[i][2] === 'Resting Heart Rate')
-                    heartratevalues.push([jsonvalues[i][3], jsonvalues[i][4]]) 
-            }
-            heartratevalues = Array.from(new Set(heartratevalues.map(JSON.stringify))).map(JSON.parse)
-            heartratevalues = heartratevalues.sort((a, b) => a[0] - b[0])
-            
-            var stepvalues = []
-            for (let i = 0; i < jsonvalues.length; i++){
-                if(jsonvalues[i][0] === selectedPatient && jsonvalues[i][1] === 'Activity' && jsonvalues[i][2] === 'Steps')
-                    stepvalues.push([jsonvalues[i][3], jsonvalues[i][4]]) 
-            }
-            stepvalues = Array.from(new Set(stepvalues.map(JSON.stringify))).map(JSON.parse)
-            stepvalues = stepvalues.sort((a, b) => a[0] - b[0])
-            
-            var burnedcaloriesvalues = []
-            for (let i = 0; i < jsonvalues.length; i++){
-                if(jsonvalues[i][0] === selectedPatient && jsonvalues[i][1] === 'Activity' && jsonvalues[i][2] === 'Burned Calories')
-                    burnedcaloriesvalues.push([jsonvalues[i][3], jsonvalues[i][4]]) 
-            }
-            burnedcaloriesvalues = Array.from(new Set(burnedcaloriesvalues.map(JSON.stringify))).map(JSON.parse)
-            burnedcaloriesvalues = burnedcaloriesvalues.sort((a, b) => a[0] - b[0])
-
-            var activitydurationvalues = []
-            for (let i = 0; i < jsonvalues.length; i++){
-                if(jsonvalues[i][0] === selectedPatient && jsonvalues[i][1] === 'Activity' && jsonvalues[i][2] === 'Activity Duration')
-                    activitydurationvalues.push([jsonvalues[i][3], jsonvalues[i][4]]) 
-            }
-            activitydurationvalues = Array.from(new Set(activitydurationvalues.map(JSON.stringify))).map(JSON.parse)
-            activitydurationvalues = activitydurationvalues.sort((a, b) => a[0] - b[0])
-
-            var ctxheartrate = document.getElementById("heartratechart").getContext('2d')
-            var heartratechart = new Chart(ctxheartrate, {
-                type: 'line',
-                data: {
-                    labels: heartratevalues.map(item => new Date(item[0]).toLocaleString("en", {month: "2-digit", day: "numeric"})),
-                    datasets: [{
-                        data: heartratevalues.map(item => item[1]),                                 
-                        backgroundColor: 'PaleTurquoise'
-                    }]
+        const dataSystemUsage = {datasets: [{data: [18, 40, 22, 20], backgroundColor: ['rgba(255,171,109,1)', 'rgba(215,202,42,1)', 'rgba(237,133,223,1)', 'rgba(117,73,200,1)'], hoverOffset: 4}]}
+        const configSystemUsage = {
+            type: 'doughnut', data: dataSystemUsage, 
+            options: {
+                tooltips: {
+                    enabled: false
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    title: {
-                        display: true,
-                        text: "Heart Rate",
-                        fontSize: 24,
-                        fontColor: 'purple'
-                    },
-                    legend: {
-                        display: false                                    
-                    },
-                    elements: {
-                        point:{
-                            radius: 0
-                        }
-                    },
-                    scales: {
-                        xAxes: [{                                            
-                            stacked: false,
-                            gridLines: {
-                                    display:false
-                            },
-                            ticks: { 
-                                fontColor: 'purple',                                              
-                            },                                                                                      
-                        }],
-                        yAxes: [{
-                            stacked: false,
-                            gridLines: {
-                                    display:false
-                            },
-                            ticks: {
-                                fontColor: 'purple',   
-                            }
-                        }]
+                plugins: {
+                    datalabels: {
+                        formatter: (value, ctxSystemUsage) => {
+                            let sum = ctxSystemUsage.dataset._meta[0].total
+                            let percentage = (value * 100 / sum).toFixed(0) + '%'
+                            return percentage
+                        },
+                        color: '#fff',
                     }
                 }
-            })                        
-        
-            var ctxsteps = document.getElementById("stepschart").getContext('2d')
-            var stepschart = new Chart(ctxsteps, {
-                type: 'line',
-                data: {
-                    labels: stepvalues.map(item => new Date(item[0]).toLocaleString("en", {month: "2-digit", day: "numeric"})),
-                    datasets: [{
-                        data: stepvalues.map(item => item[1]),
-                        backgroundColor: 'PaleTurquoise'                                 
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    title: {
-                        display: true,
-                        text: "Steps",
-                        fontSize: 24,
-                        fontColor: 'purple'
-                    },
-                    legend: {
-                        display: false                                    
-                    },
-                    elements: {
-                        point:{
-                            radius: 0
-                        }
-                    },
-                    scales: {
-                        xAxes: [{
-                            stacked: false,
-                            gridLines: {
-                                    display:false
-                            },
-                            ticks: {
-                                fontColor: 'purple',   
-                            },
-                        }],
-                        yAxes: [{
-                            stacked: true,
-                            gridLines: {
-                                    display:false
-                            },
-                            ticks: {
-                                fontColor: 'purple',   
-                            }
-                        }]
-                    }
-                }
-            }) 
-
-            var ctxburnedcalories = document.getElementById("burnedcalorieschart").getContext('2d')
-            var burnedcalorieschart = new Chart(ctxburnedcalories, {
-                type: 'line',
-                data: {
-                    labels: burnedcaloriesvalues.map(item => new Date(item[0]).toLocaleString("en", {month: "2-digit", day: "numeric"})),
-                    datasets: [{
-                        data: burnedcaloriesvalues.map(item => item[1]),                                 
-                        backgroundColor: 'PaleTurquoise'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    title: {
-                        display: true,
-                        text: "Burned Calories",
-                        fontSize: 24,
-                        fontColor: 'purple'
-                    },
-                    legend: {
-                        display: false                                    
-                    },
-                    elements: {
-                        point:{
-                            radius: 0
-                        }
-                    },
-                    scales: {
-                        xAxes: [{                                            
-                            stacked: false,
-                            gridLines: {
-                                    display:false
-                            },
-                            ticks: { 
-                                fontColor: 'purple',                                              
-                            },                                                                                      
-                        }],
-                        yAxes: [{
-                            stacked: false,
-                            gridLines: {
-                                    display:false
-                            },
-                            ticks: {
-                                fontColor: 'purple',   
-                            }
-                        }]
-                    }
-                }
-            })    
-
-            var ctxactivityduration = document.getElementById("activitydurationchart").getContext('2d')
-            var activitydurationchart = new Chart(ctxactivityduration, {
-                type: 'line',
-                data: {
-                    labels: activitydurationvalues.map(item => new Date(item[0]).toLocaleString("en", {month: "2-digit", day: "numeric"})),
-                    datasets: [{
-                        data: activitydurationvalues.map(item => item[1]),                                 
-                        backgroundColor: 'PaleTurquoise'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    title: {
-                        display: true,
-                        text: "Activity Duration",
-                        fontSize: 24,
-                        fontColor: 'purple'
-                    },
-                    legend: {
-                        display: false                                    
-                    },
-                    elements: {
-                        point:{
-                            radius: 0
-                        }
-                    },
-                    scales: {
-                        xAxes: [{                                            
-                            stacked: false,
-                            gridLines: {
-                                    display:false
-                            },
-                            ticks: { 
-                                fontColor: 'purple',                                              
-                            },                                                                                      
-                        }],
-                        yAxes: [{
-                            stacked: false,
-                            gridLines: {
-                                    display:false
-                            },
-                            ticks: {
-                                fontColor: 'purple',   
-                            }
-                        }]
-                    }
-                }
-            })                             
-        }
-
-        selectedInvite.addEventListener("click", () => {
-            optionsContainerInvite.classList.toggle("active")
-            searchBoxInvite.value = ""
-            filterListInvite("")
-
-            if (optionsContainerInvite.classList.contains("active")) {
-                searchBoxInvite.focus()
             }
-        })
+        }
+        var ctxSystemUsage = document.getElementById('chartSystemUsage').getContext('2d');
+        var chartBarSystemUsage = new Chart(ctxSystemUsage, configSystemUsage )
 
-        selectedGraph.addEventListener("click", () => {
-            optionsContainerGraph.classList.toggle("active")
-            searchBoxGraph.value = ""
-            filterListGraph("")
-
-            if (optionsContainerGraph.classList.contains("active")) {
-                searchBoxGraph.focus()
+        const dataAbnormalAlerts = {datasets: [{data: [50, 40, 10], backgroundColor: ['rgba(195,215,42,1)', 'rgba(159,160,208,1)', 'rgba(200,73,151,1)'], hoverOffset: 4}]}
+        const configAbnormalAlerts = {
+            type: 'doughnut', data: dataAbnormalAlerts, 
+            options: {
+                tooltips: {
+                    enabled: false
+                },
+                plugins: {
+                    datalabels: {
+                        formatter: (value, ctxAbnormalAlerts) => {
+                            let sum = ctxAbnormalAlerts.dataset._meta[1].total
+                            let percentage = (value * 100 / sum).toFixed(0) + '%'
+                            return percentage
+                        },
+                        color: '#fff',
+                    }
+                }
             }
-        })
+        }
+        var ctxAbnormalAlerts = document.getElementById('chartAbnormalAlerts').getContext('2d');
+        var chartBarAbnormalAlerts = new Chart(ctxAbnormalAlerts, configAbnormalAlerts )
 
-        optionsListInvite.forEach(o => {
-            o.addEventListener("click", () => {
-                selectedInvite.innerHTML = o.querySelector("label").innerHTML
-                optionsContainerInvite.classList.remove("active") 
-                btn.style.visibility='visible'               
-            })
-        })
-
-        optionsListGraph.forEach(o => {
-            o.addEventListener("click", () => {
-                selectedGraph.innerHTML = o.querySelector("label").innerHTML
-                optionsContainerGraph.classList.remove("active")
-                buildGraph(selectedGraph.innerHTML.trim())                
-            })
-        })
-
-        searchBoxInvite.addEventListener("keyup", function(e) {
-            filterListInvite(e.target.value)
-        })
-
-        searchBoxGraph.addEventListener("keyup", function(e) {
-            filterListGraph(e.target.value)
-        })
-
-        const filterListInvite = searchTerm => {
-            searchTerm = searchTerm.toLowerCase()
-            optionsListInvite.forEach(option => {
-                let label = option.firstElementChild.nextElementSibling.innerText.toLowerCase()
-                if (label.indexOf(searchTerm) > -1) {
-                    option.style.display = 'block'
-                } 
-                else {
-                    option.style.display = 'none'
-                    option.style.marginTop = '0px'                    
-                }
-            })
-            var foundFirstElem = false
-            optionsListInvite.forEach(option => {
-                if (option.style.display === 'block')
+        const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        const dataSubscriptionsAndRevenue = {
+            labels: labels,
+            datasets: [
                 {
-                    if (foundFirstElem === false)
-                    {
-                         option.style.marginTop = '45px'
-                         foundFirstElem = true
+                    data: [4, 3, 4, 5, 3, 4, 3, 5, 3, 6, 5, 5], borderColor: ['rgba(26,115,232,1)'], hoverOffset: 4, fill: false
+                },
+                {
+                    data: [5, 4, 5, 3, 3, 8, 6, 7, 5, 4, 3, 3], borderColor: ['rgba(195,215,42,1)'], hoverOffset: 4, fill: false
+                }
+            ]
+        }        
+        const configSubscriptionsAndRevenue = {
+            type: 'line', data: dataSubscriptionsAndRevenue, 
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {display: false},
+                plugins: {
+                    datalabels: {
+                        display: false,
+                    },
+                },
+                elements: {
+                    point:{
+                        radius: 0
+                    },
+                    line: {
+                        tension: 0
                     }
-                    else {
-                        option.style.marginTop = '0px' 
-                    }                    
+                },
+                tooltips: {
+                    enabled: false
+                },
+                scales: {
+                    yAxes: [{                                            
+                        stacked: false,                        
+                        gridLines: {
+                            display:true
+                        },
+                        ticks: {
+                            min: 1,                            
+                            max: 9, 
+                            callback: function(val, index) {
+                                return val + 'k'
+                            }                                            
+                        },
+                                                                                                           
+                    }],
+                    xAxes: [{
+                        stacked: false,
+                        gridLines: {
+                            display:false
+                        }
+                    }]
                 }
-                else
-                {
-                    option.style.marginTop = '0px' 
-                }
-            })
+            }
         }
+        var ctxSubscriptionsAndRevenue = document.getElementById('chartSubscriptionsAndRevenue').getContext('2d')
+        var chartBarSubscriptionsAndRevenue = new Chart(ctxSubscriptionsAndRevenue, configSubscriptionsAndRevenue )
 
-        const filterListGraph = searchTerm => {
-            searchTerm = searchTerm.toLowerCase()
-            optionsListGraph.forEach(option => {
-                let label = option.firstElementChild.nextElementSibling.innerText.toLowerCase()
-                if (label.indexOf(searchTerm) > -1) {
-                    option.style.display = 'block'
-                } 
-                else {
-                    option.style.display = 'none'
-                    option.style.marginTop = '0px'                    
-                }
-            })
-            var foundFirstElem = false
-            optionsListGraph.forEach(option => {
-                if (option.style.display === 'block')
+        const dataIncome = {
+            labels: labels,
+            datasets: [
                 {
-                    if (foundFirstElem === false)
-                    {
-                         option.style.marginTop = '45px'
-                         foundFirstElem = true
+                    data: [3, 2, 1, 2, 1, 2, 3, 2, 1, 3, 2, 1], backgroundColor: 'rgba(44,130,190,1)', hoverOffset: 4, fill: false
+                },
+                {
+                    data: [1, 2, 3, 3, 2, 4, 3, 2, 1, 1, 2, 3], backgroundColor: 'rgba(103,218,251,1)', hoverOffset: 4, fill: false
+                }
+            ]
+        }        
+        const configIncome = {
+            type: 'bar', 
+            data: dataIncome, 
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {display: false},
+                plugins: {
+                    datalabels: {
+                        display: false,
+                    },
+                },
+                elements: {
+                    point:{
+                        radius: 0
+                    },
+                    line: {
+                        tension: 0
                     }
-                    else {
-                        option.style.marginTop = '0px' 
-                    }                    
+                },
+                tooltips: {
+                    enabled: false
+                },
+                scales: {
+                    yAxes: [{                                            
+                        stacked: false,                        
+                        gridLines: {
+                            display: false
+                        },
+                        ticks: {
+                            display: false //this will remove only the label
+                        }                                                                                                       
+                    }],
+                    xAxes: [{
+                        stacked: false,
+                        gridLines: {
+                            display: false
+                        }
+                    }]
                 }
-                else
+            }
+        }
+        var ctxIncome = document.getElementById('chartIncome').getContext('2d')
+        var chartBarIncome = new Chart(ctxIncome, configIncome )
+
+        const dataClients = {
+            labels: labels,
+            datasets: [
                 {
-                    option.style.marginTop = '0px' 
+                    data: [3, 2, 1, 2, 1, 2, 3, 2, 1, 3, 2, 1], backgroundColor: 'rgba(117,73,200,1)', hoverOffset: 4, fill: false
+                },
+                {
+                    data: [1, 2, 3, 3, 2, 4, 3, 2, 1, 1, 2, 3], backgroundColor: 'rgba(255,171,109,1)', hoverOffset: 4, fill: false
                 }
-            })
-        }   
-
-        function sendEmail()
-        {
-            var request = new XMLHttpRequest()
-            $.ajax({
-                url: "/sendEmail",
-                method: "POST",
-                data: {userEmail: selectedInvite.innerHTML.trim(), doctorName: '#{doctor_name}'} 
-            }) 
-        }     
-        
-    style. 
-        .select-box {
-            position: relative;
-            display: flex;
-            width: 348px;
-            flex-direction: column;
+            ]
+        }        
+        const configClients = {
+            type: 'bar', 
+            data: dataClients, 
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {display: false},
+                plugins: {
+                    datalabels: {
+                        display: false,
+                    },
+                },
+                elements: {
+                    point:{
+                        radius: 0
+                    },
+                    line: {
+                        tension: 0
+                    }
+                },
+                tooltips: {
+                    enabled: false
+                },
+                scales: {
+                    yAxes: [{                                            
+                        stacked: false,                        
+                        gridLines: {
+                            display: false
+                        },
+                        ticks: {
+                            display: false //this will remove only the label
+                        }                                                                                                       
+                    }],
+                    xAxes: [{
+                        stacked: false,
+                        gridLines: {
+                            display: false
+                        }
+                    }]
+                }
+            }
         }
-        .select-box .options-container {
-            width: 100%;
-            opacity: 0;
-            border-radius: 8px;
-            overflow: hidden;
-            order: 1;
-            color: rgb(56, 52, 52);
-        }
-        .select-box .option, .selected {
-            padding: 12px 24px;
-            cursor: pointer;
-        }
-        .select-box .option .radio {
-            display: none;
-        }
-        .selected {
-            border-radius: 8px;
-            margin-bottom: 8px;
-            color: rgb(56, 52, 52);
-            position: relative;
-            order: 0;
-        }
-        .selected:after{  
-            content: '\f106';
-            position: absolute;
-            right: 20px;        
-            font-family: 'Font Awesome 5 Free';
-            font-weight: 700;        
-            color: black;
-            transform: rotate(180deg);
-            transition: all .4s;        
-        }  
-        .select-box .option:hover {
-            background: #F1FFF3;;
-            border-radius: 5px;
-            color: #8AD891;        
-        }
-        .select-box .option input:hover{
-            font-weight: 700px;
-        }
-        .search-box input {
-            width: 100%;
-            padding: 16px 16px;
-            font-family: Roboto, sans-serif;
-            font-size: 16px;
-            position: absolute;
-            /* outline: none; */
-            opacity: 0;
-            outline: 3px solid black;
-            outline-offset: -10px;
-            z-index: 100;
-            border: none;
-        }
-        .select-box .options-container.active {
-            max-height: 240px;
-            opacity: 1;
-            overflow-y: scroll;
-            transition: all 0.4s;
-        }
-        .select-box .options-container.active ~ .selected::after {
-            transform: rotateY(180deg);
-        }
-        .select-box .options-container::-webkit-scrollbar {
-            width: 7px;
-            background: #888;
-            border-radius:  8px ;
-            height: 1px;
-        }
-        .select-box .options-container::-webkit-scrollbar-thumb {
-            background: #464749;
-            border-radius: 8px 8px 8px 8px;
-
-        }
-        .select-box .options-container.active ~ .search-box input {
-            opacity: 1;
-            pointer-events: auto;
-        }
-                                    
-                            
-                                
+        var ctxClients = document.getElementById('chartClients').getContext('2d')
+        var chartBarClients = new Chart(ctxClients, configClients )

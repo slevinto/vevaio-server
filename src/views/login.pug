@@ -2,7 +2,7 @@ extends layout
             
 block content
     div.w-screen.h-screen.flex.justify-center.items-center(style={background: 'linear-gradient(to right, #00FDC2 , #0097FE)'})
-        div.p-24.bg-white.rounded-xl.space-y-5
+        div.p-24.bg-white.rounded-xl.space-y-5.border.border-solid(style={'border-color': '#E7E7E7'})
             div.bg-white.rounded-lg.p-4.px-4(md:p-8).mb-6
                 form(action='/login', method='POST')    
                     img(src='main_logo.png').mx-auto.w-32.mb-6
@@ -15,16 +15,15 @@ block content
                         input(name='password', type='password', value=`${credentials.password}`, required)#password.w-96.px-3.py-2.rounded-full.border
                     div.flow-root.mb-6
                         div.float-left
-                            input(type='checkbox' name='remember' id='remember')
+                            input(type='checkbox' name='remember' id='remember').mx-2
                             label(for='remember').text-sm.font-light Remember me
                         p.float-right
-                            a(href='http://www.vivaio.com').text-blue-600.text-sm.font-light(class='hover:underline') Forgot Password?
-                    button(type='submit').w-full.px-10.py-2.bg-blue-500.text-white.rounded-full.duration-300.ease-in(class='hover:bg-blue-400 hover:drop-shadow-md').mb-6 LOGIN
+                            a(href='http://www.vivaio.com' class='hover:underline').text-blue-600.text-sm.font-light Forgot Password?
+                    button(type='submit' class='hover:bg-blue-400 hover:drop-shadow-md').w-full.px-10.py-2.bg-blue-500.text-white.rounded-full.duration-300.ease-in.mb-6 LOGIN
                     div.flex.justify-center.items-center
                         p Don't have an account? 
-                            a(href='/welcome').text-blue-600.text-sm.font-light(class='hover:underline') Create an account
-            </button> 
-            </div>
+                            a(href='/welcome' class='hover:underline').text-blue-600.text-sm.font-light Create an account
+            
 
     script. 
         if ( '#{err}'.length !== 0 )
