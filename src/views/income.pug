@@ -1,0 +1,297 @@
+extends layout            
+block content
+        
+    div(style={background: '#F3F3F3', 'border-color': '#E7E7E7'}).w-screen.border.border-solid.inline-flex
+        // right part of navigation bar
+        // logo
+        div.bg-white
+            img(src='main_logo.png').w-32.mx-6.my-3
+        // navigation buttons
+        div.inline-flex.space-x-24.mx-24
+            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md text-blue-500') Overview
+            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md') Patients
+            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md') Calendar     
+        // left part of navigation bar
+        div.inline-flex.ml-auto.grid.grid-cols-2.justify-center.items-center.mx-12
+            // dark mode button
+            button.inline-flex.h-8.justify-center.items-center.ml-auto(class='hover:text-blue-500 hover:drop-shadow-md' style={'border-width': '0px 2px 0px 0px'})
+                img(src='dark mode icon.png')              
+                p.mx-2.text-sm Apply Dark Theme
+            
+            div.inline-flex.h-8.justify-center.items-center.mr-auto.space-x-12.mx-6
+                // doctor name
+                p.font-bold Dr. #{doctor_name}
+                img.rounded-full.border.border-blue-500.w-8.h-8(src='main_logo.png')
+                // bell sign
+                div.inline-flex.relative.w-8.h-8.justify-center
+                    img(src='bell.svg').w-8.h-8        
+                    div.absolute.bottom-4.left-4.h-5.w-5.border-2.border-white.rounded-full.bg-red-400.z-2.justify-center.items-center
+                        p.text-white.font-bold.mx-1(style={'margin-top': '-5px'}) 3
+        
+    div.w-screen.shadow-lg
+        p.text-black.font-bold.text-2xl.mx-4.my-3 Income
+
+    div(style={background: '#F3F3F3'}).w-screen.inline-flex.h-24
+        // buttons
+        div.inline-flex.space-x-8.mx-12.justify-center.items-center
+            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36' onclick='overview(\'' + doctor_name + '\')') Dashboard
+            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md bg-blue-500 text-white rounded-md py-2 px-4 w-36' onclick='income(\'' + doctor_name + '\')') Income
+            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36' onclick='alerts()') Alerts   
+            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36') Usage     
+        // dropdowns 
+        div.inline-flex.ml-auto.justify-center.items-center.mx-12
+            // year
+            div.relative.inline-block.text-left
+                div.inline-flex
+                    button.justify-center.items-center(type='button' class='inline-flex w-full justify-center px-4 py-2 text-base font-medium text-black hover:text-blue-500' id='menu-button' aria-expanded='true' aria-haspopup='true') Year
+                        img.mx-3(src='arrow down icon.png')
+            // month
+            div.relative.inline-block.text-left
+                div.inline-flex
+                    button.justify-center.items-center(type='button' class='inline-flex w-full justify-center px-4 py-2 text-base font-medium text-black hover:text-blue-500' id='menu-button' aria-expanded='true' aria-haspopup='true') Month
+                        img.mx-3(src='arrow down icon.png')
+            // city
+            div.relative.inline-block.text-left
+                div.inline-flex
+                    button.justify-center.items-center(type='button' class='inline-flex w-full justify-center px-4 py-2 text-base font-medium text-black hover:text-blue-500' id='menu-button' aria-expanded='true' aria-haspopup='true') City
+                        img.mx-3(src='arrow down icon.png')
+            // clinic
+            div.relative.inline-block.text-left
+                div.inline-flex
+                    button.justify-center.items-center(type='button' class='inline-flex w-full justify-center px-4 py-2 text-base font-medium text-black hover:text-blue-500' id='menu-button' aria-expanded='true' aria-haspopup='true') Clinic
+                        img.mx-3(src='arrow down icon.png')
+                        div.relative.inline-block.text-left
+            // category
+            div.relative.inline-block.text-left
+                div.inline-flex
+                    button.justify-center.items-center(type='button' class='inline-flex w-full justify-center px-4 py-2 text-base font-medium text-black hover:text-blue-500' id='menu-button' aria-expanded='true' aria-haspopup='true') Category
+                        img.mx-3(src='arrow down icon.png')    
+            
+            button.justify-center.items-center(class='inline-flex font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md bg-blue-500 text-white rounded-md py-2 px-4 w-28') 
+                img(src='export white icon.svg').h-4.mr-auto    
+                p Export                                
+    // graphs cards
+    div(style={background: '#F3F3F3'}).w-screen.inline-flex        
+        // Sales vs budget
+        div.m-4.py-6.bg-white.rounded-xl.space-y-5.border.border-solid.shadow-lg.justify-center.items-center(style={'border-color': '#E7E7E7'} class='w-1/2')   
+            div.justify-center.items-center.inline.flex
+                p.text-2xl.font-thin.mx-5.mt-5 Sales vs budget
+                img(src='export black icon.svg').h-4.ml-auto.mx-5.mt-5  
+            p.text-sm.mx-5 Jan 2022 - Jan 2023
+
+            div.justify-center.items-center.inline.flex.mx-12
+                div.justify-center.items-center.border.border-solid.rounded-lg.mr-auto(style={'border-color': 'rgba(156,173,29,1)'})
+                    p.mx-5.justify-center.items-center.flex.text-2xl.font-medium(style={'color': 'rgba(156,173,29,1)'}) $49,180,160 
+                    p.mx-5.justify-center.items-center.flex(style={'color': 'rgba(156,173,29,1)'}) Sales
+                div.justify-center.items-center.border.border-solid.rounded-lg.ml-auto(style={'border-color': 'rgba(26,115,232,1)'})
+                    p.mx-5.justify-center.items-center.flex.text-2xl.font-medium(style={'color': 'rgba(26,115,232,1)'}) $54,769,300 
+                    p.mx-5.justify-center.items-center.flex(style={'color': 'rgba(26,115,232,1)'}) Budget                    
+                  
+            // graph
+            div.inline.flex.justify-center.items-end
+                p.flex.mx-6.text-2xl.font-thin $0M
+                div(style={position: 'relative', height: '200px', 'margin-bottom': '-16px'})
+                    canvas(id='chartSalesVsBudget')    
+                p.flex.mx-6.text-2xl.font-thin $54M               
+            p.flex.justify-center.text-4xl.font-bold(style={'margin-top': '-44px'}) 91.6%   
+        
+        // Sales vs sales last year
+        div.m-4.py-6.bg-white.rounded-xl.space-y-5.border.border-solid.shadow-lg.justify-center.items-center(style={'border-color': '#E7E7E7'} class='w-1/2')   
+            div.justify-center.items-center.inline.flex
+                p.text-2xl.font-thin.mx-5.mt-5 Sales vs sales last year
+                img(src='export black icon.svg').h-4.ml-auto.mx-5.mt-5  
+            p.text-sm.mx-5 2022 vs 2023
+
+            div.justify-center.items-center.inline.flex.mx-12
+                div.justify-center.items-center.border.border-solid.rounded-lg.mr-auto(style={'border-color': 'rgba(156,173,29,1)'})
+                    p.mx-5.justify-center.items-center.flex.text-2xl.font-medium(style={'color': 'rgba(156,173,29,1)'}) $49,180,160 
+                    p.mx-5.justify-center.items-center.flex(style={'color': 'rgba(156,173,29,1)'}) Sales
+                div.justify-center.items-center.border.border-solid.rounded-lg.ml-auto(style={'border-color': 'rgba(26,115,232,1)'})
+                    p.mx-5.justify-center.items-center.flex.text-2xl.font-medium(style={'color': 'rgba(26,115,232,1)'}) $54,769,300 
+                    p.mx-5.justify-center.items-center.flex(style={'color': 'rgba(26,115,232,1)'}) Sales 2022                    
+                  
+            // graph
+            div.inline.flex.justify-center.items-end
+                p.flex.mx-6.text-2xl.font-thin $0M
+                div(style={position: 'relative', height: '200px', 'margin-bottom': '-16px'})
+                    canvas(id='chartSalesVsSalesLastYear')    
+                p.flex.mx-6.text-2xl.font-thin $54M               
+            p.flex.justify-center.text-4xl.font-bold(style={'margin-top': '-44px'}) -6.6%   
+
+    div(style={background: '#F3F3F3'}).w-screen.inline-flex        
+        // Sales by clinic
+        div.m-4.py-6.bg-white.rounded-xl.space-y-5.border.border-solid.shadow-lg.justify-center.items-center(style={'border-color': '#E7E7E7'} class='w-1/2')   
+            div.justify-center.items-center.inline.flex
+                p.text-2xl.font-thin.mx-5.mt-5 Sales by clinic
+                img(src='export black icon.svg').h-4.ml-auto.mx-5.mt-5  
+            p.text-sm.mx-5 Jan 2022 - Jan 2023
+
+            // graph
+            div(style={position: 'relative', height: '300px', width: '400px'})
+                canvas(id='chartSalesByClinic')     
+        
+        // Sales by territory
+        div.m-4.py-6.bg-white.rounded-xl.space-y-5.border.border-solid.shadow-lg.justify-center.items-center(style={'border-color': '#E7E7E7'} class='w-1/2')   
+            div.justify-center.items-center.inline.flex
+                p.text-2xl.font-thin.mx-5.mt-5 Sales by territory
+                img(src='export black icon.svg').h-4.ml-auto.mx-5
+            p.text-sm.mx-5 Jan 2022 - Jan 2023
+
+            // graph
+            div(style={position: 'relative', height: '300px'})
+                canvas(id='chartSalesByTerritory')                      
+
+    script.
+        const dataSalesVsBudget = {datasets: [{data: [91.6, 9], backgroundColor: ['rgba(156,173,29,1)', 'rgba(26,115,232,1)'], hoverOffset: 4}]}
+        const configSalesVsBudget = {
+            type: 'doughnut', data: dataSalesVsBudget, 
+            options: {
+                rotation: 1 * Math.PI,
+                circumference: 1 * Math.PI,
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {display: false},
+                plugins: {
+                    datalabels: {
+                        display: false
+                    },
+                    outlabels: {
+                        display: false
+                    },
+                },
+                tooltips: {
+                    enabled: false
+                }                
+            }
+        }
+        var ctxSalesVsBudget = document.getElementById('chartSalesVsBudget').getContext('2d');
+        var chartBarSalesVsBudget = new Chart(ctxSalesVsBudget, configSalesVsBudget )       
+
+        const dataSalesVsSalesLastYear = {datasets: [{data: [66, 34], backgroundColor: ['rgba(156,173,29,1)', 'rgba(26,115,232,1)'], hoverOffset: 4}]}
+        const configSalesVsSalesLastYear = {
+            type: 'doughnut', data: dataSalesVsSalesLastYear, 
+            options: {
+                rotation: 1 * Math.PI,
+                circumference: 1 * Math.PI,
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {display: false},
+                plugins: {
+                    datalabels: {
+                        display: false
+                    },
+                    outlabels: {
+                        display: false
+                    },
+                },
+                tooltips: {
+                    enabled: false
+                }
+            }
+        }
+        var ctxSalesVsSalesLastYear = document.getElementById('chartSalesVsSalesLastYear').getContext('2d');
+        var chartBarSalesVsSalesLastYeart = new Chart(ctxSalesVsSalesLastYear, configSalesVsSalesLastYear )   
+
+        const dataSalesByClinic = {labels: ['Clinic 1', 'Clinic 2', 'Clinic 3', 'Clinic 4', 'Clinic 5', 'Clinic 6', 'Clinic 7'], datasets: [{data: [1, 2, 3, 4, 5, 6, 7], backgroundColor: ['rgba(44,130,190,1)', 'rgba(103,218,251,1)', 'rgba(44,130,190,1)', 'rgba(103,218,251,1)', 'rgba(44,130,190,1)', 'rgba(103,218,251,1)', 'rgba(44,130,190,1)'], hoverOffset: 4}]}
+        const configSalesByClinic = {
+            type: 'horizontalBar', data: dataSalesByClinic, 
+            options: {
+                legend: {display: false},
+                responsive: true,
+                maintainAspectRatio: false,                
+                tooltips: {
+                    enabled: false
+                },
+                scales: {
+                    yAxes: [{  
+                        display: true,                                           
+                        stacked: false,                        
+                        gridLines: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            fontSize: 20
+                        }
+                    }],
+                    xAxes: [{    
+                        display: false,                                        
+                        stacked: false,                        
+                        gridLines: {
+                            display: false,
+                            drawBorder: false
+                        }
+                    }]
+                },
+                plugins: {
+                    datalabels: {
+                        formatter: (value, ctxSalesByClinic) => {
+                            return value + 'M'
+                        },
+                        align: 'end',
+                        anchor: 'end',
+                        font: {
+                           size: 20
+                        }
+                    }                    
+                }
+            }
+        }
+        var ctxSalesByClinic = document.getElementById('chartSalesByClinic').getContext('2d');
+        var chartBarSalesByClinic = new Chart(ctxSalesByClinic, configSalesByClinic )  
+
+        const labelsTerritory = ['Houston tx', 'Boston', 'New York', 'Philadelphia']
+        const dataSalesByTerritory = {labels: labelsTerritory, datasets: [{data: [18, 40, 22, 20], backgroundColor: ['rgba(255,171,109,1)', 'rgba(215,202,42,1)', 'rgba(237,133,223,1)', 'rgba(117,73,200,1)'], hoverOffset: 4}]}
+        const configSalesByTerritory = {
+            type: 'doughnut', data: dataSalesByTerritory,             
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,               
+                layout: {
+                    padding: 50
+                },                 
+                tooltips: {
+                    enabled: false
+                },
+                plugins: {
+                    legend: false,
+                    datalabels: {
+                        formatter: (value, ctxSalesByTerritory) => {
+                            let sum = ctxSalesByTerritory.dataset._meta[3].total
+                            let percentage = (value * 100 / sum).toFixed(0) + '%'
+                            return percentage
+                        },
+                        color: '#fff'
+                    },
+                    outlabels: {
+                        text: '%l',
+                        backgroundColor: null, 
+                        color: '#000',                       
+                        stretch: 45,
+                        font: {
+                                resizable: true,
+                                minSize: 20,
+                                maxSize: 20
+                        }
+                    }
+                }
+            }
+        }
+
+        var ctxSalesByTerritory = document.getElementById('chartSalesByTerritory').getContext('2d');
+        var chartBarSalesByTerritory = new Chart(ctxSalesByTerritory, configSalesByTerritory )
+
+        function overview(doctor_name)
+        {            
+            window.location.href = './home_doctor?doctor_name=' + doctor_name
+        } 
+        
+        function income(doctor_name)
+        {
+            window.location.href = './income?doctor_name=' + doctor_name
+        } 
+
+        function alerts()
+        {
+            window.location.href = './alerts'
+        } 

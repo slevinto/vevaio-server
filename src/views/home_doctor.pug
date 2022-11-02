@@ -1,6 +1,6 @@
-extends layout            
-block content
-        
+extends layout         
+
+block content        
     div(style={background: '#F3F3F3', 'border-color': '#E7E7E7'}).w-screen.border.border-solid.inline-flex
         // right part of navigation bar
         // logo
@@ -20,7 +20,7 @@ block content
             
             div.inline-flex.h-8.justify-center.items-center.mr-auto.space-x-12.mx-6
                 // doctor name
-                p.font-bold Dr. Eva Danum 
+                p.font-bold Dr. #{doctor_name}
                 img.rounded-full.border.border-blue-500.w-8.h-8(src='main_logo.png')
                 // bell sign
                 div.inline-flex.relative.w-8.h-8.justify-center
@@ -34,9 +34,9 @@ block content
     div(style={background: '#F3F3F3'}).w-screen.inline-flex.h-24
         // buttons
         div.inline-flex.space-x-8.mx-12.justify-center.items-center
-            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md bg-blue-500 text-white rounded-md py-2 px-4 w-36') Dashboard
-            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36') Income
-            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36') Alerts   
+            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md bg-blue-500 text-white rounded-md py-2 px-4 w-36' onclick='overview(\'' + doctor_name + '\')') Dashboard
+            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36' onclick='income(\'' + doctor_name + '\')') Income
+            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36' onclick='alerts()') Alerts   
             button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36') Usage     
         // dropdowns 
         div.inline-flex.ml-auto.justify-center.items-center.mx-12
@@ -204,7 +204,8 @@ block content
                         p.text-sm.mx-3 Existing members
                     div.inline-flex
                         div.right-4.h-5.w-5.rounded-md(style={background: 'rgba(255,171,109,1)'})
-                        p.text-sm.mx-3 New members             
+                        p.text-sm.mx-3 New members       
+
 
     script.
         const dataSystemUsage = {datasets: [{data: [18, 40, 22, 20], backgroundColor: ['rgba(255,171,109,1)', 'rgba(215,202,42,1)', 'rgba(237,133,223,1)', 'rgba(117,73,200,1)'], hoverOffset: 4}]}
@@ -222,6 +223,9 @@ block content
                             return percentage
                         },
                         color: '#fff',
+                    },
+                    outlabels: {
+                        display: false
                     }
                 }
             }
@@ -244,6 +248,9 @@ block content
                             return percentage
                         },
                         color: '#fff',
+                    },
+                    outlabels: {
+                        display: false
                     }
                 }
             }
@@ -423,3 +430,19 @@ block content
         }
         var ctxClients = document.getElementById('chartClients').getContext('2d')
         var chartBarClients = new Chart(ctxClients, configClients )
+
+        function overview(doctor_name)
+        {            
+            window.location.href = './home_doctor?doctor_name=' + doctor_name   
+        } 
+        
+        function income(doctor_name)
+        {
+            window.location.href = './income?doctor_name=' + doctor_name 
+        } 
+
+        function alerts()
+        {
+            window.location.href = './alerts'
+        } 
+        

@@ -139,6 +139,18 @@ app.get('/register_patient', (req, res) => {
     res.render('register_patient')
 })
   
+app.get('/home_doctor', (req, res) => {
+    res.render('home_doctor', {doctor_name: req.query.doctor_name})
+})
+
+app.get('/income', (req, res) => {
+    res.render('income', {doctor_name: req.query.doctor_name})
+})
+
+app.get('/alerts', (req, res) => {
+    res.render('alerts', {doctor_name: req.query.doctor_name})
+})
+
 // Home page route.
 app.get('/', (req, res) => {  
     var cookies = 
@@ -167,7 +179,11 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
         const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
         res.cookie(`email`, doctor_info.email, { expires: two_years })
         res.cookie(`password`, doctor_info.password, { expires: two_years })        
-        home_page_doctor(res, doctor_info.fullname)
+        var credentials = {
+            email: doctor_info.email,
+            password: doctor_info.password
+        }
+        home_page_doctor(res, doctor_info.fullname, credentials)
     })
     .catch((error) => {
         if (['auth/email-already-exists', 'auth/email-already-in-use'].includes(error.code)) 
@@ -180,7 +196,11 @@ app.post('/save_doctor_in_firebase', (req, res)=>{
                 const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
                 res.cookie(`email`, doctor_info.email, { expires: two_years })
                 res.cookie(`password`, doctor_info.password, { expires: two_years })
-                home_page_doctor(res, doctor_info.fullname)
+                var credentials = {
+                    email: doctor_info.email,
+                    password: doctor_info.password
+                }
+                home_page_doctor(res, doctor_info.fullname, credentials)
             })
             .catch((error) => {
                 res.render('login', { credentials: {email: '', password: '' }, err: 'failed to register in firebase: ' + error.message } ) 
@@ -290,7 +310,11 @@ app.post('/login', (req, res)=>{
                     const two_years = new Date(Date.now() + 1000*60*60*24*365*2)
                     res.cookie(`email`, req.body.email, { expires: two_years })
                     res.cookie(`password`, req.body.password, { expires: two_years })
-                    home_page_doctor(res, doctorname)
+                    var credentials = {
+                        email: req.body.email,
+                        password: req.body.password
+                    }
+                    home_page_doctor(res, doctorname, credentials)
                 }
             }   
         })            
@@ -578,7 +602,7 @@ function getUserInfo(username)
 }
 
 // go to home doctor page
-function home_page_doctor(res, doctor_name)
+function home_page_doctor(res, doctor_name, credentials)
 {
     allUsers = []
     var allDataPatients = null
@@ -607,7 +631,7 @@ function home_page_doctor(res, doctor_name)
             promises.push(getUserInfo(allDataPatients[patientname]))            
         }
         Promise.all(promises).then(() => {
-            res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", data: allUsers, users: firebaseUsers, doctor_name: doctor_name } )  
+            res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", doctor_name: doctor_name })  
         })     
     })   
 }
@@ -676,3 +700,4 @@ function getThryveDataSources(patientData, callback)
         console.log(error.message)
     })    
 }
+
