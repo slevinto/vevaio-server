@@ -1,0 +1,145 @@
+extends layout         
+
+block content        
+    div(style={background: '#F3F3F3', 'border-color': '#E7E7E7'}).w-screen.border.border-solid.inline-flex
+        // right part of navigation bar
+        // logo
+        div.bg-white
+            img(src='main_logo.png').w-32.mx-6.my-3
+        // navigation buttons
+        div.inline-flex.space-x-24.mx-24
+            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md' onclick='overview(\'' + doctor_name + '\')') Overview
+            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md text-blue-500' onclick='patients(\'' + doctor_name + '\')') Patients
+            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md') Calendar     
+        // left part of navigation bar
+        div.inline-flex.ml-auto.grid.grid-cols-2.justify-center.items-center.mx-12
+            // dark mode button
+            button.inline-flex.h-8.justify-center.items-center.ml-auto(class='hover:text-blue-500 hover:drop-shadow-md' style={'border-width': '0px 2px 0px 0px'})
+                img(src='dark mode icon.png')              
+                p.mx-2.text-sm Apply Dark Theme
+            
+            div.inline-flex.h-8.justify-center.items-center.mr-auto.space-x-12.mx-6
+                // doctor name
+                p.font-bold Dr. #{doctor_name}
+                img.rounded-full.border.border-gray-500.w-8.h-8(src='user gray icon.svg')
+                // bell sign
+                div.inline-flex.relative.w-8.h-8.justify-center
+                    img(src='bell.svg').w-8.h-8        
+                    div.absolute.bottom-4.left-4.h-5.w-5.border-2.border-white.rounded-full.bg-red-400.z-2.justify-center.items-center
+                        p.text-white.font-bold.mx-1(style={'margin-top': '-5px'}) 3
+        
+    div.w-screen.shadow-lg
+        p.text-black.font-bold.text-2xl.mx-4.my-3 Patients
+
+    div(style={background: '#F3F3F3'}).w-screen.inline.flex.justify-center.items-center.shadow-lg.rounded-lg
+        button.justify-center.items-center(class='inline-flex font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md bg-blue-500 text-white rounded-md').w-36.h-12.mx-6.p-3 
+            img(src='plus white icon.svg').h-4.mr-auto    
+            p New patient          
+
+        form.ml-auto.justify-center.items-center.w-96.h-16.mx-6.mt-3.mb-0
+            label(for='default-search' class='mb-2 text-sm font-medium text-gray-900 sr-only dark:text-gray-300') Search
+            div.relative.mx-3.justify-center
+                div.flex.absolute.inset-y-0.left-0.items-center.pl-3.pointer-events-none
+                    svg(aria-hidden='true' class='w-5 h-5 text-gray-500 dark:text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg')
+                        path(stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z')
+
+                input.justify-center.items-center.flex(type='search' id='default-search' class='block p-4 pl-10 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' placeholder='Search ...' required)
+                button(type='submit' class='text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800') Search
+    // Table
+    div(class='overflow-x-auto m-6')
+        table(class='text-md text-left text-gray-500 m-6')
+            thead(class='text-md text-gray-700 p-12')
+                tr
+                    th(scope='col')
+                        div(class='inline-flex justify-center items-center w-36')
+                            p.mx-3 Client name
+                            img(src='arrow down icon.png').h-4.mr-auto     
+
+                    th(scope='col')
+                        div(class='inline-flex items-center w-36')
+                            p.mx-3 Status
+                            img(src='arrow down icon.png').h-4.mr-auto    
+                    
+                    th(scope='col')
+                        div(class='inline-flex items-center w-48')
+                            p.mx-3 Next meeting
+                            img(src='arrow down icon.png').h-4.mr-auto    
+
+                    th(scope='col')
+                        div(class='inline-flex items-center w-48')
+                            p.mx-3 Last interaction
+                            img(src='arrow down icon.png').h-4.mr-auto   
+
+                    th(scope='col')
+                        div(class='inline-flex items-center w-36')
+                            p.mx-3 Weight
+                            img(src='arrow down icon.png').h-4.mr-auto    
+
+                    th(scope='col')
+                        div(class='inline-flex items-center w-36')
+                            p.mx-3 BMI
+                            img(src='arrow down icon.png').h-4.mr-auto      
+
+                    th(scope='col')
+                        div(class='inline-flex items-center w-36')
+                            p.mx-3 Blood pressure
+                            img(src='arrow down icon.png').h-4.mr-auto      
+
+                    th(scope='col')
+                        div(class='inline-flex items-center w-36')
+                            p.mx-3 Steps
+                            img(src='arrow down icon.png').h-4.mr-auto   
+                            
+                    th
+                        p.text-center #{users.length} total
+                    
+            tbody
+                each val in users 
+                    tr(class='bg-white border-b').justify-center.items-center
+                        td.text-gray-800.w-36.m-4.p-6
+                            div.inline-flex
+                                img.rounded-full.border.border-gray-200.w-6.h-6.mr-auto(src='user gray icon.svg')
+                                p.mr-auto.px-4 #{val.firstname}
+                        td.text-gray-800.w-36.m-4.p-6
+                            p Active
+                        td.text-gray-800.w-48.m-4.p-6
+                            p 02/08/2022 
+                        td.text-gray-800.w-48.m-4.p-6
+                            p 24/07/2022 : 14:22
+                        td.text-gray-800.w-36.m-4.p-6
+                            div.border.border-solid.border-green-500.rounded-lg.h-6.w-16.justify-center.items-center.flex
+                                p.text-green-500.justify-center.items-center 96
+                        td.text-gray-800.w-36.m-4.p-6
+                            div.border.border-solid.border-red-500.rounded-lg.h-6.w-16.justify-center.items-center.flex
+                                p.text-red-500.justify-center.items-center 118
+                        td.text-gray-800.w-36.m-4.p-6
+                            p 120/80
+                        td.text-gray-800.w-36.m-4.p-6
+                            p 1600
+                        td.inline-flex.m-4.p-6
+                            img.w-4.h-4(src='eye gray icon.svg')
+                            img.w-4.h-4.mx-4(src='pencil gray icon.svg')
+                            img.w-4.h-4(src='trash gray icon.svg')                   
+                    
+    
+    script.
+
+        function overview(doctor_name)
+        {            
+            window.location.href = './home_doctor?doctor_name=' + doctor_name   
+        } 
+        
+        function income(doctor_name)
+        {
+            window.location.href = './income?doctor_name=' + doctor_name 
+        } 
+
+        function alerts(doctor_name)
+        {
+            window.location.href = './alerts?doctor_name=' + doctor_name 
+        } 
+        
+        function patients(doctor_name)
+        {
+            window.location.href = './patients?doctor_name=' + doctor_name 
+        } 

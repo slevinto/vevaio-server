@@ -1,0 +1,273 @@
+extends layout            
+block content
+        
+    div(style={background: '#F3F3F3', 'border-color': '#E7E7E7'}).w-screen.border.border-solid.inline-flex
+        // right part of navigation bar
+        // logo
+        div.bg-white
+            img(src='main_logo.png').w-32.mx-6.my-3
+        // navigation buttons
+        div.inline-flex.space-x-24.mx-24
+            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md text-blue-500' onclick='overview(\'' + doctor_name + '\')') Overview
+            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md' onclick='patients(\'' + doctor_name + '\')') Patients
+            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md') Calendar     
+        // left part of navigation bar
+        div.inline-flex.ml-auto.grid.grid-cols-2.justify-center.items-center.mx-12
+            // dark mode button
+            button.inline-flex.h-8.justify-center.items-center.ml-auto(class='hover:text-blue-500 hover:drop-shadow-md' style={'border-width': '0px 2px 0px 0px'})
+                img(src='dark mode icon.png')              
+                p.mx-2.text-sm Apply Dark Theme
+            
+            div.inline-flex.h-8.justify-center.items-center.mr-auto.space-x-12.mx-6
+                // doctor name
+                p.font-bold Dr. #{doctor_name}
+                img.rounded-full.border.border-gray-500.w-8.h-8(src='user gray icon.svg')
+                // bell sign
+                div.inline-flex.relative.w-8.h-8.justify-center
+                    img(src='bell.svg').w-8.h-8        
+                    div.absolute.bottom-4.left-4.h-5.w-5.border-2.border-white.rounded-full.bg-red-400.z-2.justify-center.items-center
+                        p.text-white.font-bold.mx-1(style={'margin-top': '-5px'}) 3
+        
+    div.w-screen.shadow-lg
+        p.text-black.font-bold.text-2xl.mx-4.my-3 Overview
+
+    div(style={background: '#F3F3F3'}).w-screen.inline-flex.h-24
+        // buttons
+        div.inline-flex.space-x-8.mx-12.justify-center.items-center
+            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36' onclick='overview(\'' + doctor_name + '\')') Dashboard
+            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36' onclick='income(\'' + doctor_name + '\')') Income
+            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md bg-blue-500 text-white rounded-md py-2 px-4 w-36' onclick='alerts(\'' + doctor_name + '\')') Alerts   
+            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36') Usage     
+        // dropdowns 
+        div.inline-flex.ml-auto.justify-center.items-center.mx-12
+            // year
+            div.relative.inline-block.text-left
+                div.inline-flex
+                    button.justify-center.items-center(type='button' class='inline-flex w-full justify-center px-4 py-2 text-base font-medium text-black hover:text-blue-500' id='menu-button' aria-expanded='true' aria-haspopup='true') Year
+                        img.mx-3(src='arrow down icon.png')
+            // month
+            div.relative.inline-block.text-left
+                div.inline-flex
+                    button.justify-center.items-center(type='button' class='inline-flex w-full justify-center px-4 py-2 text-base font-medium text-black hover:text-blue-500' id='menu-button' aria-expanded='true' aria-haspopup='true') Month
+                        img.mx-3(src='arrow down icon.png')
+            // city
+            div.relative.inline-block.text-left
+                div.inline-flex
+                    button.justify-center.items-center(type='button' class='inline-flex w-full justify-center px-4 py-2 text-base font-medium text-black hover:text-blue-500' id='menu-button' aria-expanded='true' aria-haspopup='true') City
+                        img.mx-3(src='arrow down icon.png')
+            // clinic
+            div.relative.inline-block.text-left
+                div.inline-flex
+                    button.justify-center.items-center(type='button' class='inline-flex w-full justify-center px-4 py-2 text-base font-medium text-black hover:text-blue-500' id='menu-button' aria-expanded='true' aria-haspopup='true') Clinic
+                        img.mx-3(src='arrow down icon.png')
+                        div.relative.inline-block.text-left
+            // category
+            div.relative.inline-block.text-left
+                div.inline-flex
+                    button.justify-center.items-center(type='button' class='inline-flex w-full justify-center px-4 py-2 text-base font-medium text-black hover:text-blue-500' id='menu-button' aria-expanded='true' aria-haspopup='true') Category
+                        img.mx-3(src='arrow down icon.png')    
+            
+            button.justify-center.items-center(class='inline-flex font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md bg-blue-500 text-white rounded-md py-2 px-4 w-28') 
+                img(src='export white icon.svg').h-4.mr-auto    
+                p Export                                
+    // graphs cards
+    div.grid.grid-cols-4.grid-rows-2.gap-4.w-screen
+        // Unusual alerts
+        div.col-span-3.m-4.py-6.bg-white.rounded-xl.space-y-5.border.border-solid.shadow-lg.justify-center.items-center(style={'border-color': '#E7E7E7'})   
+            div.justify-center.items-center.inline.flex
+                p.text-2xl.font-thin.mx-5 Unusual alerts
+                img(src='export black icon.svg').h-4.ml-auto.mx-5 
+            p.text-sm.mx-5 Jan 2022 - Jan 2023
+
+            // graph
+            div.flex.justify-center
+                div(style={position: 'relative', height: '200px'})
+                    canvas(id='chartUnusualAlertsDoughnut')    
+
+            // graph
+            div.flex.justify-center
+                canvas(id='chartUnusualAlertsBar') 
+            // labels
+            div.px-6
+                div.inline
+                    div.inline-flex
+                        div.left-4.h-5.w-5.rounded-md(style={background: 'rgba(44,130,190,1)'})
+                        p.text-sm.mx-3 Blood pressure
+                    div.inline-flex
+                        div.right-4.h-5.w-5.rounded-md(style={background: 'rgba(103,218,251,1)'})
+                        p.text-sm.mx-3 Heartbeat  
+                    div.inline-flex
+                        div.right-4.h-5.w-5.rounded-md(style={background: 'rgba(131,179,193,1)'})
+                        p.text-sm.mx-3 Blood oxygen level                  
+                   
+        // Clients to follow
+        div.row-span-2.m-4.py-6.bg-white.rounded-xl.space-y-5.border.border-solid.shadow-lg.justify-center.items-center(style={'border-color': '#E7E7E7'})   
+            div.justify-center.items-center.inline.flex
+                p.text-2xl.font-thin.mx-5 Clients to follow
+                img(src='export black icon.svg').h-4.ml-auto.mx-5 
+            p.text-sm.mx-5 Jan 2022 - Jan 2023
+            each val in clientsToFollow 
+                div.p-3.m-3.bg-white.rounded-xl.border.border-solid.shadow-lg.justify-center.items-center
+                    div.justify-center.items-center.inline.flex
+                        img.rounded-full.border.border-gray-500.w-8.h-8(src='user gray icon.svg')
+                        div.justify-center.items-center.mx-6
+                            p.font-bold #{val.fullname} 
+                            p #{val.comment} 
+                        p.font-bold.text-xl.flex.ml-auto #{val.reason} 
+
+        // Unusual blood pressure
+        div.col-span-1.py-6.bg-white.rounded-xl.space-y-5.border.border-solid.shadow-lg.justify-center.items-center(style={'border-color': '#E7E7E7'})   
+            div.justify-center.items-center.inline.flex
+                p.text-2xl.font-thin.mx-5 Unusual blood pressure
+                img(src='export black icon.svg').h-4.ml-auto.mx-5 
+            p.text-sm.mx-5 Jan 2022 - Jan 2023
+            each val in unusualBloodPressure 
+                div.p-3.m-3.bg-white.rounded-xl.border.border-solid.shadow-lg.justify-center.items-center
+                    div.justify-center.items-center.inline.flex
+                        img.rounded-full.border.border-gray-500.w-8.h-8(src='user gray icon.svg')
+                        div.justify-center.items-center.mx-6
+                            p.font-bold #{val.fullname} 
+                            p #{val.comment} 
+                        p.font-bold.text-xl.flex.ml-auto #{val.reason} 
+
+        // Unusual heartbeat
+        div.col-span-1.py-6.bg-white.rounded-xl.space-y-5.border.border-solid.shadow-lg.justify-center.items-center(style={'border-color': '#E7E7E7'})   
+            div.justify-center.items-center.inline.flex
+                p.text-2xl.font-thin.mx-5 Unusual heartbeat
+                img(src='export black icon.svg').h-4.ml-auto.mx-5 
+            p.text-sm.mx-5 Jan 2022 - Jan 2023
+            each val in unusualHeartbeat 
+                div.p-3.m-3.bg-white.rounded-xl.border.border-solid.shadow-lg.justify-center.items-center
+                    div.justify-center.items-center.inline.flex
+                        img.rounded-full.border.border-gray-500.w-8.h-8(src='user gray icon.svg')
+                        div.justify-center.items-center.mx-6
+                            p.font-bold #{val.fullname} 
+                            p #{val.comment} 
+                        p.font-bold.text-xl.flex.ml-auto #{val.reason} 
+
+        // Unusual SPo2
+        div.col-span-1.py-6.bg-white.rounded-xl.space-y-5.border.border-solid.shadow-lg.justify-center.items-center(style={'border-color': '#E7E7E7'})   
+            div.justify-center.items-center.inline.flex
+                p.text-2xl.font-thin.mx-5 Unusual SPo2
+                img(src='export black icon.svg').h-4.ml-auto.mx-5 
+            p.text-sm.mx-5 Jan 2022 - Jan 2023
+            each val in unusualSPo2 
+                div.p-3.m-3.bg-white.rounded-xl.border.border-solid.shadow-lg.justify-center.items-center
+                    div.justify-center.items-center.inline.flex
+                        img.rounded-full.border.border-gray-500.w-8.h-8(src='user gray icon.svg')
+                        div.justify-center.items-center.mx-6
+                            p.font-bold #{val.fullname} 
+                            p #{val.comment} 
+                        p.font-bold.text-xl.flex.ml-auto #{val.reason}                                 
+        
+
+    script.   
+
+        const clientsToFollow = [1, 2, 3]
+
+        const dataUnusualAlertsDoughnut = {datasets: [{data: [50, 40, 10], backgroundColor: ['rgba(195,215,42,1)', 'rgba(159,160,208,1)', 'rgba(200,73,151,1)'], hoverOffset: 4}]}
+        const configUnusualAlertsDoughnut = {
+            type: 'doughnut', data: dataUnusualAlertsDoughnut, 
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                tooltips: {
+                    enabled: false
+                },
+                plugins: {
+                    datalabels: {
+                        formatter: (value, ctxUnusualAlertsDoughnut) => {
+                            let sum = ctxUnusualAlertsDoughnut.dataset._meta[0].total
+                            let percentage = (value * 100 / sum).toFixed(0) + '%'
+                            return percentage
+                        },
+                        color: '#fff',
+                    },
+                    outlabels: {
+                        display: false
+                    }
+                }
+            }
+        }
+        var ctxUnusualAlertsDoughnut = document.getElementById('chartUnusualAlertsDoughnut').getContext('2d')
+        var chartBarUnusualAlertsDoughnut = new Chart(ctxUnusualAlertsDoughnut, configUnusualAlertsDoughnut) 
+
+        const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        const dataUnusualAlertsBar = {
+            labels: labels,
+            datasets: [
+                {
+                    data: [3, 2, 1, 2, 1, 2, 3, 2, 1, 3, 2, 1], backgroundColor: 'rgba(44,130,190,1)', hoverOffset: 4, fill: false
+                },
+                {
+                    data: [1, 2, 3, 3, 2, 4, 3, 2, 1, 1, 2, 3], backgroundColor: 'rgba(103,218,251,1)', hoverOffset: 4, fill: false
+                },
+                {
+                    data: [2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1], backgroundColor: 'rgba(131,179,193,1)', hoverOffset: 4, fill: false
+                }
+            ]
+        }        
+        const configUnusualAlertsBar = {
+            type: 'bar', 
+            data: dataUnusualAlertsBar, 
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {display: false},
+                plugins: {
+                    datalabels: {
+                        display: false,
+                    },
+                },
+                elements: {
+                    point:{
+                        radius: 0
+                    },
+                    line: {
+                        tension: 0
+                    }
+                },
+                tooltips: {
+                    enabled: false
+                },
+                scales: {
+                    yAxes: [{                                            
+                        stacked: false,                        
+                        gridLines: {
+                            display: false
+                        },
+                        ticks: {
+                            display: false //this will remove only the label
+                        }                                                                                                       
+                    }],
+                    xAxes: [{
+                        stacked: false,
+                        gridLines: {
+                            display: false
+                        }
+                    }]
+                }
+            }
+        }
+        var ctxUnusualAlertsBar = document.getElementById('chartUnusualAlertsBar').getContext('2d')
+        var chartBarUnusualAlertsBar = new Chart(ctxUnusualAlertsBar, configUnusualAlertsBar )   
+
+        function overview(doctor_name)
+        {            
+            window.location.href = './home_doctor?doctor_name=' + doctor_name   
+        } 
+        
+        function income(doctor_name)
+        {
+            window.location.href = './income?doctor_name=' + doctor_name 
+        } 
+
+        function alerts(doctor_name)
+        {
+            window.location.href = './alerts?doctor_name=' + doctor_name 
+        } 
+
+        function patients(doctor_name)
+        {
+            window.location.href = './patients?doctor_name=' + doctor_name 
+        } 

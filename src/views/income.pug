@@ -8,8 +8,8 @@ block content
             img(src='main_logo.png').w-32.mx-6.my-3
         // navigation buttons
         div.inline-flex.space-x-24.mx-24
-            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md text-blue-500') Overview
-            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md') Patients
+            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md text-blue-500' onclick='overview(\'' + doctor_name + '\')') Overview
+            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md' onclick='patients(\'' + doctor_name + '\')') Patients
             button(class='font-medium hover:text-blue-500 hover:drop-shadow-md') Calendar     
         // left part of navigation bar
         div.inline-flex.ml-auto.grid.grid-cols-2.justify-center.items-center.mx-12
@@ -21,7 +21,7 @@ block content
             div.inline-flex.h-8.justify-center.items-center.mr-auto.space-x-12.mx-6
                 // doctor name
                 p.font-bold Dr. #{doctor_name}
-                img.rounded-full.border.border-blue-500.w-8.h-8(src='main_logo.png')
+                img.rounded-full.border.border-gray-500.w-8.h-8(src='user gray icon.svg')
                 // bell sign
                 div.inline-flex.relative.w-8.h-8.justify-center
                     img(src='bell.svg').w-8.h-8        
@@ -29,14 +29,14 @@ block content
                         p.text-white.font-bold.mx-1(style={'margin-top': '-5px'}) 3
         
     div.w-screen.shadow-lg
-        p.text-black.font-bold.text-2xl.mx-4.my-3 Income
+        p.text-black.font-bold.text-2xl.mx-4.my-3 Overview
 
     div(style={background: '#F3F3F3'}).w-screen.inline-flex.h-24
         // buttons
         div.inline-flex.space-x-8.mx-12.justify-center.items-center
             button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36' onclick='overview(\'' + doctor_name + '\')') Dashboard
             button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md bg-blue-500 text-white rounded-md py-2 px-4 w-36' onclick='income(\'' + doctor_name + '\')') Income
-            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36' onclick='alerts()') Alerts   
+            button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36' onclick='alerts(\'' + doctor_name + '\')') Alerts   
             button(class='font-medium hover:text-blue-500 hover:bg-blue-100 hover:drop-shadow-md text-blue-500 border border-2 border-blue-500 rounded-md py-2 px-4 w-36') Usage     
         // dropdowns 
         div.inline-flex.ml-auto.justify-center.items-center.mx-12
@@ -291,7 +291,12 @@ block content
             window.location.href = './income?doctor_name=' + doctor_name
         } 
 
-        function alerts()
+        function alerts(doctor_name)
         {
-            window.location.href = './alerts'
+            window.location.href = './alerts?doctor_name=' + doctor_name
+        } 
+
+        function patients(doctor_name)
+        {
+            window.location.href = './patients?doctor_name=' + doctor_name 
         } 

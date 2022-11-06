@@ -148,7 +148,66 @@ app.get('/income', (req, res) => {
 })
 
 app.get('/alerts', (req, res) => {
-    res.render('alerts', {doctor_name: req.query.doctor_name})
+    var clientsToFollow = [
+        {fullname: 'Nayah Tantoh', comment: 'Two days ago', reason: 'Covid-19'},
+        {fullname: 'Diego Morata', comment: 'Heart attack prevention', reason: '60%'},
+        {fullname: 'Anatoliy Shcherbatykh', comment: '1 week in a row', reason: '160/95'}
+    ]
+
+    var unusualBloodPressure = [
+        {fullname: 'Nayah Tantoh', comment: 'Two days ago', reason: '72/122'},
+        {fullname: 'Diego Morata', comment: 'Two days ago', reason: '72/122'},
+        {fullname: 'Anatoliy Shcherbatykh', comment: 'Two days ago', reason: '72/122'},
+        {fullname: 'Ren Delan', comment: 'Two days ago', reason: '72/122'},
+        {fullname: 'Dobroslawa Antokolskiy', comment: 'Two days ago', reason: '72/122'}
+    ]
+
+    var unusualHeartbeat = [
+        {fullname: 'Nayah Tantoh', comment: 'Two days ago', reason: '65/80 bpm'},
+        {fullname: 'Diego Morata', comment: 'Two days ago', reason: '65/80 bpm'}
+    ]
+
+    var unusualSPo2 = [
+        {fullname: 'Nayah Tantoh', comment: 'Two days ago', reason: '65%'},
+        {fullname: 'Diego Morata', comment: 'Two days ago', reason: '80%'},
+        {fullname: 'Anatoliy Shcherbatykh', comment: 'Two days ago', reason: '95%'},
+        {fullname: 'Ren Delan', comment: 'Two days ago', reason: '90%'}
+    ]
+
+    res.render('alerts', {doctor_name: req.query.doctor_name, clientsToFollow: clientsToFollow, unusualBloodPressure: unusualBloodPressure, unusualHeartbeat: unusualHeartbeat, unusualSPo2: unusualSPo2})
+})
+
+app.get('/patients', (req, res) => {
+    allUsers = []
+    var allDataPatients = null
+    var firebaseUsers = []
+    var promises = []
+
+    get(child(dbRef, `doctors/` + req.query.doctor_name + '/patients/')).then((snapshot) => {
+        
+        if (snapshot.val() != null)
+        {
+            allDataPatients = Object.values(snapshot.val())
+            allDataPatients = Array.from(new Set(allDataPatients))            
+        }
+    }).then(() => {
+        get(child(dbRef, `users/` )).then((snapshotUsers) => {
+            for (var el in snapshotUsers.val())
+            { 
+                firebaseUsers.push({email: snapshotUsers.child(el).child('info').child('email').val(), firstname: snapshotUsers.child(el).child('info').child('firstname').val()})
+            }
+            if (allDataPatients != null)
+                firebaseUsers = firebaseUsers.filter(n => !allDataPatients.includes(n.email) && n.email != null)              
+        })     
+    }).then(() => {    
+        for(var patientname in allDataPatients)
+        {
+            promises.push(getUserInfo(allDataPatients[patientname]))            
+        }
+        Promise.all(promises).then(() => {
+            res.render('patients', { data: allUsers, users: firebaseUsers, doctor_name: req.query.doctor_name } )  
+        })     
+    })   
 })
 
 // Home page route.
@@ -602,38 +661,9 @@ function getUserInfo(username)
 }
 
 // go to home doctor page
-function home_page_doctor(res, doctor_name, credentials)
+function home_page_doctor(res, doctor_name)
 {
-    allUsers = []
-    var allDataPatients = null
-    var firebaseUsers = []
-    var promises = []
-
-    get(child(dbRef, `doctors/` + doctor_name + '/patients/')).then((snapshot) => {
-        
-        if (snapshot.val() != null)
-        {
-            allDataPatients = Object.values(snapshot.val())
-            allDataPatients = Array.from(new Set(allDataPatients))            
-        }
-    }).then(() => {
-        get(child(dbRef, `users/` )).then((snapshotUsers) => {
-            for (var el in snapshotUsers.val())
-            { 
-                firebaseUsers.push(snapshotUsers.child(el).child('info').child('email').val())
-            }
-            if (allDataPatients != null)
-                firebaseUsers = firebaseUsers.filter(n => !allDataPatients.includes(n) && n != null)              
-        })     
-    }).then(() => {    
-        for(var patientname in allDataPatients)
-        {
-            promises.push(getUserInfo(allDataPatients[patientname]))            
-        }
-        Promise.all(promises).then(() => {
-            res.render('home_doctor', { appName: "Vevaio", pageName: "Vevaio", doctor_name: doctor_name })  
-        })     
-    })   
+    res.render('home_doctor', { doctor_name: doctor_name })  
 }
 
 function home_page_patient(res, userEmail, firstname)
