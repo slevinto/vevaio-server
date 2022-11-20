@@ -1,32 +1,7 @@
 extends layout         
-
+block variables
+    - var doctor_name = doctor_name
 block content        
-    div(style={background: '#F3F3F3', 'border-color': '#E7E7E7'}).w-screen.border.border-solid.inline-flex
-        // right part of navigation bar
-        // logo
-        div.bg-white
-            img(src='main_logo.png').w-32.mx-6.my-3
-        // navigation buttons
-        div.inline-flex.space-x-24.mx-24
-            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md text-blue-500' onclick='overview(\'' + doctor_name + '\')') Overview
-            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md' onclick='patients(\'' + doctor_name + '\')') Patients
-            button(class='font-medium hover:text-blue-500 hover:drop-shadow-md') Calendar     
-        // left part of navigation bar
-        div.inline-flex.ml-auto.grid.grid-cols-2.justify-center.items-center.mx-12
-            // dark mode button
-            button.inline-flex.h-8.justify-center.items-center.ml-auto(class='hover:text-blue-500 hover:drop-shadow-md' style={'border-width': '0px 2px 0px 0px'})
-                img(src='dark mode icon.png')              
-                p.mx-2.text-sm Apply Dark Theme
-            
-            div.inline-flex.h-8.justify-center.items-center.mr-auto.space-x-12.mx-6
-                // doctor name
-                p.font-bold Dr. #{doctor_name}
-                img.rounded-full.border.border-gray-500.w-8.h-8(src='user gray icon.svg')
-                // bell sign
-                div.inline-flex.relative.w-8.h-8.justify-center
-                    img(src='bell.svg').w-8.h-8        
-                    div.absolute.bottom-4.left-4.h-5.w-5.border-2.border-white.rounded-full.bg-red-400.z-2.justify-center.items-center
-                        p.text-white.font-bold.mx-1(style={'margin-top': '-5px'}) 3
         
     div.w-screen.shadow-lg
         p.text-black.font-bold.text-2xl.mx-4.my-3 Overview
@@ -431,22 +406,4 @@ block content
         var ctxClients = document.getElementById('chartClients').getContext('2d')
         var chartBarClients = new Chart(ctxClients, configClients )
 
-        function overview(doctor_name)
-        {            
-            window.location.href = './home_doctor?doctor_name=' + doctor_name   
-        } 
         
-        function income(doctor_name)
-        {
-            window.location.href = './income?doctor_name=' + doctor_name 
-        } 
-
-        function alerts(doctor_name)
-        {
-            window.location.href = './alerts?doctor_name=' + doctor_name 
-        } 
-        
-        function patients(doctor_name)
-        {
-            window.location.href = './patients?doctor_name=' + doctor_name 
-        } 

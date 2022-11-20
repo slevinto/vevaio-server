@@ -1,0 +1,262 @@
+extends layout         
+block variables
+    - var doctor_name = doctor_name
+block content          
+        
+    div.w-screen.shadow-lg.inline.flex
+        p.font-bold.text-2xl.mx-4.py-4.text-gray-400 Patients | 
+        p.font-bold.text-3xl.py-4.text-black #{patientname}
+        div.inline.flex.ml-auto.justify-center.items-center.mx-4 
+            p.text-black Last connected devices
+            div.inline.flex.justify-center.items-center.border.border-solid.border-blue-400.rounded-lg.mx-6.h-12
+                div.inline.flex.justify-center.items-center.mx-4 
+                    img(src='monitor icon.png').h-6                     
+                    div.h-3.w-3.rounded-full.bg-red-400.justify-center.items-center(style={'margin-left': '-28px', 'margin-top': '-24px'})
+                    p.text-xs.mx-6 08/10/22
+                div.inline.flex.justify-center.items-center.mx-4 
+                    img(src='smartphone icon.svg').h-6 
+                    div.h-3.w-3.rounded-full.bg-green-400.justify-center.items-center(style={'margin-left': '-28px', 'margin-top': '-24px'})
+                    p.text-xs.mx-6 1 min ago
+                div.inline.flex.justify-center.items-center.mx-4 
+                    img(src='scales icon.svg').h-6
+                    div.h-3.w-3.rounded-full.bg-green-400.justify-center.items-center(style={'margin-left': '-28px', 'margin-top': '-24px'})
+                    p.text-xs.mx-6 Yesterday
+                div.inline.flex.justify-center.items-center.mx-4 
+                    img(src='smartwatch icon.svg').h-6
+                    div.h-3.w-3.rounded-full.bg-green-400.justify-center.items-center(style={'margin-left': '-24px', 'margin-top': '-24px'})
+                    p.text-xs.mx-2 1 min ago
+
+    div.w-screen.inline.flex.bg-gray-100
+        div(class='w-96').border-solid.border-gray-400.rounded-lg.bg-blue-100.m-4
+            div.justify-center.items-center.flex.m-6
+                img.rounded-full.border.border-gray-400.border-2.w-24.h-24(src='user gray icon.svg')
+            div.justify-center.items-center.flex.inline.m-4
+                p.text-2xl.font-bold.justify-center.items-center.flex.ml-auto #{patientname}
+                img.w-4.h-4.ml-auto.flex.justify-center.items-center(src='pencil gray icon.svg')
+            hr.m-4.h-px.border-gray-400.border-1
+            table.w-full 
+                tr.text-sm 
+                    td
+                        p.mx-6.mr-auto.flex.font-bold Age 
+                    td.m-1.ml-auto.flex 
+                        p.mx-6.ml-auto.flex 42   
+                tr.text-sm 
+                    td
+                        p.mx-6.mr-auto.flex.font-bold Gender 
+                    td.m-1.ml-auto.flex 
+                        p.mx-6.ml-auto.flex Male   
+                tr.text-sm 
+                    td
+                        p.mx-6.mr-auto.flex.font-bold Occupation 
+                    td.m-1.ml-auto.flex 
+                        p.mx-6.ml-auto.flex Engineer    
+                tr.text-sm 
+                    td
+                        p.mx-6.mr-auto.flex.font-bold Email 
+                    td.m-1.ml-auto.flex 
+                        p.mx-6.ml-auto.flex #{patientemail}    
+                tr.text-sm 
+                    td
+                        p.mx-6.mr-auto.flex.font-bold Home 
+                    td.m-1.ml-auto.flex 
+                        p.mx-6.ml-auto.flex 0367258885 
+                tr.text-sm 
+                    td
+                        p.mx-6.mr-auto.flex.font-bold Mobile 
+                    td.m-1.ml-auto.flex 
+                        p.mx-6.ml-auto.flex 0582654890            
+            hr.m-4.h-px.border-gray-400.border-1
+            div.justify-center.items-center.flex.inline.m-4
+                p.text-2xl.font-bold.justify-center.items-center.flex.ml-auto Medications
+                img.w-4.h-4.ml-auto.flex(src='pencil gray icon.svg')
+
+            table.w-full 
+                tr.text-sm 
+                    td
+                        img.mx-6.w-4.h-4.flex(src='medicine icon.svg') 
+                    td.m-1.ml-auto.flex 
+                        p.mx-6.ml-auto.flex Valium 50MG   
+                tr.text-sm 
+                    td
+                        img.mx-6.w-4.h-4.flex(src='medicine icon.svg') 
+                    td.m-1.ml-auto.flex 
+                        p.mx-6.ml-auto.flex Abacavir Sulfate (Ziagen) 100MG   
+                tr.text-sm 
+                    td
+                        img.mx-6.w-4.h-4.flex(src='medicine icon.svg')  
+                    td.m-1.ml-auto.flex 
+                        p.mx-6.ml-auto.flex Factor IX Complex (Konyne)    
+                tr.text-sm 
+                    td
+                        img.mx-6.w-4.h-4.flex(src='medicine icon.svg') 
+                    td.m-1.ml-auto.flex 
+                        p.mx-6.ml-auto.flex Uceris (Budesonide Tablets)         
+            hr.m-4.h-px.border-gray-400.border-1
+            div(id='datepicker').justify-center.items-center.flex.m-4
+
+        div(class='w-1/2').m-4
+            div
+                div.inline.flex.m-4
+                    button.mx-1.rounded-lg.bg-blue-400.text-white.w-36.h-10.shadow-2xl Indicatores
+                    button.mx-1.rounded-lg.bg-white.text-gray-500.w-36.h-10.border-2.border-gray-500 Medications
+                    button.mx-1.rounded-lg.bg-white.text-gray-500.w-36.h-10.border-2.border-gray-500 Documents
+                    button.mx-1.rounded-lg.bg-white.text-gray-500.w-36.h-10.border-2.border-gray-500 Journal
+                div.inline.flex.p-4.m-4
+                    p.text-2xl.font-bold Indicatores
+                    div.inline.flex.ml-auto.m-4.justify-center.items-center   
+                        img(src='bar graph icon.svg').h-4.mx-5
+                        img(src='pencil gray icon.svg').h-4.mx-5
+
+            table.p-4.m-4.w-full.border-separate        
+                each val in [1, 2, 3, 4, 5]
+                    tr
+                        td.rounded-lg.bg-white.border-4.border-gray-100
+                            div.inline.flex
+                                div.mx-4
+                                    p.mx-6.ml-auto.flex.text-2xl.font-bold Stress  
+                                    p.mx-6.ml-auto.flex 08/11/2023 - 8:45AM 
+                                div.ml-auto.justify-center.items-center.mx-4     
+                                    p.text-4xl.font-bold 39
+                        td.rounded-lg.bg-white.border-4.border-gray-100
+                            div.inline.flex
+                                div.mx-4
+                                    p.mx-6.ml-auto.flex.text-2xl.font-bold Body Fat  
+                                    p.mx-6.ml-auto.flex 08/11/2023 - 8:45AM 
+                                div.ml-auto.justify-center.items-center.mx-4     
+                                    p.text-4xl.font-bold 39
+                    tr
+                        td.rounded-lg.bg-white.border-4.border-gray-100
+                            div.inline.flex
+                                div.mx-4
+                                    p.mx-6.ml-auto.flex.text-2xl.font-bold PM  
+                                    p.mx-6.ml-auto.flex 08/11/2023 - 8:45AM 
+                                div.ml-auto.justify-center.items-center.mx-4     
+                                    p.text-4xl.font-bold 39
+                        td.rounded-lg.bg-white.border-4.border-gray-100
+                            div.inline.flex
+                                div.mx-4
+                                    p.mx-6.ml-auto.flex.text-2xl.font-bold BMI  
+                                    p.mx-6.ml-auto.flex 08/11/2023 - 8:45AM 
+                                div.ml-auto.justify-center.items-center.mx-4     
+                                    p.text-4xl.font-bold 39 
+               
+        div.m-4
+            div.inline.flex.mt-4.mx-4
+                button.h-14.w-5.bg-gray-300.border-2.border-white.rounded-l-lg.border-r-0
+                    img(src='arrow right white icon.svg')
+                div.inline.flex.rounded-tr-lg.bg-white.border.border-gray-400.justify-center.items-center     
+                    p.text-xl.font-bold.w-80.mx-2 Chat
+                    div.inline.flex.ml-auto
+                        img.rounded-full.w-8.border-2.border-gray-300.mx-2.p-1(src='video icon.svg') 
+                        div.inline.flex.justify-center.items-center
+                            img.rounded-full.w-8.h-8.mx-2.p-1.bg-blue-300.mx-2.p-1(src='chat white icon.svg') 
+                            img.w-5.h-5(src='ok icon.svg' style={'margin-left': '-20px', 'margin-top': '-28px'})                                    
+                        img.rounded-full.w-8.border-2.border-gray-300.mx-2(src='whatsapp icon.svg' class='px-1') 
+
+            div(style={'height': '80vh'}).overflow-y-scroll.flex.flex-col.items-center.bg-white.border.border-gray-400.border-t-0.border-b-0.justify-between.ml-9.mr-4.pb-16                   
+                p.font-bold.justify-center.flex.pt-4 Yesterday 
+                table.w-full.flex.justify-center.items-center
+                    tbody.m-2.w-full.justify-center.items-center
+                        tr.w-full.flex.justify-center.items-center
+                            td.w-full.justify-center.items-center
+                                div.w-72.m-4
+                                    div.inline.bg-blue-50.rounded-2xl.justify-start.inline-flex.p-2.text-sm
+                                        p.fa.fa-check-double.text-gray-400.text-sm.ml-2  
+                                        p.text-gray-400.text-sm.mx-2 14:23
+                                        p Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem        
+                        
+                        tr.w-full.flex.justify-center.items-center
+                            td.w-full.justify-center.items-center
+                                div.w-72.m-4.ml-auto.justify-end.flex
+                                    div.inline.border-blue-200.border.rounded-2xl.inline-flex.p-2.text-sm
+                                        p.text-gray-400.text-sm.mx-2 14:23
+                                        p Lorem Ipsum is simply           
+                           
+                        tr.w-full.flex.justify-center.items-center
+                            td.w-full.justify-center.items-center
+                                div.w-72.m-4
+                                    div.inline.bg-blue-50.rounded-2xl.justify-start.inline-flex.p-2.text-sm
+                                        p.fa.fa-check-double.text-gray-400.text-sm.ml-2  
+                                        p.text-gray-400.text-sm.mx-2 14:23
+                                        p Lorem Ipsum    
+                        
+                        tr.w-full.flex.justify-center.items-center
+                            td.w-full.justify-center.items-center
+                                div.w-72.m-4
+                                    div.inline.bg-blue-50.rounded-2xl.justify-start.inline-flex.p-2.text-sm
+                                        p.fa.fa-check-double.text-gray-400.text-sm.ml-2  
+                                        p.text-gray-400.text-sm.mx-2 14:23
+                                        p Lorem Ipsum is simply dummy text of the 
+
+                        tr.w-full.flex.justify-center.items-center
+                            td.w-full.justify-center.items-center
+                                div.w-72.m-4.ml-auto.justify-end.flex
+                                    div.inline.border-blue-200.border.rounded-2xl.justify-end.inline-flex.p-2.text-sm
+                                        p.text-gray-400.text-sm.mx-2 14:23
+                                        p Lorem Ipsum is simply                                                           
+            
+                p.font-bold.justify-center.flex.pt-4 Today 
+                table.w-full.flex.justify-center.items-center
+                    tbody.m-2.w-full.justify-center.items-center
+                        tr.w-full.flex.justify-center.items-center
+                            td.w-full.justify-center.items-center
+                                div.w-72.m-4
+                                    div.inline.bg-blue-50.rounded-2xl.justify-start.inline-flex.p-2.text-sm
+                                        p.fa.fa-check-double.text-gray-400.text-sm.ml-2  
+                                        p.text-gray-400.text-sm.mx-2 14:23
+                                        p Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem        
+                        
+                        tr.w-full.flex.justify-center.items-center
+                            td.w-full.justify-center.items-center
+                                div.w-72.m-4.ml-auto.justify-end.flex
+                                    div.inline.border-blue-200.border.rounded-2xl.justify-end.inline-flex.p-2.text-sm
+                                        p.text-gray-400.text-sm.mx-2 14:23
+                                        p Lorem Ipsum is simply           
+                           
+                        tr.w-full.flex.justify-center.items-center
+                            td.w-full.justify-center.items-center
+                                div.w-72.m-4
+                                    div.inline.bg-blue-50.rounded-2xl.justify-start.inline-flex.p-2.text-sm
+                                        p.fa.fa-check-double.text-gray-400.text-sm.ml-2  
+                                        p.text-gray-400.text-sm.mx-2 14:23
+                                        p Lorem Ipsum    
+                        
+                        tr.w-full.flex.justify-center.items-center
+                            td.w-full.justify-center.items-center
+                                div.w-72.m-4
+                                    div.inline.bg-blue-50.rounded-2xl.justify-start.inline-flex.p-2.text-sm
+                                        p.fa.fa-check-double.text-gray-400.text-sm.ml-2  
+                                        p.text-gray-400.text-sm.mx-2 14:23
+                                        p Lorem Ipsum is simply dummy text of the 
+
+                        tr.w-full.flex.justify-center.items-center
+                            td.w-full.justify-center.items-center
+                                div.w-72.m-4.ml-auto.justify-end.flex
+                                    div.inline.border-blue-200.border.rounded-2xl.inline-flex.p-2.text-sm
+                                        p.text-gray-400.text-sm.mx-2 14:23
+                                        p Lorem Ipsum is simply             
+
+            div.flex.items-center.bg-white.border.border-gray-400.border-t-0.rounded-b-lg.justify-center.ml-9.mr-4 
+                div.inline.flex.items-center.bg-gray-100.border.rounded-lg.border-gray-400.m-4.w-full 
+                    img.h-6.w-6.m-2(src='attachment icon.png')   
+                    span(class='input' role='textbox' contenteditable='true').w-full.border-0.block 
+                    img.h-6.w-10.m-2.p-2.bg-red-700.ml-auto.rounded-xl(src='send white icon.png')    
+
+    script.
+        // Define array for list of disable dates 
+        var array = ['2022-09-14', '2022-09-16', '2022-09-19'] 
+        
+        $(document).ready(function() {      
+            $('#datepicker').datepicker({
+                beforeShowDay: function(date){
+                    var string = jQuery.datepicker.formatDate('yy-mm-dd', date)
+                    return [ array.indexOf(string) == -1 ]
+                },
+                onSelect: function (dateText, inst) {                    
+                    
+                }
+            })  
+            $('#datepicker' ).datepicker('setDate', '09/20/2022')
+        })         
+
+        

@@ -1,0 +1,203 @@
+extends layout         
+block variables
+    - var doctor_name = doctor_name
+block content          
+        
+    div.w-screen.shadow-lg
+        p.text-black.font-bold.text-2xl.mx-4.my-3 Alerts #{'&'} Notifications
+
+    div(style={background: '#F3F3F3'}).w-screen.flex
+        p.text-black.font-bold.text-2xl.mx-8.my-3 High Alerts          
+
+    // graphs cards
+    div.w-screen.inline-flex(style={background: '#F3F3F3'})
+        
+        // Unusual blood pressure
+        div.m-6.py-6.bg-white.rounded-xl.border.border-solid.shadow-lg.justify-center.items-center.w-full(style={'border-color': '#E7E7E7'})   
+            div.justify-center.items-center.inline.flex
+                p.text-2xl.text-blue-600.mx-5 Unusual blood pressure
+                img(src='export black icon.svg').h-4.ml-auto.mx-5 
+            p.text-sm.mx-5 Jan 2022 - Jan 2023
+            each val in unusualBloodPressure 
+                div.p-3.m-3.bg-white.rounded-xl.justify-center.items-center
+                    div.justify-center.items-center.inline.flex
+                        img.rounded-full.border.border-gray-500.w-8.h-8(src='user gray icon.svg')
+                        div.justify-center.items-center.mx-6
+                            p.font-bold #{val.fullname} 
+                            p #{val.comment} 
+                        p.font-bold.text-xl.flex.ml-auto #{val.reason} 
+
+        // Unusual heartbeat
+        div.m-6.py-6.bg-white.rounded-xl.border.border-solid.shadow-lg.justify-center.items-center.w-full(style={'border-color': '#E7E7E7'})   
+            div.justify-center.items-center.inline.flex
+                p.text-2xl.text-blue-600.mx-5 Unusual heartbeat
+                img(src='export black icon.svg').h-4.ml-auto.mx-5 
+            p.text-sm.mx-5 Jan 2022 - Jan 2023
+            each val in unusualHeartbeat 
+                div.p-3.m-3.bg-white.rounded-xl.justify-center.items-center
+                    div.justify-center.items-center.inline.flex
+                        img.rounded-full.border.border-gray-500.w-8.h-8(src='user gray icon.svg')
+                        div.justify-center.items-center.mx-6
+                            p.font-bold #{val.fullname} 
+                            p #{val.comment} 
+                        p.font-bold.text-xl.flex.ml-auto #{val.reason} 
+
+        // Unusual SPo2
+        div.m-6.py-6.bg-white.rounded-xl.border.border-solid.shadow-lg.justify-center.items-center.w-full(style={'border-color': '#E7E7E7'})   
+            div.justify-center.items-center.inline.flex
+                p.text-2xl.text-blue-600.mx-5 Unusual SPo2
+                img(src='export black icon.svg').h-4.ml-auto.mx-5 
+            p.text-sm.mx-5 Jan 2022 - Jan 2023
+            each val in unusualSPo2 
+                div.p-3.m-3.bg-white.rounded-xl.justify-center.items-center
+                    div.justify-center.items-center.inline.flex
+                        img.rounded-full.border.border-gray-500.w-8.h-8(src='user gray icon.svg')
+                        div.justify-center.items-center.mx-6
+                            p.font-bold #{val.fullname} 
+                            p #{val.comment} 
+                        p.font-bold.text-xl.flex.ml-auto #{val.reason}                                
+        
+    div(style={background: '#F3F3F3'}).w-screen.flex
+        p.text-black.font-bold.text-2xl.mx-8.my-3 Patients Request
+
+    // Table
+    div.m-6.flex
+        div(class='overflow-x-auto')
+            table(class='text-md text-left text-gray-500 w-full')
+                thead(class='text-md text-gray-700 p-12')
+                    tr
+                        th(scope='col')
+                            div(class='inline-flex w-36')
+                                p.mx-3 Client name
+                                img(src='arrow down icon.png').h-4.mr-auto     
+
+                        th(scope='col')
+                            div(class='inline-flex w-36')
+                                p.mx-3 Status
+                                img(src='arrow down icon.png').h-4.mr-auto    
+                        
+                        th(scope='col')
+                            div(class='inline-flex w-48')
+                                p.mx-3 Request
+                                img(src='arrow down icon.png').h-4.mr-auto    
+
+                        th(scope='col')
+                            div(class='inline-flex w-48')
+                                p.mx-3 Date #{'&'} Time
+                                img(src='arrow down icon.png').h-4.mr-auto   
+
+                        th(scope='col')
+                            div(class='inline-flex w-96')
+                                p.mx-3 Message                                                 
+                                
+                        th
+                            p.text-center #{users.length} total
+                        
+                tbody
+                    each val in users 
+                        tr(class='bg-white border-b').justify-center.items-center
+                            td.text-gray-800.w-48.p-3
+                                div.inline-flex
+                                    img.rounded-full.border.border-gray-200.w-6.h-6.mr-auto(src='user gray icon.svg')
+                                    p.mr-auto.px-4 #{val.firstname}
+                            td.text-gray-800.w-48.p-3
+                                p Active
+
+                            td.text-gray-800.w-48.p-3
+                                p Video chat 
+
+                            td.text-gray-800.w-48.p-3
+                                p 24/07/2022 : 14:22
+
+                            td.text-gray-800.w-36.p-3
+                                p.justify-center.items-center I'm worried about my high blood pressure
+                           
+                            td.flex.p-3
+                                img.w-4.h-4(src='eye gray icon.svg' onclick=`alertpatient(${JSON.stringify(val)})`) 
+
+            div(id='alertModal')   
+
+    script. 
+     
+        $(document).on('click','.ui-dialog-titlebar-close',function(){
+            $('#alertModal').next().remove();
+            $(this).dialog('close')
+        })
+
+        $(document).ready(function() {         
+            $('#alertModal').dialog({
+                title: 'Patients notification',
+                autoOpen: false, 
+                modal: true,
+                buttons: [            
+                    { text: 'Choose different time', click: function() { $('#alertModal').next().remove(); $(this).dialog('close') }, class: 'cancelcss' },
+                    { text: 'Add new meeting', click: function() { $('#alertModal').next().remove(); $(this).dialog('close') }, class: 'savecss' }
+                ],
+                width: 500,
+                height: 800,
+                position: { at: 'top' },  
+                open : function() {
+                    if ($(this).closest('.ui-dialog').offset().top < 40) {
+                        $(this).closest('.ui-dialog').css({'top':'60px'})
+                    }
+                }              
+            }) 
+        })
+
+        function alertpatient(patient)
+        {
+            $('#alertModal').dialog('open')
+
+            var textpatient = 
+                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the" +
+                "industry's standard dummy text ever since the 1500s." +
+                "when an unknown printer took a galley of type and scrambled it to make a type specimen book. " +
+                "It has survived not only five centuries." + "\n" +
+                "But also the leap into electronic typesetting, remaining essentially unchanged. " +
+                "It was popularised in the 1960s with the release of Letraset sheets containing"
+
+            $('#alertModal').after('<div>' + 
+                                   '<div class="items-center justify-center flex"><img class="rounded-full border border-gray-200 w-16 h-16" src="user gray icon.svg"></img></div>' +
+                                   '<p class="items-center justify-center flex underline font-bold p-4">' + patient.firstname + ' - 47 male</p>' + 
+                                   '<p class="items-center justify-center flex p-4 mt-16">' + textpatient + '</p>' +
+                                   '<div class="items-center justify-center flex mt-4"><div class="items-center justify-center rounded-full border border-gray-200 w-20 h-20 bg-blue-400 flex"><img class="w-16 h-16" src="chat white icon.svg"></img></div></div>' +
+                                   '<p class="items-center justify-center flex font-bold text-2xl text-gray-400 p-4 mb-12">Chat</p>' + 
+                                   '</div>')
+        }
+
+    style.    
+        .savecss {
+            background: #00AAF3;
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            height: 40px;
+            width: 180px;
+        }
+        
+        .cancelcss {
+            color: gray;
+            font-weight: bold;
+            border-radius: 8px;
+            height: 40px;
+            width: 200px;
+            position: absolute;
+            left: 32px;
+        }
+
+        .ui-widget-overlay {
+            background: rgba(0,0,0,0.8);
+            opacity: .8;
+        }        
+        
+        #alertModal {
+            height: 0px !important;
+        }
+
+        .ui-dialog .ui-dialog-title {
+            text-align: center;
+            width: 100%;
+            padding: 16px;
+            font-size: 1.5em;
+        }

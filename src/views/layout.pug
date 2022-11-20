@@ -1,15 +1,167 @@
-html
-    head
-        title #{appName}
-        meta(name='viewport', content='width=device-width, initial-scale=1.0')
-        link(href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', rel='stylesheet', media='screen')  
-        style
-            include ../public/styles/tailwind.css
-        script(src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js')  
-        script(src='https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0')
-        script(src='https://cdn.jsdelivr.net/npm/chartjs-plugin-piechart-outlabels')
-        script(src='https://code.jquery.com/jquery-3.6.0.min.js', rel='stylesheet', media='screen')
-    body
-        .container.grid.place-items-center   
-            block content
+extends includes
+
+block header
+    div.container.grid.place-items-center   
+        
+        div(style={background: '#F3F3F3', 'border-color': '#E7E7E7'}).w-screen.border.border-solid.inline-flex
+            // right part of navigation bar
+            // logo
+            div.bg-white
+                img(src='main_logo.png').w-32.mx-6.my-3
+            // navigation buttons
+            div.inline-flex.space-x-24.mx-24
+                button(class='font-medium hover:text-blue-500 hover:drop-shadow-md text-blue-500' onclick='overview(\'' + doctor_name + '\')') Overview
+                button(class='font-medium hover:text-blue-500 hover:drop-shadow-md' onclick='patients(\'' + doctor_name + '\')') Patients
+                button(class='font-medium hover:text-blue-500 hover:drop-shadow-md' onclick='calendar(\'' + doctor_name + '\')') Calendar     
+            // left part of navigation bar
+            div.inline-flex.ml-auto.grid.grid-cols-2.justify-center.items-center.mx-12
+                // dark mode button
+                button.inline-flex.h-8.justify-center.items-center.ml-auto(class='hover:text-blue-500 hover:drop-shadow-md' style={'border-width': '0px 2px 0px 0px'})
+                    img(src='dark mode icon.png')              
+                    p.mx-2.text-sm Apply Dark Theme
                 
+                div.inline-flex.h-8.justify-center.items-center.mr-auto.space-x-12.mx-6
+                    // doctor name
+                    p.font-bold Dr. #{doctor_name}
+                    img.rounded-full.border.border-gray-500.w-8.h-8(src='user gray icon.svg')
+                    // bell sign
+                    div.inline-flex.relative.w-8.h-8.justify-center
+                        img(src='bell.svg' onclick='notifications(\'' + doctor_name + '\')').w-8.h-8        
+                        div.absolute.bottom-4.left-4.h-5.w-5.border-2.border-white.rounded-full.bg-red-400.z-2.justify-center.items-center
+                            p.text-white.font-bold.mx-1(style={'margin-top': '-5px'}) 3    
+       
+
+    script.
+        function overview(doctor_name)
+        {            
+            window.location.href = './home_doctor?doctor_name=' + doctor_name   
+        } 
+        
+        function income(doctor_name)
+        {
+            window.location.href = './income?doctor_name=' + doctor_name 
+        } 
+
+        function alerts(doctor_name)
+        {
+            window.location.href = './alerts?doctor_name=' + doctor_name 
+        } 
+        
+        function patients(doctor_name)
+        {
+            window.location.href = './patients?doctor_name=' + doctor_name 
+        } 
+
+        function calendar(doctor_name)
+        {
+            window.location.href = './calendar?doctor_name=' + doctor_name 
+        }             
+
+        function notifications(doctor_name)
+        {
+            window.location.href = './notifications?doctor_name=' + doctor_name 
+        }     
+
+    style.    
+
+        *::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: white;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background-color: gray;
+        }
+
+        [contenteditable] {
+            outline: 0px solid transparent;
+            max-width: 300px;
+        }
+
+        .ui-datepicker {
+            font-size: 120%;
+        }
+
+        #datepicker .ui-widget.ui-widget-content, #datepickerPopup .ui-widget.ui-widget-content  {            
+            border-color: transparent;
+        }
+        
+        .ui-datepicker {
+            background-color: transparent;
+            border-color: transparent;  
+            width: 18em;           
+        } 
+
+        .ui-datepicker table {
+            border-color: transparent;
+            font-size: .8em;
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+
+        .ui-datepicker-header {
+            background-color: transparent;
+            border-color: transparent;
+        }    
+
+        .ui-datepicker td {
+            position: relative;            
+        }
+        .ui-datepicker td a {
+            display: table-cell;
+            text-align:center;
+            vertical-align: middle;
+        }
+
+        .ui-datepicker td span {
+            display: table-cell;
+            text-align:center;
+            vertical-align: middle;           
+        }               
+        
+        #datepicker .ui-widget-content .ui-state-default, #datepickerPopup .ui-widget-content .ui-state-default {
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            background: transparent;
+            color: #000;            
+        }
+
+        #datepicker .ui-widget-content .ui-state-default:hover #datepickerPopup .ui-widget-content .ui-state-default:hover {
+            border: none;
+            background: #616eff;
+            color: #fff;
+        }
+
+        #datepicker .ui-widget-content .ui-state-active, #datepickerPopup .ui-widget-content .ui-state-active {
+            border: none;
+            background: url('calendar active icon.jpeg') no-repeat center;
+            color: #fff;
+        }
+
+        #datepicker .ui-widget-content .ui-state-disabled span, #datepickerPopup .ui-widget-content .ui-state-disabled span {
+            border: none;
+            background: gray;
+            color: #fff;
+        }
+
+        .ui-datepicker-prev span {
+            background: transparent;
+            color: #000;
+            background-image: url(/public/arrow left icon.svg) !important;
+            background-position: 0px 0px !important;
+            transform: rotate(-90deg);
+        }        
+
+        .ui-datepicker-next span {
+            background: transparent;
+            color: #000;
+            background-image: url(/public/arrow right icon.svg') !important;
+            background-position: 0px 0px !important;
+            transform: rotate(90deg);
+        }
+    

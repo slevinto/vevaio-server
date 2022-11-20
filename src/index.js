@@ -210,6 +210,97 @@ app.get('/patients', (req, res) => {
     })   
 })
 
+app.get('/calendar', (req, res) => {    
+    allUsers = []
+    var allDataPatients = null
+    var firebaseUsers = []
+    var promises = []
+
+    get(child(dbRef, `doctors/` + req.query.doctor_name + '/patients/')).then((snapshot) => {
+        
+        if (snapshot.val() != null)
+        {
+            allDataPatients = Object.values(snapshot.val())
+            allDataPatients = Array.from(new Set(allDataPatients))            
+        }
+    }).then(() => {
+        get(child(dbRef, `users/` )).then((snapshotUsers) => {
+            for (var el in snapshotUsers.val())
+            { 
+                firebaseUsers.push({email: snapshotUsers.child(el).child('info').child('email').val(), firstname: snapshotUsers.child(el).child('info').child('firstname').val()})
+            }
+            if (allDataPatients != null)
+                firebaseUsers = firebaseUsers.filter(n => !allDataPatients.includes(n.email) && n.email != null)              
+        })     
+    }).then(() => {    
+        for(var patientname in allDataPatients)
+        {
+            promises.push(getUserInfo(allDataPatients[patientname]))            
+        }
+        Promise.all(promises).then(() => {
+            res.render('calendar', {doctor_name: req.query.doctor_name, users: firebaseUsers } )  
+        })     
+    })   
+})
+
+app.get('/notifications', (req, res) => {
+    
+    var unusualBloodPressure = [
+        {fullname: 'Nayah Tantoh', comment: 'Two days ago', reason: '72/122'},
+        {fullname: 'Diego Morata', comment: 'Two days ago', reason: '72/122'},
+        {fullname: 'Anatoliy Shcherbatykh', comment: 'Two days ago', reason: '72/122'},
+        {fullname: 'Ren Delan', comment: 'Two days ago', reason: '72/122'},
+        {fullname: 'Dobroslawa Antokolskiy', comment: 'Two days ago', reason: '72/122'}
+    ]
+
+    var unusualHeartbeat = [
+        {fullname: 'Nayah Tantoh', comment: 'Two days ago', reason: '65/80 bpm'},
+        {fullname: 'Diego Morata', comment: 'Two days ago', reason: '65/80 bpm'}
+    ]
+
+    var unusualSPo2 = [
+        {fullname: 'Nayah Tantoh', comment: 'Two days ago', reason: '65%'},
+        {fullname: 'Diego Morata', comment: 'Two days ago', reason: '80%'},
+        {fullname: 'Anatoliy Shcherbatykh', comment: 'Two days ago', reason: '95%'},
+        {fullname: 'Ren Delan', comment: 'Two days ago', reason: '90%'}
+    ]    
+
+    allUsers = []
+    var allDataPatients = null
+    var firebaseUsers = []
+    var promises = []
+
+    get(child(dbRef, `doctors/` + req.query.doctor_name + '/patients/')).then((snapshot) => {
+        
+        if (snapshot.val() != null)
+        {
+            allDataPatients = Object.values(snapshot.val())
+            allDataPatients = Array.from(new Set(allDataPatients))            
+        }
+    }).then(() => {
+        get(child(dbRef, `users/` )).then((snapshotUsers) => {
+            for (var el in snapshotUsers.val())
+            { 
+                firebaseUsers.push({email: snapshotUsers.child(el).child('info').child('email').val(), firstname: snapshotUsers.child(el).child('info').child('firstname').val()})
+            }
+            if (allDataPatients != null)
+                firebaseUsers = firebaseUsers.filter(n => !allDataPatients.includes(n.email) && n.email != null)              
+        })     
+    }).then(() => {    
+        for(var patientname in allDataPatients)
+        {
+            promises.push(getUserInfo(allDataPatients[patientname]))            
+        }
+        Promise.all(promises).then(() => {
+            res.render('notifications', {doctor_name: req.query.doctor_name, unusualBloodPressure: unusualBloodPressure, unusualHeartbeat: unusualHeartbeat, unusualSPo2: unusualSPo2, users: firebaseUsers } )  
+        })     
+    })   
+})
+
+app.get('/patientinfo', (req, res) => {
+    res.render('patientinfo', {doctor_name: req.query.doctor_name, patientname: req.query.patientname, patientemail: req.query.patientemail})
+})
+
 // Home page route.
 app.get('/', (req, res) => {  
     var cookies = 
@@ -730,4 +821,45 @@ function getThryveDataSources(patientData, callback)
         console.log(error.message)
     })    
 }
+
+// ajax to get all patients of doctor
+app.post("/getPatients", (req, res) => {
+    
+    var doctorname = req.body.doctorname
+    
+    allUsers = []
+    var allDataPatients = null
+    var firebaseUsers = []
+    var promises = []
+
+    get(child(dbRef, `doctors/` + doctorname + '/patients/')).then((snapshot) => {
+        
+        if (snapshot.val() != null)
+        {
+            allDataPatients = Object.values(snapshot.val())
+            allDataPatients = Array.from(new Set(allDataPatients))            
+        }
+    }).then(() => {
+        get(child(dbRef, `users/` )).then((snapshotUsers) => {
+            for (var el in snapshotUsers.val())
+            { 
+                firebaseUsers.push({email: snapshotUsers.child(el).child('info').child('email').val(), firstname: snapshotUsers.child(el).child('info').child('firstname').val()})
+            }
+            if (allDataPatients != null)
+                firebaseUsers = firebaseUsers.filter(n => !allDataPatients.includes(n.email) && n.email != null)              
+        })     
+    }).then(() => {    
+        for(var patientname in allDataPatients)
+        {
+            promises.push(getUserInfo(allDataPatients[patientname]))            
+        }
+        Promise.all(promises).then(() => {
+            var names = []
+            firebaseUsers.forEach(dataSource => {
+                names.push(dataSource.firstname)
+            })           
+            res.status(200).send({ data: names})
+        })     
+    })   
+})
 
