@@ -6,6 +6,7 @@ block content
     div.w-screen.shadow-lg.inline.flex
         p.font-bold.text-2xl.mx-4.py-4.text-gray-400 Patients | 
         p.font-bold.text-3xl.py-4.text-black #{patientname}
+        p(id='patientemail') #{patientemail}
         div.inline.flex.ml-auto.justify-center.items-center.mx-4 
             p.text-black Last connected devices
             div.inline.flex.justify-center.items-center.border.border-solid.border-blue-400.rounded-lg.mx-6.h-12
@@ -103,11 +104,12 @@ block content
                     button.mx-1.rounded-lg.bg-white.text-gray-500.w-36.h-10.border-2.border-gray-500 Journal
                 div.inline.flex.p-4.m-4
                     p.text-2xl.font-bold Indicatores
-                    div.inline.flex.ml-auto.m-4.justify-center.items-center   
-                        img(src='bar graph icon.svg').h-4.mx-5
-                        img(src='pencil gray icon.svg').h-4.mx-5
+                    div.inline.flex.ml-auto.mx-4.justify-center.items-center   
+                        img(src='bar graph icon.svg' id='toggleGraphBar').h-6.mx-5
+                        img(src='menu green icon.svg' id='toggleGraphMenu').h-6.mx-5
+                        img(src='pencil gray icon.svg').h-6.mx-5
 
-            table.p-4.m-4.w-full.border-separate        
+            table(id='tableBar').px-4.mx-4.w-full.border-separate        
                 each val in [1, 2, 3, 4, 5]
                     tr
                         td.rounded-lg.bg-white.border-4.border-gray-100
@@ -139,6 +141,36 @@ block content
                                     p.mx-6.ml-auto.flex 08/11/2023 - 8:45AM 
                                 div.ml-auto.justify-center.items-center.mx-4     
                                     p.text-4xl.font-bold 39 
+
+            table(id='tableMenu').px-0.mx-0.w-full.border-separate        
+                tr
+                    td.rounded-xl.bg-white.border-4.border-gray-100
+                        div
+                            p.m-3.text-2xl.font-bold.text-black Heart Rate
+                            div(id='heartrate').chart-container.h-64  
+                                canvas(id='heartratechart')  
+
+                tr
+                    td.rounded-xl.bg-white.border-4.border-gray-100
+                        div
+                            p.m-3.text-2xl.font-bold.text-black Steps
+                            div(id='step').chart-container.h-64  
+                                canvas(id='stepchart')         
+
+                tr
+                    td.rounded-xl.bg-white.border-4.border-gray-100
+                        div
+                            p.m-3.text-2xl.font-bold.text-black Burned Calories
+                            div(id='burnedcalories').chart-container.h-64  
+                                canvas(id='burnedcalorieschart')  
+
+                tr
+                    td.rounded-xl.bg-white.border-4.border-gray-100
+                        div
+                            p.m-3.text-2xl.font-bold.text-black Activity Duration
+                            div(id='activityduration').chart-container.h-64  
+                                canvas(id='activitydurationchart')                                    
+
                
         div.m-4
             div.inline.flex.mt-4.mx-4
@@ -245,7 +277,76 @@ block content
     script.
         // Define array for list of disable dates 
         var array = ['2022-09-14', '2022-09-16', '2022-09-19'] 
-        
+        const email = $('#patientemail').text()
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+        function createChart(chartToCreate, values, beginY, endY)
+        {
+            return new Chart(chartToCreate, {
+                type: 'line',
+                data: {
+                    labels: values.map(item => new Date(item[0]).getDate() + ' ' + monthNames[new Date(item[0]).getMonth()]),
+                    datasets: [{
+                        data: values.map(item => item[1]),
+                        backgroundColor: 'transparent',
+                        borderColor: '#00AAF3',
+                        pointBackgroundColor: 'gray',
+                        pointBorderColor: 'transparent',
+                    }],
+                    yHighlightRange : {
+                        begin: beginY,
+                        end: endY
+                    },
+                },
+                options: {
+                    maintainAspectRatio: false,                            
+                    title: {
+                        display: true,
+                        text: 'Optimal range',
+                        position: 'right',
+                    },
+                    legend: {
+                        display: false,                                                                
+                    },
+                    elements: {
+                        point:{
+                            radius: 4,
+                        }
+                    },
+                    plugins: {
+                        datalabels: {
+                            display: false,
+                        },                                                             
+                    },
+                    scales: {
+                        xAxes: [{                                            
+                            gridLines: {
+                                    display: false,
+                            },
+                            ticks: { 
+                                fontColor: 'gray',
+                                fontSize: 16,
+                                autoSkip: true,
+                                maxRotation: 0,
+                                minRotation: 0,
+                                maxTicksLimit: 7,                                             
+                            },                                                                                      
+                        }],
+                        yAxes: [{
+                            stacked: false,
+                            gridLines: {
+                                    display: true,
+                            },
+                            ticks: {
+                                fontColor: 'gray',
+                                fontSize: 16   
+                            }
+                        }]
+                    }
+                }
+            }) 
+        }  
+
         $(document).ready(function() {      
             $('#datepicker').datepicker({
                 beforeShowDay: function(date){
@@ -257,6 +358,117 @@ block content
                 }
             })  
             $('#datepicker' ).datepicker('setDate', '09/20/2022')
-        })         
 
+            $('#toggleGraphMenu').hide()
+            $('#tableMenu').hide()
+
+            $('#patientemail').hide()            
+            
+            var originalLineDraw = Chart.controllers.line.prototype.draw
+            // Extend the line chart, in order to override the draw function.
+            Chart.helpers.extend(Chart.controllers.line.prototype, {
+                draw : function() {
+                    var chart = this.chart
+                    // Get the object that determines the region to highlight.
+                    var yHighlightRange = chart.config.data.yHighlightRange;
+
+                    // If the object exists.
+                    if (yHighlightRange !== undefined) {
+                        var ctx = chart.chart.ctx
+
+                        var yRangeBegin = yHighlightRange.begin
+                        var yRangeEnd = yHighlightRange.end
+
+                        var xaxis = chart.scales['x-axis-0']
+                        var yaxis = chart.scales['y-axis-0']
+
+                        var yRangeBeginPixel = yaxis.getPixelForValue(yRangeBegin)
+                        var yRangeEndPixel = yaxis.getPixelForValue(yRangeEnd)
+
+                        ctx.save()
+
+                        // The fill style of the rectangle we are about to fill.
+                        ctx.fillStyle = 'rgba(225,243,165,0.2)'
+                        // Fill the rectangle that represents the highlight region. The parameters are the closest-to-starting-point pixel's x-coordinate,
+                        // the closest-to-starting-point pixel's y-coordinate, the width of the rectangle in pixels, and the height of the rectangle in pixels, respectively.
+                        ctx.fillRect(xaxis.left, Math.min(yRangeBeginPixel, yRangeEndPixel), xaxis.right - xaxis.left, Math.max(yRangeBeginPixel, yRangeEndPixel) - Math.min(yRangeBeginPixel, yRangeEndPixel));
+
+                        ctx.restore()
+                    }
+
+                    // Apply the original draw function for the line chart.
+                    originalLineDraw.apply(this, arguments);
+                }
+            })                   
+
+            $.ajax({
+                type: 'POST',
+                url: '/getPatientInfo',
+                data: { patientemail:  email },
+                success: function(data) {
+                    var jsonvalues = data.data
+                    
+                    var heartratevalues = []
+                    for (let i = 0; i < jsonvalues.length; i++){
+                        if(jsonvalues[i][0] === 'Vitals' && jsonvalues[i][1] === 'Resting Heart Rate')
+                            heartratevalues.push([jsonvalues[i][2], jsonvalues[i][3]]) 
+                    }
+                    heartratevalues = Array.from(new Set(heartratevalues.map(JSON.stringify))).map(JSON.parse)
+                    heartratevalues = heartratevalues.sort((a, b) => a[0] - b[0])
+
+                    var ctxheartrate = document.getElementById('heartratechart').getContext('2d')                   
+                    var heartratechart = createChart(ctxheartrate, heartratevalues, 60, 90)
+
+                    var stepvalues = []
+                    for (let i = 0; i < jsonvalues.length; i++){
+                        if(jsonvalues[i][0] === 'Activity' && jsonvalues[i][1] === 'Steps')
+                            stepvalues.push([jsonvalues[i][2], jsonvalues[i][3]])  
+                    }
+                    stepvalues = Array.from(new Set(stepvalues.map(JSON.stringify))).map(JSON.parse)
+                    stepvalues = stepvalues.sort((a, b) => a[0] - b[0])
+
+                    var ctxstep = document.getElementById('stepchart').getContext('2d')                   
+                    var stepchart = createChart(ctxstep, stepvalues, 5000, 10000)
+
+                    var burnedcaloriesvalues = []
+                    for (let i = 0; i < jsonvalues.length; i++){
+                        if(jsonvalues[i][0] === 'Activity' && jsonvalues[i][1] === 'Burned Calories')
+                    burnedcaloriesvalues.push([jsonvalues[i][2], jsonvalues[i][3]])
+                    }
+                    burnedcaloriesvalues = Array.from(new Set(burnedcaloriesvalues.map(JSON.stringify))).map(JSON.parse)
+                    burnedcaloriesvalues = burnedcaloriesvalues.sort((a, b) => a[0] - b[0])
+
+                    var ctxburnedcalories = document.getElementById('burnedcalorieschart').getContext('2d')                   
+                    var burnedcalorieschart = createChart(ctxburnedcalories, burnedcaloriesvalues, 1000, 2000)
+
+                    var activitydurationvalues = []
+                    for (let i = 0; i < jsonvalues.length; i++){
+                        if(jsonvalues[i][0] === 'Activity' && jsonvalues[i][1] === 'Activity Duration')
+                            activitydurationvalues.push([jsonvalues[i][2], jsonvalues[i][3]]) 
+                    }
+                    activitydurationvalues = Array.from(new Set(activitydurationvalues.map(JSON.stringify))).map(JSON.parse)
+                    activitydurationvalues = activitydurationvalues.sort((a, b) => a[0] - b[0])
+
+                    var ctxactivityduration = document.getElementById('activitydurationchart').getContext('2d')                   
+                    var activitydurationchart = createChart(ctxactivityduration, activitydurationvalues, 20, 30)
+                                          
+                },
+                failure: function(errMsg) {
+                    alert(errMsg)
+                }                        
+            })
+        })  
+
+        $('#toggleGraphBar, #toggleGraphMenu').click(function(){
+            $('#toggleGraphBar, #toggleGraphMenu').toggle()
+            $('#tableBar, #tableMenu').toggle()
+        })
+
+        
+
+
+
+
+        
+    
         

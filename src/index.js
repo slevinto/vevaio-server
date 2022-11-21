@@ -858,8 +858,30 @@ app.post("/getPatients", (req, res) => {
             firebaseUsers.forEach(dataSource => {
                 names.push(dataSource.firstname)
             })           
-            res.status(200).send({ data: names})
+            res.status(200).send({ data: names })
         })     
     })   
+})
+
+// ajax to get all patient info
+app.post("/getPatientInfo", (req, res) => {
+    
+    var patientemail = req.body.patientemail    
+    var dataItems = []       
+    
+    get(child(dbRef, `users/` + patientemail.replace(/[^a-z0-9]/gi, ''))).then((snapshot) => {
+        const allData = snapshot.val()
+        for (var section in allData) {
+            for(var subsection in snapshot.child(section).val()) {
+                for(var dirsubsection in snapshot.child(section).child(subsection).val()) {
+                    dataItems.push([section, 
+                                    subsection, 
+                                    snapshot.child(section).child(subsection).child(dirsubsection).child('createdAtUnix').val(),
+                                    snapshot.child(section).child(subsection).child(dirsubsection).child('value').val()]) 
+                }           
+            } 
+        }     
+        res.status(200).send({ data: dataItems })               
+    })     
 })
 
