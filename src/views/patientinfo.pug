@@ -174,9 +174,9 @@ block content
                
         div.m-4
             div.inline.flex.mt-4.mx-4
-                button.h-14.w-5.bg-gray-300.border-2.border-white.rounded-l-lg.border-r-0
+                button.h-14.w-5.bg-gray-300.border-2.border-white.rounded-l-lg.border-r-0(id='chatbutton' onclick='clickChatButton()')
                     img(src='arrow right white icon.svg')
-                div.inline.flex.rounded-tr-lg.bg-white.border.border-gray-400.justify-center.items-center     
+                div.inline.flex.rounded-tr-lg.bg-white.border.border-gray-400.justify-center.items-center(id='chatdivheader')     
                     p.text-xl.font-bold.w-80.mx-2 Chat
                     div.inline.flex.ml-auto
                         img.rounded-full.w-8.border-2.border-gray-300.mx-2.p-1(src='video icon.svg') 
@@ -185,7 +185,7 @@ block content
                             img.w-5.h-5(src='ok icon.svg' style={'margin-left': '-20px', 'margin-top': '-28px'})                                    
                         img.rounded-full.w-8.border-2.border-gray-300.mx-2(src='whatsapp icon.svg' class='px-1') 
 
-            div(style={'height': '80vh'}).overflow-y-scroll.flex.flex-col.items-center.bg-white.border.border-gray-400.border-t-0.border-b-0.justify-between.ml-9.mr-4.pb-16                   
+            div(style={'height': '80vh'} id='chatdiv').overflow-y-scroll.flex.flex-col.items-center.bg-white.border.border-gray-400.border-t-0.border-b-0.justify-between.ml-9.mr-4.pb-16                   
                 p.font-bold.justify-center.flex.pt-4 Yesterday 
                 table.w-full.flex.justify-center.items-center
                     tbody.m-2.w-full.justify-center.items-center
@@ -268,13 +268,20 @@ block content
                                         p.text-gray-400.text-sm.mx-2 14:23
                                         p Lorem Ipsum is simply             
 
-            div.flex.items-center.bg-white.border.border-gray-400.border-t-0.rounded-b-lg.justify-center.ml-9.mr-4 
+            div.flex.items-center.bg-white.border.border-gray-400.border-t-0.rounded-b-lg.justify-center.ml-9.mr-4(id='chatdivfooter') 
                 div.inline.flex.items-center.bg-gray-100.border.rounded-lg.border-gray-400.m-4.w-full 
                     img.h-6.w-6.m-2(src='attachment icon.png')   
                     span(class='input' role='textbox' contenteditable='true').w-full.border-0.block 
                     img.h-6.w-10.m-2.p-2.bg-red-700.ml-auto.rounded-xl(src='send white icon.png')    
 
     script.
+        function clickChatButton()
+        {
+            $('#chatdivheader').toggle()  
+            $('#chatdivfooter').toggle()  
+            $('#chatdiv').toggle()           
+        }
+        
         // Define array for list of disable dates 
         var array = ['2022-09-14', '2022-09-16', '2022-09-19'] 
         const email = $('#patientemail').text()

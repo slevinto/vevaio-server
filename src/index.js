@@ -178,11 +178,9 @@ app.get('/alerts', (req, res) => {
 })
 
 app.get('/patients', (req, res) => {
-    allUsers = []
     var allDataPatients = null
     var firebaseUsers = []
-    var promises = []
-
+    
     get(child(dbRef, `doctors/` + req.query.doctor_name + '/patients/')).then((snapshot) => {
         
         if (snapshot.val() != null)
@@ -197,25 +195,18 @@ app.get('/patients', (req, res) => {
                 firebaseUsers.push({email: snapshotUsers.child(el).child('info').child('email').val(), firstname: snapshotUsers.child(el).child('info').child('firstname').val()})
             }
             if (allDataPatients != null)
+            {
                 firebaseUsers = firebaseUsers.filter(n => !allDataPatients.includes(n.email) && n.email != null)              
+                res.render('patients', { users: firebaseUsers, doctor_name: req.query.doctor_name } )  
+            }
         })     
-    }).then(() => {    
-        for(var patientname in allDataPatients)
-        {
-            promises.push(getUserInfo(allDataPatients[patientname]))            
-        }
-        Promise.all(promises).then(() => {
-            res.render('patients', { data: allUsers, users: firebaseUsers, doctor_name: req.query.doctor_name } )  
-        })     
-    })   
+    })
 })
 
 app.get('/calendar', (req, res) => {    
-    allUsers = []
     var allDataPatients = null
     var firebaseUsers = []
-    var promises = []
-
+    
     get(child(dbRef, `doctors/` + req.query.doctor_name + '/patients/')).then((snapshot) => {
         
         if (snapshot.val() != null)
@@ -230,17 +221,12 @@ app.get('/calendar', (req, res) => {
                 firebaseUsers.push({email: snapshotUsers.child(el).child('info').child('email').val(), firstname: snapshotUsers.child(el).child('info').child('firstname').val()})
             }
             if (allDataPatients != null)
-                firebaseUsers = firebaseUsers.filter(n => !allDataPatients.includes(n.email) && n.email != null)              
+            {
+                firebaseUsers = firebaseUsers.filter(n => !allDataPatients.includes(n.email) && n.email != null) 
+                res.render('calendar', {doctor_name: req.query.doctor_name, users: firebaseUsers } )               
+            }
         })     
-    }).then(() => {    
-        for(var patientname in allDataPatients)
-        {
-            promises.push(getUserInfo(allDataPatients[patientname]))            
-        }
-        Promise.all(promises).then(() => {
-            res.render('calendar', {doctor_name: req.query.doctor_name, users: firebaseUsers } )  
-        })     
-    })   
+    })
 })
 
 app.get('/notifications', (req, res) => {
@@ -265,11 +251,9 @@ app.get('/notifications', (req, res) => {
         {fullname: 'Ren Delan', comment: 'Two days ago', reason: '90%'}
     ]    
 
-    allUsers = []
     var allDataPatients = null
     var firebaseUsers = []
-    var promises = []
-
+    
     get(child(dbRef, `doctors/` + req.query.doctor_name + '/patients/')).then((snapshot) => {
         
         if (snapshot.val() != null)
@@ -284,17 +268,13 @@ app.get('/notifications', (req, res) => {
                 firebaseUsers.push({email: snapshotUsers.child(el).child('info').child('email').val(), firstname: snapshotUsers.child(el).child('info').child('firstname').val()})
             }
             if (allDataPatients != null)
+            {
                 firebaseUsers = firebaseUsers.filter(n => !allDataPatients.includes(n.email) && n.email != null)              
+                res.render('notifications', {doctor_name: req.query.doctor_name, unusualBloodPressure: unusualBloodPressure, unusualHeartbeat: unusualHeartbeat, unusualSPo2: unusualSPo2, users: firebaseUsers } )  
+      
+            }
         })     
-    }).then(() => {    
-        for(var patientname in allDataPatients)
-        {
-            promises.push(getUserInfo(allDataPatients[patientname]))            
-        }
-        Promise.all(promises).then(() => {
-            res.render('notifications', {doctor_name: req.query.doctor_name, unusualBloodPressure: unusualBloodPressure, unusualHeartbeat: unusualHeartbeat, unusualSPo2: unusualSPo2, users: firebaseUsers } )  
-        })     
-    })   
+    })
 })
 
 app.get('/patientinfo', (req, res) => {
@@ -868,7 +848,7 @@ app.post("/getPatientInfo", (req, res) => {
     
     var patientemail = req.body.patientemail    
     var dataItems = []       
-    
+
     get(child(dbRef, `users/` + patientemail.replace(/[^a-z0-9]/gi, ''))).then((snapshot) => {
         const allData = snapshot.val()
         for (var section in allData) {
