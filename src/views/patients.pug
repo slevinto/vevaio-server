@@ -86,9 +86,12 @@ block content
                                 img.w-4.h-4(src='trash gray icon.svg')                   
                     
         script. 
+            $(document).ready(function(){
+                $('#overviewbutton').css({'color':'#2D2D2D'}) 
+                $('#patientsbutton').css({'color':'#00AAF3'}) 
+                $('#calendarbutton').css({'color':'#2D2D2D'})
+                $('#alertsbutton').css({'color':'#2D2D2D'})
+            })  
      
-            function patientinfo(doctor_name, val)
-            {
-                window.location.href = './patientinfo?doctor_name=' + doctor_name + '&patientname=' + val.firstname + '&patientemail=' + val.email   
-            }
+            
 

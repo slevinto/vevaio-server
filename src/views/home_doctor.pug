@@ -406,4 +406,10 @@ block content
         var ctxClients = document.getElementById('chartClients').getContext('2d')
         var chartBarClients = new Chart(ctxClients, configClients )
 
+        $(document).ready(function(){
+            $('#overviewbutton').css({'color':'#00AAF3'}) 
+            $('#patientsbutton').css({'color':'#2D2D2D'}) 
+            $('#calendarbutton').css({'color':'#2D2D2D'})
+            $('#alertsbutton').css({'color':'#2D2D2D'})
+        })
         

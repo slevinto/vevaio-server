@@ -1,10 +1,10 @@
 extends layout         
 block variables
-    - var doctor_name = doctor_name
+    - var doctor_name = doctor_name    
 block content          
         
     div.w-screen.shadow-lg.inline.flex
-        p.font-bold.text-2xl.mx-4.py-4.text-gray-400 Patients | 
+        button.font-bold.text-2xl.mx-4.py-4.text-gray-400(onclick='patients(\'' + doctor_name + '\')') Patients | 
         p.font-bold.text-3xl.py-4.text-black #{patientname}
         p(id='patientemail') #{patientemail}
         div.inline.flex.ml-auto.justify-center.items-center.mx-4 
@@ -95,84 +95,384 @@ block content
             hr.m-4.h-px.border-gray-400.border-1
             div(id='datepicker').justify-center.items-center.flex.m-4
 
-        div(class='w-1/2').m-4
+        div(class='w-1/2' id='divTables').relative.m-4
             div
                 div.inline.flex.m-4
-                    button.mx-1.rounded-lg.bg-blue-400.text-white.w-36.h-10.shadow-2xl Indicatores
-                    button.mx-1.rounded-lg.bg-white.text-gray-500.w-36.h-10.border-2.border-gray-500 Medications
-                    button.mx-1.rounded-lg.bg-white.text-gray-500.w-36.h-10.border-2.border-gray-500 Documents
-                    button.mx-1.rounded-lg.bg-white.text-gray-500.w-36.h-10.border-2.border-gray-500 Journal
-                div.inline.flex.p-4.m-4
-                    p.text-2xl.font-bold Indicatores
-                    div.inline.flex.ml-auto.mx-4.justify-center.items-center   
+                    button.mx-1.rounded-lg.bg-blue-400.text-white.w-36.h-10.shadow-2xl(id='buttonIndicators' onclick=`patientinfo(${JSON.stringify(doctor_name)}, ${JSON.stringify({ firstname: patientname, email: patientemail })})`) Indicators
+                    button.mx-1.rounded-lg.bg-white.text-gray-500.w-36.h-10.border-2.border-gray-500(id='buttonMedications' onclick=`medications()`) Medications
+                    button.mx-1.rounded-lg.bg-white.text-gray-500.w-36.h-10.border-2.border-gray-500(id='buttonDocuments' onclick=`medications()`) Documents
+                    button.mx-1.rounded-lg.bg-white.text-gray-500.w-36.h-10.border-2.border-gray-500(id='buttonJournal' onclick=`journal()`) Journal
+                div.inline.flex.p-4.m-4(id='middleTable') 
+                    button.text-2xl.font-bold(id='indicators' onclick=`patientinfo(${JSON.stringify(doctor_name)}, ${JSON.stringify({ firstname: patientname, email: patientemail })})`) Indicators
+                    div.inline.flex.ml-auto.mx-4.justify-center.items-center.w-20  
                         img(src='bar graph icon.svg' id='toggleGraphBar').h-6.mx-5
                         img(src='menu green icon.svg' id='toggleGraphMenu').h-6.mx-5
-                        img(src='pencil gray icon.svg').h-6.mx-5
+                        div(id='toggleSettings')
+                            img(src='pencil gray icon.svg').h-6.mx-5
+                        div(id='toggleSettingsText')
+                            a(href='#' id='toggleSettingsIcon').underline.text-gray-600.font-bold Show All
+                        div(id='selectDatePeriodWrapper').w-40.rounded-lg.bg-white
+                            select(id='selectDatePeriod')
+                                option(value='1' selected='selected') By week
+                                option(value='2') By month
+                                option(value='3') By year
+                        div(id='medicationsIcons').inline.flex.ml-auto.mx-4.justify-center.items-center 
+                            img(src='log icon.png' onclick='log()').h-6.mx-5
+                            img(src='pencil gray icon.svg' onclick='changeMedicationsList()').h-6
+                            img(src='plus black icon.png' onclick='openNewMedicationModal()').h-6.mx-5    		            
+                        div(id='JournalIcons').inline.flex.ml-auto.mx-4.justify-center.items-center 
+                            img(src='plus black icon.png').h-6.mx-5                        
+                        div(id='JournalIcon').inline.flex.ml-auto.mx-4.justify-center.items-center 
+                            img(src='pencil gray icon.svg' onclick='clickEditJournal()').h-6.mx-5 
+
+            div(id='LogSelectSortWrapper').w-40
+                            select(id='LogSelectSort').inline.flex.ml-auto.mx-4.justify-center.items-center.bg-gray-100 
+                                option(value='0') Sort by 
+                                option(value='1') Medicine 
+                                option(value='2') Date 
 
             table(id='tableBar').px-4.mx-4.w-full.border-separate        
-                each val in [1, 2, 3, 4, 5]
+                each val in ['Heart Rate', 'Steps', 'Burned Calories', 'Activity Duration']
                     tr
-                        td.rounded-lg.bg-white.border-4.border-gray-100
+                        td.rounded-lg.bg-white.border-4.border-gray-100(onclick='clickSetting(\'' + val + '\')')
                             div.inline.flex
                                 div.mx-4
-                                    p.mx-6.ml-auto.flex.text-2xl.font-bold Stress  
+                                    p.mx-6.ml-auto.flex.text-2xl.font-bold #{val} 
                                     p.mx-6.ml-auto.flex 08/11/2023 - 8:45AM 
                                 div.ml-auto.justify-center.items-center.mx-4     
                                     p.text-4xl.font-bold 39
-                        td.rounded-lg.bg-white.border-4.border-gray-100
+                        td.rounded-lg.bg-white.border-4.border-gray-100(onclick='clickSetting(\'' + val + '\')')
                             div.inline.flex
                                 div.mx-4
-                                    p.mx-6.ml-auto.flex.text-2xl.font-bold Body Fat  
+                                    p.mx-6.ml-auto.flex.text-2xl.font-bold #{val}  
                                     p.mx-6.ml-auto.flex 08/11/2023 - 8:45AM 
                                 div.ml-auto.justify-center.items-center.mx-4     
                                     p.text-4xl.font-bold 39
+            
+            table(id='tableMenu').px-4.mx-4.w-full.border-separate        
+                each val in ['Heart Rate', 'Steps', 'Burned Calories', 'Activity Duration']
                     tr
-                        td.rounded-lg.bg-white.border-4.border-gray-100
-                            div.inline.flex
-                                div.mx-4
-                                    p.mx-6.ml-auto.flex.text-2xl.font-bold PM  
-                                    p.mx-6.ml-auto.flex 08/11/2023 - 8:45AM 
-                                div.ml-auto.justify-center.items-center.mx-4     
-                                    p.text-4xl.font-bold 39
-                        td.rounded-lg.bg-white.border-4.border-gray-100
-                            div.inline.flex
-                                div.mx-4
-                                    p.mx-6.ml-auto.flex.text-2xl.font-bold BMI  
-                                    p.mx-6.ml-auto.flex 08/11/2023 - 8:45AM 
-                                div.ml-auto.justify-center.items-center.mx-4     
-                                    p.text-4xl.font-bold 39 
+                        td.rounded-xl.bg-white.border-4.border-gray-100(onclick='clickSetting(\'' + val + '\')')
+                            div
+                                div
+                                    p.m-3.text-2xl.font-bold.text-black #{val}
+                                    div(id=val).chart-container.h-64.w-full  
+                                        canvas(id=val + 'chart')  
 
-            table(id='tableMenu').px-0.mx-0.w-full.border-separate        
-                tr
-                    td.rounded-xl.bg-white.border-4.border-gray-100
+            div(id='tableSettings')
+                table.px-0.mx-0.w-full.border-separate(id='tblSettings')        
+                    tbody
+                    each val in ['Heart Rate', 'Steps', 'Burned Calories', 'Activity Duration']                                                            
+                        tr
+                            td.rounded-lg.bg-white.border-4.border-gray-100(onclick='clickSetting(\'' + val + '\')')
+                                div.inline.flex
+                                    div
+                                        img(src='more icon.png').w-8.h-8.mx-2.flex 
+                                    div.mx-4
+                                        p.mx-6.flex.text-2xl.font-bold #{val}                                      
+                                    div.ml-auto.justify-center.items-center.mx-4.inline.flex     
+                                        p.text-gray-400.mx-4 Show/hide
+                                        label.switch
+                                            input(type='checkbox' checked)
+                                            span.slider.round
+
+                div.bottom-px.right-0.absolute
+                    button.underline.text-gray-600.mx-8 Cancel
+                    button(style={'background' : '#A8CD29'}).text-white.font-bold.w-32.h-12.rounded-xl Save
+
+            div(id='tableSetting')
+                div.chart-container.h-64  
+                    canvas(id='dynamicchart') 
+                    table.px-0.mx-0.w-full    
+                        tr.border-b.border-gray-300
+                            td
+                                div.inline.flex.justify-center.items-center
+                                    p.m-3.text-2xl.text-gray-400 123 STEPS
+                                    p.m-3.text-black.ml-auto Today - 11:45 AM 
+                                    img(src='smartwatch icon.svg').h-8.w-8                                  
+                        tr.border-b.border-gray-300
+                            td
+                                div.inline.flex.justify-center.items-center
+                                    p.m-3.text-2xl.text-gray-400 625 STEPS
+                                    p.m-3.text-black.ml-auto Yesterday - 04:00 PM 
+                                    img(src='smartwatch icon.svg').h-8.w-8  
+                        tr.border-b.border-gray-300
+                            td
+                                div.inline.flex.justify-center.items-center
+                                    p.m-3.text-2xl.text-gray-400 721 STEPS
+                                    p.m-3.text-black.ml-auto 22/08/2023 - 05:00 AM 
+                                    img(src='smartphone icon.svg').h-8.w-8  
+                        tr.border-b.border-gray-300
+                            td
+                                div.inline.flex.justify-center.items-center
+                                    p.m-3.text-2xl.text-gray-400 235 STEPS
+                                    p.m-3.text-black.ml-auto 23/08/2023 - 12:45 AM 
+                                    img(src='smartwatch icon.svg').h-8.w-8  
+                        tr.border-b.border-gray-300
+                            td
+                                div.inline.flex.justify-center.items-center
+                                    p.m-3.text-2xl.text-gray-400 366 STEPS
+                                    p.m-3.text-black.ml-auto 24/08/2023 - 17:15 AM 
+                                    img(src='smartphone icon.svg').h-8.w-8  
+                        tr.border-b.border-gray-300
+                            td
+                                div.inline.flex.justify-center.items-center
+                                    p.m-3.text-2xl.text-gray-400 322 STEPS
+                                    p.m-3.text-black.ml-auto 25/08/2023 - 12:35 AM 
+                                    img(src='smartwatch icon.svg').h-8.w-8  
+                        tr.border-b.border-gray-300
+                            td
+                                div.inline.flex.justify-center.items-center
+                                    p.m-3.text-2xl.text-gray-400 701 STEPS
+                                    p.m-3.text-black.ml-auto 26/08/2023 - 11:45 AM 
+                                    img(src='smartphone icon.svg').h-8.w-8              
+
+            div(id='tableMedications' class='h-5/6').w-full.bg-white.rounded-xl.shadow-3xl.border.border-gray-200.flex
+                table.flex.px-4
+                    tr.h-12.border-b-2.border-gray-200
+                        th.w-16 Type
+                        th.w-44.text-left Name
+                        th.w-32.text-left Start Date
+                        th.w-32.text-left Doze 
+                        th.w-64.text-left Added by
+                        th.w-16 Log
+                        th.w-32.text-left Status
+                    tr.h-12(onclick=`clickMedication()`).border-b-2.border-gray-200
+                        td
+                            img.mx-6.w-4.h-4.flex(src='medicine icon.svg') 
+                        td
+                            p LITORVA 50MG 30TAB  
+                        td
+                            p 22/08/2023  
+                        td 
+                            p 2 a day   
+                        td.
+                            p Dr. Lyn Hannson ( Family doctor )  
+                        td
+                            img.mx-6.w-4.h-4.flex(src='log icon.png')    
+                        td
+                            p Not taking           
+                    tr.h-12(onclick=`clickMedication()`).border-b-2.border-gray-200 
+                        td
+                            img.mx-6.w-4.h-4.flex(src='medicine icon.svg') 
+                        td 
+                            p Valium 50MG   
+                        td 
+                            p 22/08/2023  
+                        td
+                            p 2 a day   
+                        td 
+                            p Dr. Lyn Hannson ( Family doctor )  
+                        td
+                            img.mx-6.w-4.h-4.flex(src='log icon.png')    
+                        td
+                            p Not taking             
+                    tr.h-12(onclick=`clickMedication()`).border-b-2.border-gray-200
+                        td
+                            img.mx-6.w-4.h-4.flex(src='medicine icon.svg') 
+                        td
+                            p Valium 50MG   
+                        td 
+                            p 22/08/2023  
+                        td
+                            p 2 a day   
+                        td
+                            p Dr. Lyn Hannson ( Family doctor )  
+                        td
+                            img.mx-6.w-4.h-4.flex(src='log icon.png')    
+                        td 
+                            p Taking    
+                    tr.h-12(onclick=`clickMedication()`).border-b-2.border-gray-200
+                        td
+                            img.mx-6.w-4.h-4.flex(src='medicine icon.svg') 
+                        td
+                            p Valium 50MG   
+                        td 
+                            p 22/08/2023  
+                        td 
+                            p 2 a day   
+                        td 
+                            p Dr. Lyn Hannson ( Family doctor )  
+                        td
+                            img.mx-6.w-4.h-4.flex(src='log icon.png')    
+                        td 
+                            p Not taking                        
+
+            div(id='tableMedication' class='h-5/6').w-full.bg-white.rounded-xl.shadow-3xl.border.border-gray-200.flex.inline
+                div(class='w-1/2')
+                    p.font-bold.m-4 Medication description 
+                    p.text-sm.m-4 Atorvastatin, sold under the brand name Lipitor among others, is a statin medication used to prevent cardiovascular 
+                        | disease in those at high risk and to treat abnormal lipid levels.[2] 
+                        | For the prevention of cardiovascular disease, statins are a first-line treatment.[2] It is taken by mouth.[2] 
+                    p.text-sm.m-4 Common side effects include joint pain, diarrhea, heartburn, nausea, and muscle pains.[2] Serious side effects 
+                        | may include rhabdomyolysis, liver problems, and diabetes.[2] Use during pregnancy may harm the fetus.[2] Like all 
+                        | statins, atorvastatin works by inhibiting HMG-CoA reductase, an enzyme found in the liver that plays a role in 
+                        | producing cholesterol.[2]  
+                    p.font-bold.mx-4.my-8 Usage   
+                    div.flex.inline.w-44.m-4 
+                        div 
+                            p Dosage: 
+                            p Daily usage: 
+                            p Time: 
+                            p Repeat:
+                        div.ml-auto 
+                            p.font-bold 40MG
+                            p.font-bold 1 a day 
+                            p.font-bold 08:00 AM
+                            p.font-bold Every day
+
+                div.justify-center.items-center.my-16.mx-2.rounded-xl.bg-blue-100.border.border-blue-400.w-96.h-64.flex
+                    img(src='medication.png').m-8.justify-center.items-center.flex
+        
+            div(id='tableMedicationsList' class='h-5/6')
+                table.px-0.mx-0.w-full.border-separate(id='tblMedicationsList')   
+                    tbody
+                    each val in ['LITORVA 40MG 30TAB', 'LITORVA 40MG 30TAB', 'LITORVA 40MG 30TAB', 'LITORVA 40MG 30TAB', 'LITORVA 40MG 30TAB', 'LITORVA 40MG 30TAB', 'LITORVA 40MG 30TAB']                                                            
+                        tr
+                            td.rounded-lg.bg-white.border-4.border-gray-100
+                                div.inline.flex
+                                    div
+                                        img(src='more icon.png').w-8.h-8.mx-2.flex 
+                                    div.mx-4
+                                        p.mx-6.flex.text-2xl.font-bold #{val}                                      
+                                    div.ml-auto.justify-center.items-center.mx-4.inline.flex     
+                                        p.text-gray-400.mx-4 Taking
+                                        label.switch
+                                            input(type='checkbox' checked)
+                                            span.slider.round
+
+                div.bottom-px.right-0.absolute
+                    button.underline.text-gray-600.mx-8 Cancel
+                    button(style={'background' : '#A8CD29'}).text-white.font-bold.w-32.h-12.rounded-xl Save
+
+            div(id='tableLogList' class='h-5/6').w-full.bg-white.rounded-xl.shadow-3xl.border.border-gray-200.flex
+                table.flex.px-4
+                    tr.h-12.border-b-2.border-gray-200
+                        th.w-80.text-left Medicine
+                        th.w-40.text-left Date
+                        th.w-40.text-left Time
+                        th.w-80.text-left Doze                         
+                    each val in ['LITORVA 40MG 30TAB', 'VERRUMAL SOLUTION', 'NEOBLOC', 'OXOPURIN 400', 'MOTILIUM', 'DEPO-PROVERA 500', 'BETNOVATE SCALP APPLICATION', 'ASSIVAL 5 MG']                                                            
+                        tr.h-12(onclick='clickLogRow(\'' + val + '\')').border-b-2.border-gray-200
+                            td
+                                p #{val}
+                            td
+                                p 22/08/2023  
+                            td 
+                                p 08:30AM   
+                            td.
+                                1 tablet                                    
+
+            div(id='rowLog' class='h-5/6').w-full.bg-white.rounded-xl.shadow-3xl.border.border-gray-200
+                p(id='MedicationName').text-left.text-2xl.font-bold.text-gray-700.m-4
+                table.flex.px-4
+                    tr.h-12.border-b-2.border-gray-200
+                        th.w-40.text-left Date
+                        th.w-40.text-left Time
+                        th.w-80.text-left Doze                         
+                    each val in ['04/08/2022', '03/08/2022', '02/08/2022', '01/08/2022']                                                            
+                        tr.h-12.border-b-2.border-gray-200
+                            td
+                                p #{val}
+                            td 
+                                p 08:30AM   
+                            td.
+                                1 tablet   
+
+            div(id='tableJournal' class='h-5/6').w-full.bg-white.rounded-xl.shadow-3xl.border.border-gray-200.flex
+                table.w-full.h-12.mx-6
+                    tr.h-12.border-b-2.border-gray-300.w-100
+                        th.w-60.text-left Date
+                        th.text-left Summary
+                    tr.h-12.border-b-2.border-gray-300.w-100(onclick='clickJournal()') 
+                        td
+                            p 01/08/2022 - 08:45AM 
+                        td
+                            p The patient is complaining of a headache and back pains
+                                
+                    tr.h-12.border-b-2.border-gray-300(onclick='clickJournal()')
+                        td
+                            p 23/07/2022 - 09:12AM 
+                        td 
+                            p The patient is complaining of a headache and back pains                
+                    tr.h-12.border-b-2.border-gray-300(onclick='clickJournal()') 
+                        td
+                            p 18/05/2022 - 11:40AM 
+                        td
+                            p The patient is complaining of a headache and back pains      
+                    tr.h-12.border-b-2.border-gray-300(onclick='clickJournal()') 
+                        td
+                            p 12/04/2022 - 12:25PM
+                        td
+                            p The patient is complaining of a headache and back pains 
+
+            div(id='tableJournala' class='h-5/6').w-full.bg-white.rounded-xl.shadow-3xl.border.border-gray-200.flex
+                div.w-full.m-4
+                    p(class='float-left').font-bold.mb-4 Meeting summary 
+                    p(class='float-right').font-bold.mb-4 01/08/2022 - 08:45AM
+                
+                    hr.w-full.h-6.border-gray-300.flex
+                    p(id='textJournal').text-sm.mb-4 Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has 
+                        | been the industry's standard dummy text ever since the 1500s, when an unknown printer took 
+                        | a galley of type and scrambled it to make a type specimen book. It has survived not only five 
+                        | centuries, but also the leap into electronic typesetting, remaining essentially unchanged. 
+                        | It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum 
+                        | passages, and more recently with desktop publishing software like Aldus PageMaker including 
+                        | versions of Lorem Ipsum.
+                    p.text-sm.mb-4  Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of 
+                        | classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin 
+                        | professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, 
+                        | consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical 
+                        | literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 
+                        | of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. 
+                        | This book is a treatise on the theory of ethics, very popular during the Renaissance. The first 
+                        | line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.          
+                    div.flex
                         div
-                            p.m-3.text-2xl.font-bold.text-black Heart Rate
-                            div(id='heartrate').chart-container.h-64  
-                                canvas(id='heartratechart')  
-
-                tr
-                    td.rounded-xl.bg-white.border-4.border-gray-100
+                            img(src='journal.png').w-60.h-auto.border-2.border-gray-300.mr-6
+                            a(href='#').block.underline.text-center.text-blue-600.text-sm.mt-4.mr-6 Open file
                         div
-                            p.m-3.text-2xl.font-bold.text-black Steps
-                            div(id='step').chart-container.h-64  
-                                canvas(id='stepchart')         
+                            img(src='journal.png').w-60.h-auto.border-2.border-gray-300.mr-6
+                            a(href='#').block.underline.text-center.text-blue-600.text-sm.mt-4.mr-6 Open file
 
-                tr
-                    td.rounded-xl.bg-white.border-4.border-gray-100
-                        div
-                            p.m-3.text-2xl.font-bold.text-black Burned Calories
-                            div(id='burnedcalories').chart-container.h-64  
-                                canvas(id='burnedcalorieschart')  
+            div(id='editJournal' class='h-5/6').w-full.bg-white.rounded-xl.shadow-3xl.border.border-gray-200.flex
+                div.w-full
+                    p(class='float-left').font-bold.mb-4.m-4 Meeting summary 
+                    p(class='float-right').font-bold.mb-4.m-4 01/08/2022 - 08:45AM
+                    div(id='textIcons').flex.h-12.bg-gray-50.w-full.border-t-2.border-b-2.border-gray-300
+                        button.mx-4  Normal
+                        img.w-4.h-auto.mx-6(src='sort icon.svg')     
+                        img.w-5.h-auto.mx-2(src='bold icon.svg')
+                        img.w-4.h-auto.mx-2(src='italic icon.svg')
+                        img.w-6.h-auto.mx-2(src='underline icon.svg')
+                        img.w-6.h-auto.mx-2(src='strikethrough icon.svg')
+                        
+                        img.w-6.h-auto.ml-6.mr-2(src='fontcolor icon.svg')
+                        img.w-5.h-auto.ml-2.mr-6(src='fontfamily icon.svg')
 
-                tr
-                    td.rounded-xl.bg-white.border-4.border-gray-100
-                        div
-                            p.m-3.text-2xl.font-bold.text-black Activity Duration
-                            div(id='activityduration').chart-container.h-64  
-                                canvas(id='activitydurationchart')                                    
+                        img.w-5.h-auto.mx-2(src='list N icon.svg')
+                        img.w-4.h-auto.mx-2(src='list B icon.svg')
+                        
 
-               
-        div.m-4
+                        img.w-6.h-auto.mx-2(src='text align left icon.svg')
+                        img.w-4.h-auto.ml-2.mr-6(src='paragraph icon.svg')
+
+                        img.w-4.h-auto.mx-2(src='link icon.svg')
+                        img.w-4.h-auto.mx-2(src='card icon.svg')
+
+                    div.flex.w-full.m-4    
+                        //span(class='input' role='textbox' contenteditable='true').w-full
+                        textarea(id='journatText' rows='60' class='w-5/6').text-sm.m-8
+                    
+                    div.bottom-px.left-0.absolute.m-6
+                        input(type='checkbox' name='sentToPatient' id='sentToPatient' checked).w-6
+                        label(for='sentToPatient').text-sm Send to patient
+                    div.bottom-px.right-0.absolute  
+                        button.underline.text-gray-600.mx-8 Cancel 
+                        button(style={'background' : '#A8CD29'} ).text-white.font-bold.w-32.h-12.mr-6.mb-4.rounded-xl Save 
+                                   
+
+        div.m-4(id='divChat')
             div.inline.flex.mt-4.mx-4
                 button.h-14.w-5.bg-gray-300.border-2.border-white.rounded-l-lg.border-r-0(id='chatbutton' onclick='clickChatButton()')
                     img(src='arrow right white icon.svg')
@@ -273,13 +573,73 @@ block content
                     img.h-6.w-6.m-2(src='attachment icon.png')   
                     span(class='input' role='textbox' contenteditable='true').w-full.border-0.block 
                     img.h-6.w-10.m-2.p-2.bg-red-700.ml-auto.rounded-xl(src='send white icon.png')    
-
+        
+        div(id='NewMedicationModal')  
+        div(id='NewMedicationModalNext')    
+        div(id='ShareCaregiver').items-center.justify-center.inline-flex.mx-6
+            input(type='checkbox' checked).w-4.h-4.mx-2
+            a(href="#") Share with caregiver 
+    
     script.
+
+        var medication_names = [{id: -1, text: 'Medication'}, 
+                                {id: 0, text: 'Lipitor 10MG'}, 
+                                {id: 1, text: 'Option 2'}, 
+                                {id: 2, text: 'Option 3'}, 
+                                {id: 3, text: 'Option 4'}]
+
+        var when_names = [{id: -1, text: 'Before meal'}, 
+                          {id: 0, text: 'With meal'}, 
+                          {id: 1, text: 'After meal'}, 
+                          {id: 2, text: 'Option 3'}, 
+                          {id: 3, text: 'Option 4'}]
+
+        var type_names = [{id: -1, text: 'Pill'}, 
+                          {id: 0, text: 'Option 1'}, 
+                          {id: 1, text: 'Option 2'}, 
+                          {id: 2, text: 'Option 3'}, 
+                          {id: 3, text: 'Option 4'}]
+
+        var received_names = [{id: -1, text: 'Dr. Lyn Hansen'}, 
+                              {id: 0, text: 'Option 1'}, 
+                              {id: 1, text: 'Option 2'}, 
+                              {id: 2, text: 'Option 3'}, 
+                              {id: 3, text: 'Option 4'}]
+
+        var perday_names = [{id: -1, text: 'One time'}, 
+                            {id: 0, text: 'Two times'}, 
+                            {id: 1, text: 'Three times'}, 
+                            {id: 2, text: 'Option 3'}, 
+                            {id: 3, text: 'Option 4'}]
+
+        var time_names = [{id: -1, text: '08:00AM'}, 
+                          {id: 0, text: 'Option 1'}, 
+                          {id: 1, text: 'Option 2'}, 
+                          {id: 2, text: 'Option 3'}, 
+                          {id: 3, text: 'Option 4'}]  
+
+        var shareWith_names = [{id: -1, text: 'Choose caregiver'}, 
+                               {id: 0, text: 'Option 1'}, 
+                               {id: 1, text: 'Option 2'}, 
+                               {id: 2, text: 'Option 3'}, 
+                               {id: 3, text: 'Option 4'}]                                                                  
+
+        var heartratevalues = []
+        var stepvalues = []
+        var burnedcaloriesvalues = []
+        var activitydurationvalues = []
+
+        var heartratechart
+        var stepchart 
+        var burnedactivitychart 
+        var activitydurationchart 
+
         function clickChatButton()
         {
             $('#chatdivheader').toggle()  
             $('#chatdivfooter').toggle()  
-            $('#chatdiv').toggle()           
+            $('#chatdiv').toggle() 
+            $('#divTables').toggleClass('w-full')                               
         }
         
         // Define array for list of disable dates 
@@ -306,7 +666,8 @@ block content
                     },
                 },
                 options: {
-                    maintainAspectRatio: false,                            
+                    maintainAspectRatio: false, 
+                    responsive: true,                           
                     title: {
                         display: true,
                         text: 'Optimal range',
@@ -355,6 +716,95 @@ block content
         }  
 
         $(document).ready(function() {      
+            $('#NewMedicationModal').dialog({
+                title: 'New medication',
+                autoOpen: false, 
+                modal: true,
+                buttons: [            
+                    { text: 'Cancel', click: function() {$(this).dialog('close')}, class: 'cancelcss' },
+                    { text: 'Next', click: function() { $(this).dialog('close'); openNewMedicationModalNext($("#selectMedication").select2('data')[0].text); }, class: 'savecss' }
+                ],
+                width: 500,
+                height: 800,
+                position: { at: 'top' },
+                
+            })
+            $('#NewMedicationModal').before('<div class="m-12 h-24"><p class="text-xs text-gray-400">Choose</p>' +
+                                     '<select id="selectMedication" class="w-96"/></div></div>' +                                     
+                                     '<table id="buttonsTable" class="border-none"></table>')            
+            
+            $('#NewMedicationModalNext').dialog({
+                title: 'New medication',
+                autoOpen: false, 
+                modal: true,
+                buttons: [            
+                    { text: 'Cancel', click: function() {$(this).dialog('close')}, class: 'cancelcss' },
+                    { text: 'Next', click: function() { $(this).dialog('close'); medications(); }, class: 'savecss' }
+                ],
+                width: 500,
+                height: 800,
+                position: { at: 'top' },
+                
+            })
+            $('#NewMedicationModalNext').before(
+                '<div class="m-12"><div class="inline flex"><img src="tablets blue icon.svg" class="h-12 w-12 mx-6"/><p id="medicineName" class="text-lg font-bold text-gray-500 m-6"/></div>' +
+                '<table>' +
+                    '<tr>' +
+                        '<td class="p-4">' +
+                            '<label>Doze</label>' +
+                            '<div class="inline flex">' +
+                                '<button class="p-4 w-12 h-12 bg-gray-100 rounded-l-lg border border-blue-100">' +
+                                    '<img src="minus icon.svg"></img>' +
+                                '</button>' +
+                                '<p id="selectDoze" class="text-lg font-bold w-12 border border-blue-100 text-center p-2"></p>' +
+                                '<button class="p-4 w-12 h-12 bg-gray-100 rounded-r-lg border border-blue-100">' +
+                                    '<img src="plus black icon.png"></img>' +
+                                '</button>' +
+                            '</div>' +    
+                        '</td>' +
+                        '<td>' +
+                            '<label>When</label>' +
+                            '<div class="inline flex my-2"><select id="selectWhen" class="w-40 my-2"></select></div>' +
+                        '</td>' +
+                    '</tr>' +  
+                        '<tr>' +
+                        '<td class="p-4">' +
+                            '<label>Type</label>' +
+                            '<div class="inline flex my-2"><select id="selectType" class="w-40 my-2"></select></div>' +
+                        '</td>' +
+                        '<td>' +
+                            '<label>Received by</label>' +
+                            '<div class="inline flex my-2"><select id="selectReceived" class="w-40 my-2"></select></div>' +
+                        '</td>' +
+                    '</tr>' +  
+                    '</tr>' +  
+                        '<tr>' +
+                        '<td class="p-4">' +
+                            '<label>Per Day</label>' +
+                            '<div class="inline flex my-2"><select id="selectPerDay" class="w-40 my-2"></select></div>' +
+                        '</td>' +
+                        '<td>' +
+                            '<label>Time</label>' +
+                            '<div class="inline flex my-2"><select id="selectTime" class="w-40 my-2"></select></div>' +
+                        '</td>' +
+                    '</tr>' +  
+                    '</tr>' +  
+                        '<tr>' +
+                        '<td class="p-4 inline flex items-center">' +
+                            '<label class="switch">' +
+                                '<input type="checkbox" checked="checked"/>' +
+                                '<span id="selectEveryDay" class="slider round"/>' +
+                            '</label>' +
+                            '<label class="mx-2">Alery every day</label>' +                            
+                        '</td>' +
+                        '<td>' +
+                            '<label>Share with</label>' +
+                            '<div class="inline flex my-2"><select id="selectShareWith" class="w-40 my-2"></select></div>' +
+                        '</td>' +
+                    '</tr>' +  
+                '</table>')                                                
+                $('.ui-dialog-buttonset').after($('#ShareCaregiver'))  
+
             $('#datepicker').datepicker({
                 beforeShowDay: function(date){
                     var string = jQuery.datepicker.formatDate('yy-mm-dd', date)
@@ -368,9 +818,25 @@ block content
 
             $('#toggleGraphMenu').hide()
             $('#tableMenu').hide()
-
+            $('#tableSettings').hide()
+            $('#tableSetting').hide()
+            $('#toggleSettingsText').hide()
+            $('#selectDatePeriodWrapper').hide()
+            $('#medicationsIcons').hide()
+            $('#JournalIcons').hide()
+            $('#JournalIcon').hide()
+            $('#tableMedications').hide()
+            $('#tableMedication').hide() 
+            $('#tableJournal').hide() 
+            $('#tableJournala').hide()
+            $('#editJournal').hide()   
             $('#patientemail').hide()            
-            
+            $('#ShareCaregiver').hide()  
+            $('#tableMedicationsList').hide()  
+            $('#tableLogList').hide()  
+            $('#LogSelectSortWrapper').hide()
+            $('#rowLog').hide()
+
             var originalLineDraw = Chart.controllers.line.prototype.draw
             // Extend the line chart, in order to override the draw function.
             Chart.helpers.extend(Chart.controllers.line.prototype, {
@@ -413,9 +879,14 @@ block content
                 url: '/getPatientInfo',
                 data: { patientemail:  email },
                 success: function(data) {
+
+                    heartratevalues = []
+                    stepvalues = []
+                    burnedcaloriesvalues = []
+                    activitydurationvalues = []
+                    
                     var jsonvalues = data.data
                     
-                    var heartratevalues = []
                     for (let i = 0; i < jsonvalues.length; i++){
                         if(jsonvalues[i][0] === 'Vitals' && jsonvalues[i][1] === 'Resting Heart Rate')
                             heartratevalues.push([jsonvalues[i][2], jsonvalues[i][3]]) 
@@ -423,10 +894,9 @@ block content
                     heartratevalues = Array.from(new Set(heartratevalues.map(JSON.stringify))).map(JSON.parse)
                     heartratevalues = heartratevalues.sort((a, b) => a[0] - b[0])
 
-                    var ctxheartrate = document.getElementById('heartratechart').getContext('2d')                   
-                    var heartratechart = createChart(ctxheartrate, heartratevalues, 60, 90)
-
-                    var stepvalues = []
+                    var ctxheartrate = document.getElementById('Heart Ratechart').getContext('2d')                   
+                    heartratechart = createChart(ctxheartrate, heartratevalues, 60, 90)
+                    
                     for (let i = 0; i < jsonvalues.length; i++){
                         if(jsonvalues[i][0] === 'Activity' && jsonvalues[i][1] === 'Steps')
                             stepvalues.push([jsonvalues[i][2], jsonvalues[i][3]])  
@@ -434,21 +904,19 @@ block content
                     stepvalues = Array.from(new Set(stepvalues.map(JSON.stringify))).map(JSON.parse)
                     stepvalues = stepvalues.sort((a, b) => a[0] - b[0])
 
-                    var ctxstep = document.getElementById('stepchart').getContext('2d')                   
-                    var stepchart = createChart(ctxstep, stepvalues, 5000, 10000)
+                    var ctxstep = document.getElementById('Stepschart').getContext('2d')                   
+                    stepchart = createChart(ctxstep, stepvalues, 5000, 10000)
 
-                    var burnedcaloriesvalues = []
                     for (let i = 0; i < jsonvalues.length; i++){
                         if(jsonvalues[i][0] === 'Activity' && jsonvalues[i][1] === 'Burned Calories')
-                    burnedcaloriesvalues.push([jsonvalues[i][2], jsonvalues[i][3]])
+                            burnedcaloriesvalues.push([jsonvalues[i][2], jsonvalues[i][3]])
                     }
                     burnedcaloriesvalues = Array.from(new Set(burnedcaloriesvalues.map(JSON.stringify))).map(JSON.parse)
                     burnedcaloriesvalues = burnedcaloriesvalues.sort((a, b) => a[0] - b[0])
 
-                    var ctxburnedcalories = document.getElementById('burnedcalorieschart').getContext('2d')                   
-                    var burnedcalorieschart = createChart(ctxburnedcalories, burnedcaloriesvalues, 1000, 2000)
-
-                    var activitydurationvalues = []
+                    var ctxburnedcalories = document.getElementById('Burned Calorieschart').getContext('2d')                   
+                    burnedcalorieschart = createChart(ctxburnedcalories, burnedcaloriesvalues, 1000, 2000)
+                    
                     for (let i = 0; i < jsonvalues.length; i++){
                         if(jsonvalues[i][0] === 'Activity' && jsonvalues[i][1] === 'Activity Duration')
                             activitydurationvalues.push([jsonvalues[i][2], jsonvalues[i][3]]) 
@@ -456,9 +924,8 @@ block content
                     activitydurationvalues = Array.from(new Set(activitydurationvalues.map(JSON.stringify))).map(JSON.parse)
                     activitydurationvalues = activitydurationvalues.sort((a, b) => a[0] - b[0])
 
-                    var ctxactivityduration = document.getElementById('activitydurationchart').getContext('2d')                   
-                    var activitydurationchart = createChart(ctxactivityduration, activitydurationvalues, 20, 30)
-                                          
+                    var ctxactivityduration = document.getElementById('Activity Durationchart').getContext('2d')                   
+                    activitydurationchart = createChart(ctxactivityduration, activitydurationvalues, 20, 30)                                          
                 },
                 failure: function(errMsg) {
                     alert(errMsg)
@@ -471,11 +938,363 @@ block content
             $('#tableBar, #tableMenu').toggle()
         })
 
+        $('#toggleSettings').click(function(){
+            $('#toggleGraphBar, #toggleGraphMenu').hide()
+            $('#tableBar, #tableMenu').hide()
+            $('#tableSettings').show()
+            
+            $('#indicators').text('Choose indicators to show') 
+            $('#toggleSettings').hide()
+            $('#toggleSettingsText').show()
+
+        })
+
+        var fixHelperModified = function(e, tr) {
+            var $originals = tr.children()
+            var $helper = tr.clone()
+            $helper.children().each(function(index) {
+                $(this).width($originals.eq(index).width())
+            })
+            return $helper
+        }
+        var updateIndex = function(e, ui) {
+            $('td.index', ui.item.parent()).each(function (i) {
+                $(this).html(i + 1)
+            })
+        }
+
+        $("#tblSettings tbody").sortable({
+            helper: fixHelperModified,
+            stop: updateIndex
+        }).disableSelection()
+
+        $("#tblMedicationsList tbody").sortable({
+            helper: fixHelperModified,
+            stop: updateIndex
+        }).disableSelection()
+
+
+        function clickSetting(val)
+        {
+            $('#toggleGraphBar, #toggleGraphMenu, #toggleSettings, #toggleSettingsIcon').hide()
+            $('#tableBar, #tableMenu, #tableSettings').hide()
+            
+            $('#tableSetting').show()
+            
+            $('#indicators').text('Indicators | ' + val) 
+            $('#toggleSettings').hide()            
+            $('#toggleSettingsText').show()
+            
+            $('#selectDatePeriodWrapper').show()            
+            
+            var elem = document.getElementById('dynamicchart').getContext('2d')
+            var list = []
+            var min = 0
+            var max = 0
+            switch (val)
+            {
+                case 'Heart Rate': 
+                    list = heartratevalues
+                    min = 60
+                    max = 90
+                    break
+                case 'Steps': 
+                    list = stepvalues
+                    min = 5000
+                    max = 10000
+                    break
+                case 'Burned Calories': 
+                    list = burnedcaloriesvalues
+                    min = 1000
+                    max = 2000
+                    break
+                case 'Activity Duration': 
+                    list = activitydurationvalues
+                    min = 20
+                    max = 30
+                    break
+                default: 
+                    alert('No this case')
+            }
+            createChart(elem, list, min, max)                                           
+        }
+
+        function medications()
+        {
+            $('#toggleGraphBar, #toggleGraphMenu, #toggleSettings, #toggleSettingsIcon').hide()
+            $('#tableBar, #tableMenu, #tableSettings').hide()
+            $('#tableSetting').hide()
+            $('#toggleSettings').hide()            
+            $('#toggleSettingsText').hide()
+            $('#selectDatePeriodWrapper').hide()  
+            $('#LogSelectSortWrapper').hide() 
+            $('#rowLog').hide()
+            $('#tableMedication').hide()   
+            $('#tableMedicationsList').hide()  
+            $('#tableLogList').hide()
+            
+            $('#indicators').text('Medication & supplements') 
+            $('#indicators').attr('onclick','medications()')
+
+            $('#buttonIndicators').css('background-color', 'white')     
+            $('#buttonMedications').css('background-color', '#54A6F6')    
+            $('#buttonDocuments').css('background-color', 'white')     
+            $('#buttonJournal').css('background-color', 'white')         
+
+            $('#buttonIndicators').css('color', '#656565')     
+            $('#buttonMedications').css('color', 'white')    
+            $('#buttonDocuments').css('color', '#656565')     
+            $('#buttonJournal').css('color', '#656565') 
+
+            $('#buttonIndicators').css('border-width', '2px')     
+            $('#buttonMedications').css('border-width', '0')    
+            $('#buttonDocuments').css('border-width', '2px')     
+            $('#buttonJournal').css('border-width', '2px') 
+
+            $('#buttonIndicators').css('border-color', '#656565')     
+            $('#buttonMedications').css('border-color', 'white')    
+            $('#buttonDocuments').css('border-color', '#656565')     
+            $('#buttonJournal').css('border-color', '#656565')  
+
+            $('#medicationsIcons').show()       
+            $('#tableMedications').show()
+            $('#JournalIcons').hide()
+            $('#JournalIcon').hide()       
+            $('#tableJournal').hide()
+            $('#tableJournala').hide()
+            $('#editJournal').hide()                          
+        }
+
+        function clickMedication()
+        {
+            $('#tableMedications').hide()            
+            $('#indicators').text('Medications | LITORVA 50 MG 30 TAB')                          
+            $('#tableMedication').show()                                  
+        }
+
+        function openNewMedicationModal() {
+            
+            $('#selectMedication').select2({data: medication_names})
+            $('#ShareCaregiver').hide()  
+            $('#NewMedicationModal').dialog('open')
+        } 
+
+        function openNewMedicationModalNext(medication) {            
+            $('#medicineName').text(medication)
+            $('#selectDoze').text('0.5')
+            $('#selectWhen').select2({data: when_names, minimumResultsForSearch: -1})
+            $('#selectType').select2({data: type_names, minimumResultsForSearch: -1})
+            $('#selectReceived').select2({data: received_names})
+            $('#selectPerDay').select2({data: perday_names, minimumResultsForSearch: -1})
+            $('#selectTime').select2({data: time_names, minimumResultsForSearch: -1})
+            $('#selectShareWith').select2({data: shareWith_names, minimumResultsForSearch: -1})
+            $('#NewMedicationModal').hide()
+            $('#NewMedicationModalNext').dialog('open')
+            $('#ShareCaregiver').show()              
+        } 
+
+        function changeMedicationsList()
+        {
+            $('#toggleGraphMenu').hide()
+            $('#tableMenu').hide()
+            $('#tableSettings').hide()
+            $('#tableSetting').hide()
+            $('#toggleSettingsText').hide()
+            $('#selectDatePeriodWrapper').hide()
+            $('#medicationsIcons').hide()
+            $('#tableMedications').hide()
+            $('#tableMedication').hide()    
+            $('#patientemail').hide()            
+            $('#ShareCaregiver').hide()  
+            $('#LogSelectSortWrapper').hide() 
+            $('#tableMedicationsList').hide()  
+            $('#tableLogList').hide()
+            
+            $('#indicators').text('Update Your Medications & Supplements Status')  
+            $('#tableMedicationsList').show()  
+        }
+
+        function log(val)
+        {
+            $('#toggleGraphMenu').hide()
+            $('#tableMenu').hide()
+            $('#tableSettings').hide()
+            $('#tableSetting').hide()
+            $('#toggleSettingsText').hide()
+            $('#selectDatePeriodWrapper').hide()
+            $('#medicationsIcons').hide()
+            $('#tableMedications').hide()
+            $('#tableMedication').hide()    
+            $('#patientemail').hide()            
+            $('#ShareCaregiver').hide()            
+
+            $('#indicators').text('Medication | Log overview all')  
+            $('#tableLogList').show()  
+            $('#LogSelectSortWrapper').show()
+        }
+
+        function clickLogRow(val)
+        {
+            $('#indicators').text('Medication | Log Overview')
+            $('#MedicationName').text(val)
+            $('#tableLogList').hide()  
+            $('#LogSelectSortWrapper').hide() 
+            $('#rowLog').show()
+        }
+
+        function journal(doctorname, patientname, patientemail)
+        {
+            $('#toggleGraphBar, #toggleGraphMenu, #toggleSettings, #toggleSettingsIcon').hide()
+            $('#tableBar, #tableMenu, #tableSettings').hide()
+            $('#tableSetting').hide()
+            $('#toggleSettings').hide()            
+            $('#toggleSettingsText').hide()
+            $('#selectDatePeriodWrapper').hide()  
+         
+            $('#indicators').text('Journal') 
+            $('#indicators').attr('onclick', 'journal()') 
+         
+            $('#buttonIndicators').css('background-color', 'white')     
+            $('#buttonMedications').css('background-color', 'white')    
+            $('#buttonDocuments').css('background-color', 'white')     
+            $('#buttonJournal').css('background-color', '#54A6F6')         
+
+            $('#buttonIndicators').css('color', '#656565')     
+            $('#buttonMedications').css('color', '#656565')    
+            $('#buttonDocuments').css('color', '#656565')     
+            $('#buttonJournal').css('color', 'white') 
+
+            $('#buttonIndicators').css('border-width', '2px')     
+            $('#buttonMedications').css('border-width', '2px')    
+            $('#buttonDocuments').css('border-width', '2px')     
+            $('#buttonJournal').css('border-width', '0') 
+
+            $('#buttonIndicators').css('border-color', '#656565')     
+            $('#buttonMedications').css('border-color', '#656565')    
+            $('#buttonDocuments').css('border-color', '#656565')     
+            $('#buttonJournal').css('border-color', 'white')  
+
+            $('#medicationsIcons').hide()       
+            $('#tableMedications').hide()
+            $('#tableMedication').hide()
+            $('#editJournal').hide()
+            $('#JournalIcon').hide()
+            $('#JournalIcons').show()       
+            $('#tableJournal').show()                          
+        }
+
+        function clickJournal()
+        {
+            $('#tableJournal').hide()
+            $('#JournalIcons').hide()
+            $('#indicators').text('Journal | 01/08/2022 - 08:45AM')                    
+            $('#tableJournala').show()
+            $('#JournalIcon').show()                                          
+        }
+
+
+        var textjournal = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.' 
+                    + 'Lorem Ipsum has been the industry s standard dummy text ever since the 1500s,' 
+                    + 'when an unknown printer took a galley of type and scrambled it to make a type specimen book.' 
+                    + 'It has survived not only five centuries, but also the leap into electronic typesetting,' 
+                    + 'remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset' 
+                    + 'sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like' 
+                    + 'Aldus PageMaker including versions of Lorem Ipsum'                      
+                    + 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of\n' 
+                    + 'classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin' 
+                    + 'professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words,' 
+                    + 'consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical' 
+                    + 'literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33' 
+                    + 'of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC.' 
+                    + 'This book is a treatise on the theory of ethics, very popular during the Renaissance. The first' 
+                    + 'line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.n'
         
+                    
+        function clickEditJournal()
+        {
+            $('#tableJournal').hide()
+            $('#JournalIcons').hide()
+            $('#indicators').text('Journal | 01/08/2022 - 08:45AM')                    
+            $('#tableJournala').hide()
+            $('#JournalIcon').hide() 
+            $('#editJournal').show()
+            $('#journatText').val(textjournal)
+        }    
+
+    style. 
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 43px;
+            height: 24px;
+        }
+
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 5px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #A8CD29;
+        }        
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(18px);
+            -ms-transform: translateX(18px);
+            transform: translateX(18px);
+        }
+
+        .slider.round {
+            border-radius: 24px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+                    
+        #selectDatePeriodWrapper {
+            border-radius:26px;
+            display:inline-block;
+            overflow:hidden;
+            background:'gray';
+            border:0px;
+            padding: 0px 8px;
+        }
+
+        #selectDatePeriod, #LogSelectSort {
+            width:140px;
+            height:30px;
+            border:0px;
+            outline:none;            
+        }
 
 
 
-
-        
+                
     
         

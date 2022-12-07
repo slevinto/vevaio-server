@@ -306,6 +306,11 @@ block content
 
         $(document).ready(function() {         
             
+            $('#overviewbutton').css({'color':'#2D2D2D'}) 
+            $('#patientsbutton').css({'color':'#2D2D2D'}) 
+            $('#calendarbutton').css({'color':'#00AAF3'})
+            $('#alertsbutton').css({'color':'#2D2D2D'})
+
             $('#defaultModal').dialog({
                 title: 'Schedule new appointment',
                 autoOpen: false, 
@@ -437,37 +442,7 @@ block content
             color: gray;
             font-size: 0.675em;
             font-weight: bold; 
-        }
-
-        .ui-widget-overlay {
-            background: rgba(0,0,0,0.8);
-            opacity: .8;
         }        
-        
-        .ui-dialog .ui-dialog-title {
-            text-align: center;
-            width: 100%;
-            padding: 16px;
-            font-size: 1.5em;
-        }
-
-        .savecss {
-            background: #00AAF3;
-            color: white;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            height: 40px;
-            width: 90px;
-        }
-        
-        .cancelcss {
-            color: gray;
-            font-weight: bold;
-            border-radius: 8px;
-            height: 40px;
-            width: 90px;
-        }
 
         .linkcss {
             color: #333333;
@@ -475,19 +450,7 @@ block content
             border-bottom: 1px solid;
             height: 40px;
             align: center;
-        }
-        
-        .select2-container .select2-selection--single {
-            height: 40px !important;
-        }
-
-        .select2-selection__arrow {
-            height: 40px !important;
-        }
-
-        .select2-container--default .select2-selection--single { 
-            background: #F1F1F1; 
-        }
+        }        
 
         #buttonsTable thead th {
             border-bottom: none;
